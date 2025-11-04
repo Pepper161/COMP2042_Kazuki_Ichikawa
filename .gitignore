@@ -5,6 +5,7 @@ target/
 .kotlin
 AGENTS.md
 codex.log
+docs-local/
 
 ### IntelliJ IDEA ###
 .idea/modules.xml
