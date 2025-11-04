@@ -9,13 +9,17 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.geometry.Pos;
 import javafx.scene.Group;
 import javafx.scene.effect.Reflection;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Pane;
+import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
+import javafx.scene.shape.Line;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import javafx.util.Duration;
@@ -26,6 +30,7 @@ import java.util.ResourceBundle;
 public class GuiController implements Initializable {
 
     private static final int BRICK_SIZE = 20;
+    private static final int HIDDEN_ROWS = 2;
 
     @FXML
     private GridPane gamePanel;
@@ -39,6 +44,12 @@ public class GuiController implements Initializable {
     @FXML
     private GameOverPanel gameOverPanel;
 
+    @FXML
+    private StackPane gameLayer;
+
+    @FXML
+    private Pane guidePane;
+
     private Rectangle[][] displayMatrix;
 
     private InputEventListener eventListener;
@@ -51,11 +62,16 @@ public class GuiController implements Initializable {
 
     private final BooleanProperty isGameOver = new SimpleBooleanProperty();
 
+    private Line gameOverGuideLine;
+    private int cachedGameOverRow = Integer.MIN_VALUE;
+
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         Font.loadFont(getClass().getClassLoader().getResource("digital.ttf").toExternalForm(), 38);
         gamePanel.setFocusTraversable(true);
         gamePanel.requestFocus();
+        StackPane.setAlignment(gamePanel, Pos.TOP_LEFT);
+        StackPane.setAlignment(guidePane, Pos.TOP_LEFT);
         gamePanel.setOnKeyPressed(new EventHandler<KeyEvent>() {
             @Override
             public void handle(KeyEvent keyEvent) {
@@ -110,8 +126,9 @@ public class GuiController implements Initializable {
                 brickPanel.add(rectangle, j, i);
             }
         }
-        brickPanel.setLayoutX(gamePanel.getLayoutX() + brick.getxPosition() * brickPanel.getVgap() + brick.getxPosition() * BRICK_SIZE);
-        brickPanel.setLayoutY(-42 + gamePanel.getLayoutY() + brick.getyPosition() * brickPanel.getHgap() + brick.getyPosition() * BRICK_SIZE);
+        brickPanel.setLayoutX(gameLayer.getLayoutX() + brick.getxPosition() * (brickPanel.getVgap() + BRICK_SIZE));
+        brickPanel.setLayoutY(-42 + gameLayer.getLayoutY() + brick.getyPosition() * (brickPanel.getHgap() + BRICK_SIZE));
+        updateGameOverGuide(brick.getGameOverRow());
 
 
         timeLine = new Timeline(new KeyFrame(
@@ -159,13 +176,14 @@ public class GuiController implements Initializable {
 
     private void refreshBrick(ViewData brick) {
         if (isPause.getValue() == Boolean.FALSE) {
-            brickPanel.setLayoutX(gamePanel.getLayoutX() + brick.getxPosition() * brickPanel.getVgap() + brick.getxPosition() * BRICK_SIZE);
-            brickPanel.setLayoutY(-42 + gamePanel.getLayoutY() + brick.getyPosition() * brickPanel.getHgap() + brick.getyPosition() * BRICK_SIZE);
+            brickPanel.setLayoutX(gameLayer.getLayoutX() + brick.getxPosition() * (brickPanel.getVgap() + BRICK_SIZE));
+            brickPanel.setLayoutY(-42 + gameLayer.getLayoutY() + brick.getyPosition() * (brickPanel.getHgap() + BRICK_SIZE));
             for (int i = 0; i < brick.getBrickData().length; i++) {
                 for (int j = 0; j < brick.getBrickData()[i].length; j++) {
                     setRectangleData(brick.getBrickData()[i][j], rectangles[i][j]);
                 }
             }
+            updateGameOverGuide(brick.getGameOverRow());
         }
     }
 
@@ -221,5 +239,38 @@ public class GuiController implements Initializable {
 
     public void pauseGame(ActionEvent actionEvent) {
         gamePanel.requestFocus();
+    }
+
+    private void updateGameOverGuide(int gameOverRow) {
+        if (guidePane == null || displayMatrix == null) {
+            return;
+        }
+        if (cachedGameOverRow == gameOverRow && gameOverGuideLine != null) {
+            return;
+        }
+        int columns = displayMatrix[0].length;
+        int visibleRows = displayMatrix.length - HIDDEN_ROWS;
+        double rowHeight = BRICK_SIZE + gamePanel.getVgap();
+        double boardWidth = columns * BRICK_SIZE + Math.max(0, columns - 1) * gamePanel.getHgap();
+        double boardHeight = visibleRows * BRICK_SIZE + Math.max(0, visibleRows - 1) * gamePanel.getVgap();
+        guidePane.setPrefWidth(boardWidth);
+        guidePane.setPrefHeight(boardHeight);
+        double y = (gameOverRow - HIDDEN_ROWS) * rowHeight;
+        if (y < 0) {
+            y = 0;
+        }
+        if (gameOverGuideLine == null) {
+            gameOverGuideLine = new Line(0, y, boardWidth, y);
+            gameOverGuideLine.setStroke(Color.rgb(220, 20, 60));
+            gameOverGuideLine.setOpacity(0.5);
+            gameOverGuideLine.setStrokeWidth(2);
+            guidePane.getChildren().add(gameOverGuideLine);
+        } else {
+            gameOverGuideLine.setStartX(0);
+            gameOverGuideLine.setEndX(boardWidth);
+            gameOverGuideLine.setStartY(y);
+            gameOverGuideLine.setEndY(y);
+        }
+        cachedGameOverRow = gameOverRow;
     }
 }

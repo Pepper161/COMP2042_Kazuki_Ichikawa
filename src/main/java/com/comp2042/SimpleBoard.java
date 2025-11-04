@@ -8,6 +8,9 @@ import java.awt.*;
 
 public class SimpleBoard implements Board {
 
+    public static final int SPAWN_ROW = -1;
+    public static final int GAME_OVER_ROW = 0;
+
     private final int width;
     private final int height;
     private final BrickGenerator brickGenerator;
@@ -85,7 +88,8 @@ public class SimpleBoard implements Board {
     public boolean createNewBrick() {
         Brick currentBrick = brickGenerator.getBrick();
         brickRotator.setBrick(currentBrick);
-        currentOffset = new Point(4, 10);
+        int spawnColumn = Math.max(0, (currentGameMatrix[0].length / 2) - 1);
+        currentOffset = new Point(spawnColumn, SPAWN_ROW);
         return MatrixOperations.intersect(currentGameMatrix, brickRotator.getCurrentShape(), (int) currentOffset.getX(), (int) currentOffset.getY());
     }
 
@@ -96,7 +100,7 @@ public class SimpleBoard implements Board {
 
     @Override
     public ViewData getViewData() {
-        return new ViewData(brickRotator.getCurrentShape(), (int) currentOffset.getX(), (int) currentOffset.getY(), brickGenerator.getNextBrick().getShapeMatrix().get(0));
+        return new ViewData(brickRotator.getCurrentShape(), (int) currentOffset.getX(), (int) currentOffset.getY(), brickGenerator.getNextBrick().getShapeMatrix().get(0), GAME_OVER_ROW);
     }
 
     @Override
