@@ -11,7 +11,10 @@
     <GridPane fx:id="brickPanel" vgap="1" hgap="1"/>
     <BorderPane styleClass="gameBoard" fx:id="gameBoard">
         <center>
-            <GridPane fx:id="gamePanel" hgap="1" vgap="1" layoutY="30" layoutX="40"/>
+            <StackPane fx:id="gameLayer" layoutX="40" layoutY="30">
+                <GridPane fx:id="gamePanel" hgap="1" vgap="1"/>
+                <Pane fx:id="guidePane" mouseTransparent="true" pickOnBounds="false"/>
+            </StackPane>
         </center>
     </BorderPane>
 
