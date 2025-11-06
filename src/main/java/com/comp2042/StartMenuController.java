@@ -16,8 +16,8 @@ import java.net.URL;
  */
 public class StartMenuController {
 
-    private static final double WINDOW_WIDTH = 300;
-    private static final double WINDOW_HEIGHT = 510;
+    public static final double WINDOW_WIDTH = 300;
+    public static final double WINDOW_HEIGHT = 510;
 
     private Stage primaryStage;
 
@@ -33,6 +33,7 @@ public class StartMenuController {
             FXMLLoader loader = new FXMLLoader(layoutUrl);
             Parent root = loader.load();
             GuiController guiController = loader.getController();
+            guiController.setPrimaryStage(primaryStage);
             Scene scene = new Scene(root, WINDOW_WIDTH, WINDOW_HEIGHT);
             primaryStage.setScene(scene);
             primaryStage.show();
@@ -54,4 +55,3 @@ public class StartMenuController {
         }
     }
 }
-

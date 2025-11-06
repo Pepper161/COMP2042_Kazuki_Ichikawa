@@ -9,9 +9,11 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.geometry.Pos;
 import javafx.scene.Group;
+import javafx.scene.Parent;
 import javafx.scene.effect.Reflection;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
@@ -23,8 +25,11 @@ import javafx.scene.paint.Paint;
 import javafx.scene.shape.Line;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
+import javafx.scene.Scene;
+import javafx.stage.Stage;
 import javafx.util.Duration;
 
+import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 
@@ -65,6 +70,8 @@ public class GuiController implements Initializable {
     private final BooleanProperty isGameOver = new SimpleBooleanProperty();
 
     private GameState gameState = GameState.MENU;
+
+    private Stage primaryStage;
 
     private Line gameOverGuideLine;
     private int cachedGameOverRow = Integer.MIN_VALUE;
@@ -107,6 +114,7 @@ public class GuiController implements Initializable {
         gameOverPanel.setVisible(false);
         gameOverPanel.setManaged(false);
         gameOverPanel.setOnRestart(this::startNewGameSession);
+        gameOverPanel.setOnMainMenu(this::returnToMainMenu);
         gameOverPanel.setOnExit(Platform::exit);
 
         final Reflection reflection = new Reflection();
@@ -241,6 +249,10 @@ public class GuiController implements Initializable {
     public void bindScore(IntegerProperty integerProperty) {
     }
 
+    public void setPrimaryStage(Stage primaryStage) {
+        this.primaryStage = primaryStage;
+    }
+
     public void gameOver() {
         setGameState(GameState.GAME_OVER);
     }
@@ -267,6 +279,33 @@ public class GuiController implements Initializable {
         ViewData freshState = eventListener.createNewGame();
         applyBrickView(freshState);
         setGameState(GameState.PLAYING);
+    }
+
+    private void returnToMainMenu() {
+        if (timeLine != null) {
+            timeLine.stop();
+        }
+        setGameState(GameState.MENU);
+        if (gamePanel != null) {
+            gamePanel.setFocusTraversable(false);
+        }
+        if (primaryStage == null) {
+            throw new IllegalStateException("Primary stage has not been set on GuiController.");
+        }
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("StartMenu.fxml"));
+            Parent menuRoot = loader.load();
+            StartMenuController menuController = loader.getController();
+            menuController.setPrimaryStage(primaryStage);
+            Scene currentScene = primaryStage.getScene();
+            double width = currentScene != null ? currentScene.getWidth() : StartMenuController.WINDOW_WIDTH;
+            double height = currentScene != null ? currentScene.getHeight() : StartMenuController.WINDOW_HEIGHT;
+            Scene menuScene = new Scene(menuRoot, width, height);
+            primaryStage.setScene(menuScene);
+            primaryStage.show();
+        } catch (IOException e) {
+            throw new IllegalStateException("Failed to load StartMenu.fxml", e);
+        }
     }
 
     public GameState getGameState() {
