@@ -63,7 +63,7 @@ public class GuiController implements Initializable {
 
     private final BooleanProperty isGameOver = new SimpleBooleanProperty();
 
-    private GameState gameState = GameState.PLAYING;
+    private GameState gameState = GameState.MENU;
 
     private Line gameOverGuideLine;
     private int cachedGameOverRow = Integer.MIN_VALUE;
@@ -279,6 +279,9 @@ public class GuiController implements Initializable {
                 throw new IllegalStateException("Unhandled game state: " + gameState);
         }
         updateTimelinePlayback();
+        if (gameState == GameState.PLAYING && gamePanel != null) {
+            gamePanel.requestFocus();
+        }
     }
 
     private void updateTimelinePlayback() {

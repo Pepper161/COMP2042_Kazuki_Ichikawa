@@ -70,3 +70,10 @@
     -fx-fill: yellow;
     -fx-text-fill: yellow;
 }
+
+.menu-title {
+    -fx-font-family: "Let's go Digital";
+    -fx-font-size: 48;
+    -fx-text-fill: yellow;
+    -fx-effect: dropshadow(two-pass-box, rgba(0, 0, 0, 0.6), 4, 0.0, 0, 2);
+}
