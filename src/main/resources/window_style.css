@@ -77,3 +77,12 @@
     -fx-text-fill: yellow;
     -fx-effect: dropshadow(two-pass-box, rgba(0, 0, 0, 0.6), 4, 0.0, 0, 2);
 }
+
+.game-over-panel {
+    -fx-background-color: rgba(0, 0, 0, 0.78);
+    -fx-padding: 24;
+    -fx-background-radius: 14;
+    -fx-border-radius: 14;
+    -fx-border-width: 2;
+    -fx-border-color: rgba(255, 255, 255, 0.35);
+}

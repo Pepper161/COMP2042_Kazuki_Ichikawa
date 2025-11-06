@@ -2,6 +2,7 @@ package com.comp2042;
 
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
+import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -104,6 +105,9 @@ public class GuiController implements Initializable {
             }
         });
         gameOverPanel.setVisible(false);
+        gameOverPanel.setManaged(false);
+        gameOverPanel.setOnRestart(this::startNewGameSession);
+        gameOverPanel.setOnExit(Platform::exit);
 
         final Reflection reflection = new Reflection();
         reflection.setFraction(0.8);
@@ -131,9 +135,7 @@ public class GuiController implements Initializable {
                 brickPanel.add(rectangle, j, i);
             }
         }
-        brickPanel.setLayoutX(gameLayer.getLayoutX() + brick.getxPosition() * (brickPanel.getVgap() + BRICK_SIZE));
-        brickPanel.setLayoutY(-42 + gameLayer.getLayoutY() + brick.getyPosition() * (brickPanel.getHgap() + BRICK_SIZE));
-        updateGameOverGuide(brick.getGameOverRow());
+        applyBrickView(brick);
 
 
         timeLine = new Timeline(new KeyFrame(
@@ -180,15 +182,11 @@ public class GuiController implements Initializable {
 
 
     private void refreshBrick(ViewData brick) {
+        if (brick == null) {
+            return;
+        }
         if (gameState == GameState.PLAYING && isPause.getValue() == Boolean.FALSE) {
-            brickPanel.setLayoutX(gameLayer.getLayoutX() + brick.getxPosition() * (brickPanel.getVgap() + BRICK_SIZE));
-            brickPanel.setLayoutY(-42 + gameLayer.getLayoutY() + brick.getyPosition() * (brickPanel.getHgap() + BRICK_SIZE));
-            for (int i = 0; i < brick.getBrickData().length; i++) {
-                for (int j = 0; j < brick.getBrickData()[i].length; j++) {
-                    setRectangleData(brick.getBrickData()[i][j], rectangles[i][j]);
-                }
-            }
-            updateGameOverGuide(brick.getGameOverRow());
+            applyBrickView(brick);
         }
     }
 
@@ -198,6 +196,21 @@ public class GuiController implements Initializable {
                 setRectangleData(board[i][j], displayMatrix[i][j]);
             }
         }
+    }
+
+    private void applyBrickView(ViewData brick) {
+        if (brick == null || rectangles == null || brickPanel == null || gameLayer == null) {
+            return;
+        }
+        brickPanel.setLayoutX(gameLayer.getLayoutX() + brick.getxPosition() * (brickPanel.getVgap() + BRICK_SIZE));
+        brickPanel.setLayoutY(-42 + gameLayer.getLayoutY() + brick.getyPosition() * (brickPanel.getHgap() + BRICK_SIZE));
+        int[][] brickData = brick.getBrickData();
+        for (int i = 0; i < brickData.length; i++) {
+            for (int j = 0; j < brickData[i].length; j++) {
+                setRectangleData(brickData[i][j], rectangles[i][j]);
+            }
+        }
+        updateGameOverGuide(brick.getGameOverRow());
     }
 
     private void setRectangleData(int color, Rectangle rectangle) {
@@ -233,17 +246,27 @@ public class GuiController implements Initializable {
     }
 
     public void newGame(ActionEvent actionEvent) {
-        if (timeLine != null) {
-            timeLine.stop();
-        }
-        gameOverPanel.setVisible(false);
-        eventListener.createNewGame();
-        gamePanel.requestFocus();
-        setGameState(GameState.PLAYING);
+        startNewGameSession();
     }
 
     public void pauseGame(ActionEvent actionEvent) {
         gamePanel.requestFocus();
+    }
+
+    private void startNewGameSession() {
+        if (timeLine != null) {
+            timeLine.stop();
+        }
+        if (gameOverPanel != null) {
+            gameOverPanel.setVisible(false);
+            gameOverPanel.setManaged(false);
+        }
+        if (eventListener == null) {
+            return;
+        }
+        ViewData freshState = eventListener.createNewGame();
+        applyBrickView(freshState);
+        setGameState(GameState.PLAYING);
     }
 
     public GameState getGameState() {
@@ -263,17 +286,26 @@ public class GuiController implements Initializable {
             case MENU:
                 isPause.setValue(Boolean.TRUE);
                 isGameOver.setValue(Boolean.FALSE);
-                gameOverPanel.setVisible(false);
+                if (gameOverPanel != null) {
+                    gameOverPanel.setVisible(false);
+                    gameOverPanel.setManaged(false);
+                }
                 break;
             case PLAYING:
                 isPause.setValue(Boolean.FALSE);
                 isGameOver.setValue(Boolean.FALSE);
-                gameOverPanel.setVisible(false);
+                if (gameOverPanel != null) {
+                    gameOverPanel.setVisible(false);
+                    gameOverPanel.setManaged(false);
+                }
                 break;
             case GAME_OVER:
                 isPause.setValue(Boolean.TRUE);
                 isGameOver.setValue(Boolean.TRUE);
-                gameOverPanel.setVisible(true);
+                if (gameOverPanel != null) {
+                    gameOverPanel.setVisible(true);
+                    gameOverPanel.setManaged(true);
+                }
                 break;
             default:
                 throw new IllegalStateException("Unhandled game state: " + gameState);
