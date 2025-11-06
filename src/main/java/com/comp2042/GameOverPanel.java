@@ -13,6 +13,7 @@ public class GameOverPanel extends BorderPane {
 
     private Runnable onRestart = () -> {};
     private Runnable onExit = () -> {};
+    private Runnable onMainMenu = () -> {};
 
     public GameOverPanel() {
         final Label gameOverLabel = new Label("GAME OVER");
@@ -22,11 +23,15 @@ public class GameOverPanel extends BorderPane {
         restartButton.getStyleClass().add("ipad-dark-grey");
         restartButton.setOnAction(event -> onRestart.run());
 
+        Button menuButton = new Button("Main Menu");
+        menuButton.getStyleClass().add("ipad-dark-grey");
+        menuButton.setOnAction(event -> onMainMenu.run());
+
         Button exitButton = new Button("Exit");
         exitButton.getStyleClass().add("ipad-dark-grey");
         exitButton.setOnAction(event -> onExit.run());
 
-        VBox container = new VBox(18, gameOverLabel, restartButton, exitButton);
+        VBox container = new VBox(18, gameOverLabel, restartButton, menuButton, exitButton);
         container.setAlignment(Pos.CENTER);
         container.setFillWidth(false);
 
@@ -40,5 +45,9 @@ public class GameOverPanel extends BorderPane {
 
     public void setOnExit(Runnable onExit) {
         this.onExit = onExit != null ? onExit : () -> {};
+    }
+
+    public void setOnMainMenu(Runnable onMainMenu) {
+        this.onMainMenu = onMainMenu != null ? onMainMenu : () -> {};
     }
 }
