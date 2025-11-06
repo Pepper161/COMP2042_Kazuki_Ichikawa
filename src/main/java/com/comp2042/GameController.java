@@ -16,6 +16,9 @@ public class GameController implements InputEventListener {
 
     @Override
     public DownData onDownEvent(MoveEvent event) {
+        if (viewGuiController.getGameState() != GameState.PLAYING) {
+            return new DownData(null, board.getViewData());
+        }
         boolean canMove = board.moveBrickDown();
         ClearRow clearRow = null;
         if (!canMove) {
@@ -40,18 +43,27 @@ public class GameController implements InputEventListener {
 
     @Override
     public ViewData onLeftEvent(MoveEvent event) {
+        if (viewGuiController.getGameState() != GameState.PLAYING) {
+            return board.getViewData();
+        }
         board.moveBrickLeft();
         return board.getViewData();
     }
 
     @Override
     public ViewData onRightEvent(MoveEvent event) {
+        if (viewGuiController.getGameState() != GameState.PLAYING) {
+            return board.getViewData();
+        }
         board.moveBrickRight();
         return board.getViewData();
     }
 
     @Override
     public ViewData onRotateEvent(MoveEvent event) {
+        if (viewGuiController.getGameState() != GameState.PLAYING) {
+            return board.getViewData();
+        }
         board.rotateLeftBrick();
         return board.getViewData();
     }
