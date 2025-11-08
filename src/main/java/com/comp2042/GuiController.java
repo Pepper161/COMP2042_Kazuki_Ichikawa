@@ -4,7 +4,6 @@ import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -47,6 +46,9 @@ public class GuiController implements Initializable {
 
     @FXML
     private GridPane brickPanel;
+
+    @FXML
+    private HudPanel hudPanel;
 
     @FXML
     private GameOverPanel gameOverPanel;
@@ -246,7 +248,10 @@ public class GuiController implements Initializable {
         this.eventListener = eventListener;
     }
 
-    public void bindScore(IntegerProperty integerProperty) {
+    public void bindScore(Score score) {
+        if (hudPanel != null && score != null) {
+            hudPanel.bindScore(score);
+        }
     }
 
     public void setPrimaryStage(Stage primaryStage) {
