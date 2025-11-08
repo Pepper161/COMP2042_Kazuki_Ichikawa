@@ -2,9 +2,12 @@ package com.comp2042;
 
 public class GameController implements InputEventListener {
 
-    private Board board = new SimpleBoard(25, 10);
+    private static final int LOCK_DELAY_TICKS = 8;
 
     private final GuiController viewGuiController;
+    private final Board board = new SimpleBoard(25, 10);
+    private int lockDelayCounter = LOCK_DELAY_TICKS;
+    private boolean lockPending = false;
 
     public GameController(GuiController c) {
         viewGuiController = c;
@@ -22,21 +25,12 @@ public class GameController implements InputEventListener {
         boolean canMove = board.moveBrickDown();
         ClearRow clearRow = null;
         if (!canMove) {
-            board.mergeBrickToBackground();
-            clearRow = board.clearRows();
-            if (clearRow.getLinesRemoved() > 0) {
-                board.getScore().add(clearRow.getScoreBonus());
-            }
-            if (board.createNewBrick()) {
-                viewGuiController.gameOver();
-            }
-
-            viewGuiController.refreshGameBackground(board.getBoardMatrix());
-
+            clearRow = handleLockDelay();
         } else {
             if (event.getEventSource() == EventSource.USER) {
                 board.getScore().add(1);
             }
+            resetLockDelay();
         }
         return new DownData(clearRow, board.getViewData());
     }
@@ -46,7 +40,9 @@ public class GameController implements InputEventListener {
         if (viewGuiController.getGameState() != GameState.PLAYING) {
             return board.getViewData();
         }
-        board.moveBrickLeft();
+        if (board.moveBrickLeft()) {
+            resetLockDelay();
+        }
         return board.getViewData();
     }
 
@@ -55,7 +51,9 @@ public class GameController implements InputEventListener {
         if (viewGuiController.getGameState() != GameState.PLAYING) {
             return board.getViewData();
         }
-        board.moveBrickRight();
+        if (board.moveBrickRight()) {
+            resetLockDelay();
+        }
         return board.getViewData();
     }
 
@@ -64,7 +62,9 @@ public class GameController implements InputEventListener {
         if (viewGuiController.getGameState() != GameState.PLAYING) {
             return board.getViewData();
         }
-        board.rotateLeftBrick();
+        if (board.rotateLeftBrick()) {
+            resetLockDelay();
+        }
         return board.getViewData();
     }
 
@@ -73,6 +73,40 @@ public class GameController implements InputEventListener {
     public ViewData createNewGame() {
         board.newGame();
         viewGuiController.refreshGameBackground(board.getBoardMatrix());
+        resetLockDelay();
         return board.getViewData();
+    }
+
+    private ClearRow handleLockDelay() {
+        if (!lockPending) {
+            lockPending = true;
+            lockDelayCounter = LOCK_DELAY_TICKS;
+            return null;
+        }
+        lockDelayCounter--;
+        if (lockDelayCounter <= 0) {
+            return lockCurrentPiece();
+        }
+        return null;
+    }
+
+    private ClearRow lockCurrentPiece() {
+        board.mergeBrickToBackground();
+        ClearRow clearRow = board.clearRows();
+        if (clearRow.getLinesRemoved() > 0) {
+            board.getScore().add(clearRow.getScoreBonus());
+        }
+        boolean isGameOver = board.createNewBrick();
+        viewGuiController.refreshGameBackground(board.getBoardMatrix());
+        if (isGameOver) {
+            viewGuiController.gameOver();
+        }
+        resetLockDelay();
+        return clearRow;
+    }
+
+    private void resetLockDelay() {
+        lockPending = false;
+        lockDelayCounter = LOCK_DELAY_TICKS;
     }
 }
