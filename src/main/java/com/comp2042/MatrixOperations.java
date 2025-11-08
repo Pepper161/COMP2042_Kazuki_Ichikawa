@@ -1,5 +1,6 @@
 package com.comp2042;
 
+import java.awt.Point;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
@@ -30,6 +31,10 @@ public class MatrixOperations {
             }
         }
         return false;
+    }
+
+    public static boolean intersect(final int[][] matrix, final int[][] brick, Point offset) {
+        return intersect(matrix, brick, (int) offset.getX(), (int) offset.getY());
     }
 
     private static boolean checkOutOfBound(int[][] matrix, int targetX, int targetY) {
