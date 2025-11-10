@@ -5,11 +5,14 @@ import com.comp2042.logic.bricks.BrickGenerator;
 import com.comp2042.logic.bricks.PieceGenerator;
 
 import java.awt.*;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class SimpleBoard implements Board {
 
     public static final int SPAWN_ROW = -1;
     public static final int GAME_OVER_ROW = 0;
+    private static final int NEXT_PREVIEW_COUNT = 5;
 
     private final int width;
     private final int height;
@@ -72,21 +75,13 @@ public class SimpleBoard implements Board {
     }
 
     @Override
-    public boolean rotateLeftBrick() {
-        NextShapeInfo rotationInfo = brickRotator.getNextShape();
-        int[][] rotatedShape = rotationInfo.getShape();
-        Point[] kicks = rotationInfo.getKicks();
-        for (Point kick : kicks) {
-            Point candidateOffset = new Point(currentOffset);
-            candidateOffset.translate((int) kick.getX(), (int) kick.getY());
-            boolean conflict = MatrixOperations.intersect(currentGameMatrix, rotatedShape, candidateOffset);
-            if (!conflict) {
-                brickRotator.setCurrentShape(rotationInfo.getPosition());
-                currentOffset = candidateOffset;
-                return true;
-            }
-        }
-        return false;
+    public boolean rotateClockwise() {
+        return attemptRotation(brickRotator.getNextShapeClockwise());
+    }
+
+    @Override
+    public boolean rotateCounterClockwise() {
+        return attemptRotation(brickRotator.getNextShapeCounterClockwise());
     }
 
     @Override
@@ -105,7 +100,12 @@ public class SimpleBoard implements Board {
 
     @Override
     public ViewData getViewData() {
-        return new ViewData(brickRotator.getCurrentShape(), (int) currentOffset.getX(), (int) currentOffset.getY(), brickGenerator.getNextBrick().getShapeMatrix().get(0), GAME_OVER_ROW);
+        return new ViewData(
+                brickRotator.getCurrentShape(),
+                (int) currentOffset.getX(),
+                (int) currentOffset.getY(),
+                collectNextPreview(),
+                GAME_OVER_ROW);
     }
 
     @Override
@@ -132,5 +132,34 @@ public class SimpleBoard implements Board {
         currentGameMatrix = new int[width][height];
         score.reset();
         createNewBrick();
+    }
+
+    private List<int[][]> collectNextPreview() {
+        return brickGenerator.peekUpcoming(NEXT_PREVIEW_COUNT)
+                .stream()
+                .map(brick -> {
+                    List<int[][]> rotations = brick.getShapeMatrix();
+                    if (rotations.isEmpty()) {
+                        return new int[0][0];
+                    }
+                    return MatrixOperations.copy(rotations.get(0));
+                })
+                .collect(Collectors.toList());
+    }
+
+    private boolean attemptRotation(NextShapeInfo rotationInfo) {
+        int[][] rotatedShape = rotationInfo.getShape();
+        Point[] kicks = rotationInfo.getKicks();
+        for (Point kick : kicks) {
+            Point candidateOffset = new Point(currentOffset);
+            candidateOffset.translate((int) kick.getX(), (int) kick.getY());
+            boolean conflict = MatrixOperations.intersect(currentGameMatrix, rotatedShape, candidateOffset);
+            if (!conflict) {
+                brickRotator.setCurrentShape(rotationInfo.getPosition());
+                currentOffset = candidateOffset;
+                return true;
+            }
+        }
+        return false;
     }
 }

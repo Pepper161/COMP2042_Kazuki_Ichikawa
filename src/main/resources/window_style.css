@@ -101,3 +101,23 @@
     -fx-font-size: 18;
     -fx-text-fill: #f0f0f0;
 }
+
+.next-queue-panel {
+    -fx-background-color: rgba(0, 0, 0, 0.55);
+    -fx-padding: 12;
+    -fx-background-radius: 8;
+    -fx-border-radius: 8;
+    -fx-border-color: rgba(255, 255, 255, 0.2);
+    -fx-border-width: 1;
+}
+
+.next-queue-title {
+    -fx-font-family: "Let's go Digital";
+    -fx-font-size: 20;
+    -fx-text-fill: yellow;
+}
+
+.next-queue-cell {
+    -fx-stroke: rgba(255, 255, 255, 0.25);
+    -fx-stroke-width: 0.5;
+}

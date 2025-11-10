@@ -6,6 +6,7 @@ import com.comp2042.logic.bricks.TetrominoType;
 import org.junit.jupiter.api.Test;
 
 import java.util.EnumSet;
+import java.util.List;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -37,5 +38,14 @@ class PieceGeneratorTest {
         }
         assertEquals(EnumSet.allOf(TetrominoType.class), bag);
     }
-}
 
+    @Test
+    void peekUpcomingReturnsFiveWithoutConsumingQueue() {
+        PieceGenerator generator = new PieceGenerator();
+        List<Brick> preview = generator.peekUpcoming(5);
+        assertEquals(5, preview.size());
+        Brick nextFromPeek = preview.get(0);
+        Brick actualNext = generator.getBrick();
+        assertEquals(nextFromPeek.getType(), actualNext.getType());
+    }
+}

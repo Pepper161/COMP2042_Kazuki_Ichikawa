@@ -45,11 +45,21 @@ public class GameController implements InputEventListener {
     }
 
     @Override
-    public ViewData onRotateEvent(MoveEvent event) {
+    public ViewData onRotateClockwise(MoveEvent event) {
         if (viewGuiController.getGameState() != GameState.PLAYING) {
             return board.getViewData();
         }
-        ViewData data = logic.rotate();
+        ViewData data = logic.rotateClockwise();
+        syncBoardState();
+        return data;
+    }
+
+    @Override
+    public ViewData onRotateCounterClockwise(MoveEvent event) {
+        if (viewGuiController.getGameState() != GameState.PLAYING) {
+            return board.getViewData();
+        }
+        ViewData data = logic.rotateCounterClockwise();
         syncBoardState();
         return data;
     }
