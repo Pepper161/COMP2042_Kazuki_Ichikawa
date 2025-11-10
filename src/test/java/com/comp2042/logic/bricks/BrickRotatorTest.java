@@ -15,7 +15,7 @@ class BrickRotatorTest {
     void standardPiecesUseStandardKickTable() {
         BrickRotator rotator = new BrickRotator();
         rotator.setBrick(new TBrick());
-        NextShapeInfo nextShape = rotator.getNextShape();
+        NextShapeInfo nextShape = rotator.getNextShapeClockwise();
         Point[] kicks = nextShape.getKicks();
         assertEquals(5, kicks.length);
         assertEquals(new Point(0, 0), kicks[0]);
@@ -27,12 +27,22 @@ class BrickRotatorTest {
     void iPieceUsesIKickTable() {
         BrickRotator rotator = new BrickRotator();
         rotator.setBrick(new IBrick());
-        NextShapeInfo nextShape = rotator.getNextShape();
+        NextShapeInfo nextShape = rotator.getNextShapeClockwise();
         Point[] kicks = nextShape.getKicks();
         assertEquals(5, kicks.length);
         assertEquals(new Point(0, 0), kicks[0]);
         assertEquals(new Point(-2, 0), kicks[1]);
         assertEquals(new Point(1, 0), kicks[2]);
     }
-}
 
+    @Test
+    void counterClockwiseUsesCorrectKickTable() {
+        BrickRotator rotator = new BrickRotator();
+        rotator.setBrick(new TBrick());
+        NextShapeInfo previousShape = rotator.getNextShapeCounterClockwise();
+        Point[] kicks = previousShape.getKicks();
+        assertEquals(5, kicks.length);
+        assertEquals(new Point(0, 0), kicks[0]);
+        assertEquals(new Point(1, 0), kicks[1]);
+    }
+}

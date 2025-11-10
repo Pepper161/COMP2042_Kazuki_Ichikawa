@@ -4,6 +4,7 @@ import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Deque;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -38,6 +39,26 @@ public class PieceGenerator implements BrickGenerator {
         return queue.peek();
     }
 
+    @Override
+    public List<Brick> peekUpcoming(int count) {
+        if (count <= 0) {
+            return Collections.emptyList();
+        }
+        ensureQueueSize(count);
+        List<Brick> preview = new ArrayList<>(count);
+        Iterator<Brick> iterator = queue.iterator();
+        for (int i = 0; i < count && iterator.hasNext(); i++) {
+            preview.add(iterator.next());
+        }
+        return preview;
+    }
+
+    private void ensureQueueSize(int minSize) {
+        while (queue.size() < minSize) {
+            refillBag();
+        }
+    }
+
     private void refillBag() {
         List<Brick> bag = new ArrayList<>(7);
         bag.add(new IBrick());
@@ -51,4 +72,3 @@ public class PieceGenerator implements BrickGenerator {
         queue.addAll(bag);
     }
 }
-

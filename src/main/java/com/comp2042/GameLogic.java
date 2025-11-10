@@ -7,12 +7,14 @@ package com.comp2042;
 public class GameLogic {
 
     private static final int LOCK_DELAY_TICKS = 8;
+    private static final int LOCK_RESET_CAP = 15;
 
     private final Board board;
     private int lockDelayCounter = LOCK_DELAY_TICKS;
     private boolean lockPending = false;
     private boolean boardRefreshRequested = false;
     private boolean gameOverTriggered = false;
+    private int lockResetsRemaining = LOCK_RESET_CAP;
 
     public GameLogic(Board board) {
         this.board = board;
@@ -27,35 +29,42 @@ public class GameLogic {
             if (event.getEventSource() == EventSource.USER) {
                 board.getScore().add(1);
             }
-            resetLockDelay();
+            resetLockDelayState();
         }
         return new DownData(clearRow, board.getViewData());
     }
 
     public ViewData moveLeft() {
         if (board.moveBrickLeft()) {
-            resetLockDelay();
+            refreshLockDelayIfGrounded();
         }
         return board.getViewData();
     }
 
     public ViewData moveRight() {
         if (board.moveBrickRight()) {
-            resetLockDelay();
+            refreshLockDelayIfGrounded();
         }
         return board.getViewData();
     }
 
-    public ViewData rotate() {
-        if (board.rotateLeftBrick()) {
-            resetLockDelay();
+    public ViewData rotateClockwise() {
+        if (board.rotateClockwise()) {
+            refreshLockDelayIfGrounded();
+        }
+        return board.getViewData();
+    }
+
+    public ViewData rotateCounterClockwise() {
+        if (board.rotateCounterClockwise()) {
+            refreshLockDelayIfGrounded();
         }
         return board.getViewData();
     }
 
     public ViewData newGame() {
         board.newGame();
-        resetLockDelay();
+        resetLockDelayState();
         boardRefreshRequested = true;
         return board.getViewData();
     }
@@ -84,6 +93,7 @@ public class GameLogic {
         if (!lockPending) {
             lockPending = true;
             lockDelayCounter = LOCK_DELAY_TICKS;
+            lockResetsRemaining = LOCK_RESET_CAP;
             return null;
         }
         lockDelayCounter--;
@@ -105,12 +115,21 @@ public class GameLogic {
         if (newBrickConflict) {
             gameOverTriggered = true;
         }
-        resetLockDelay();
+        resetLockDelayState();
         return clearRow;
     }
 
-    private void resetLockDelay() {
+    private void resetLockDelayState() {
         lockPending = false;
         lockDelayCounter = LOCK_DELAY_TICKS;
+        lockResetsRemaining = LOCK_RESET_CAP;
+    }
+
+    private void refreshLockDelayIfGrounded() {
+        if (!lockPending || lockResetsRemaining <= 0) {
+            return;
+        }
+        lockDelayCounter = LOCK_DELAY_TICKS;
+        lockResetsRemaining--;
     }
 }

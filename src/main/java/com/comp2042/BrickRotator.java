@@ -133,12 +133,12 @@ public class BrickRotator {
     private TetrominoType type = TetrominoType.O;
     private int currentShape = 0;
 
-    public NextShapeInfo getNextShape() {
-        int from = currentShape;
-        int to = (currentShape + 1) % ORIENTATION_COUNT;
-        int[][] rotatedShape = MatrixOperations.copy(getShapeForOrientation(to));
-        Point[] kicks = getKickData(from, to);
-        return new NextShapeInfo(rotatedShape, to, kicks);
+    public NextShapeInfo getNextShapeClockwise() {
+        return createNextShape(1);
+    }
+
+    public NextShapeInfo getNextShapeCounterClockwise() {
+        return createNextShape(-1);
     }
 
     public int[][] getCurrentShape() {
@@ -161,6 +161,14 @@ public class BrickRotator {
         }
         int index = Math.floorMod(orientation, rotations.size());
         return rotations.get(index);
+    }
+
+    private NextShapeInfo createNextShape(int delta) {
+        int from = currentShape;
+        int to = Math.floorMod(currentShape + delta, ORIENTATION_COUNT);
+        int[][] rotatedShape = MatrixOperations.copy(getShapeForOrientation(to));
+        Point[] kicks = getKickData(from, to);
+        return new NextShapeInfo(rotatedShape, to, kicks);
     }
 
     private Point[] getKickData(int from, int to) {

@@ -51,6 +51,9 @@ public class GuiController implements Initializable {
     private HudPanel hudPanel;
 
     @FXML
+    private NextQueuePanel nextQueuePanel;
+
+    @FXML
     private GameOverPanel gameOverPanel;
 
     @FXML
@@ -91,19 +94,24 @@ public class GuiController implements Initializable {
                 if (gameState == GameState.PLAYING
                         && isPause.getValue() == Boolean.FALSE
                         && isGameOver.getValue() == Boolean.FALSE) {
-                    if (keyEvent.getCode() == KeyCode.LEFT || keyEvent.getCode() == KeyCode.A) {
+                    KeyCode code = keyEvent.getCode();
+                    if (code == KeyCode.LEFT || code == KeyCode.A) {
                         refreshBrick(eventListener.onLeftEvent(new MoveEvent(EventType.LEFT, EventSource.USER)));
                         keyEvent.consume();
                     }
-                    if (keyEvent.getCode() == KeyCode.RIGHT || keyEvent.getCode() == KeyCode.D) {
+                    if (code == KeyCode.RIGHT || code == KeyCode.D) {
                         refreshBrick(eventListener.onRightEvent(new MoveEvent(EventType.RIGHT, EventSource.USER)));
                         keyEvent.consume();
                     }
-                    if (keyEvent.getCode() == KeyCode.UP || keyEvent.getCode() == KeyCode.W) {
-                        refreshBrick(eventListener.onRotateEvent(new MoveEvent(EventType.ROTATE, EventSource.USER)));
+                    if (code == KeyCode.UP || code == KeyCode.W || code == KeyCode.X || code == KeyCode.E) {
+                        refreshBrick(eventListener.onRotateClockwise(new MoveEvent(EventType.ROTATE_CLOCKWISE, EventSource.USER)));
                         keyEvent.consume();
                     }
-                    if (keyEvent.getCode() == KeyCode.DOWN || keyEvent.getCode() == KeyCode.S) {
+                    if (code == KeyCode.Z || code == KeyCode.Q || code == KeyCode.SLASH) {
+                        refreshBrick(eventListener.onRotateCounterClockwise(new MoveEvent(EventType.ROTATE_COUNTERCLOCKWISE, EventSource.USER)));
+                        keyEvent.consume();
+                    }
+                    if (code == KeyCode.DOWN || code == KeyCode.S) {
                         moveDown(new MoveEvent(EventType.DOWN, EventSource.USER));
                         keyEvent.consume();
                     }
@@ -140,7 +148,7 @@ public class GuiController implements Initializable {
         for (int i = 0; i < brick.getBrickData().length; i++) {
             for (int j = 0; j < brick.getBrickData()[i].length; j++) {
                 Rectangle rectangle = new Rectangle(BRICK_SIZE, BRICK_SIZE);
-                rectangle.setFill(getFillColor(brick.getBrickData()[i][j]));
+                rectangle.setFill(BrickColorPalette.resolve(brick.getBrickData()[i][j]));
                 rectangles[i][j] = rectangle;
                 brickPanel.add(rectangle, j, i);
             }
@@ -154,40 +162,6 @@ public class GuiController implements Initializable {
         ));
         timeLine.setCycleCount(Timeline.INDEFINITE);
         updateTimelinePlayback();
-    }
-
-    private Paint getFillColor(int i) {
-        Paint returnPaint;
-        switch (i) {
-            case 0:
-                returnPaint = Color.TRANSPARENT;
-                break;
-            case 1:
-                returnPaint = Color.AQUA;
-                break;
-            case 2:
-                returnPaint = Color.BLUEVIOLET;
-                break;
-            case 3:
-                returnPaint = Color.DARKGREEN;
-                break;
-            case 4:
-                returnPaint = Color.YELLOW;
-                break;
-            case 5:
-                returnPaint = Color.RED;
-                break;
-            case 6:
-                returnPaint = Color.BEIGE;
-                break;
-            case 7:
-                returnPaint = Color.BURLYWOOD;
-                break;
-            default:
-                returnPaint = Color.WHITE;
-                break;
-        }
-        return returnPaint;
     }
 
 
@@ -220,11 +194,14 @@ public class GuiController implements Initializable {
                 setRectangleData(brickData[i][j], rectangles[i][j]);
             }
         }
+        if (nextQueuePanel != null) {
+            nextQueuePanel.setQueue(brick.getNextBricksData());
+        }
         updateGameOverGuide(brick.getGameOverRow());
     }
 
     private void setRectangleData(int color, Rectangle rectangle) {
-        rectangle.setFill(getFillColor(color));
+        rectangle.setFill(BrickColorPalette.resolve(color));
         rectangle.setArcHeight(9);
         rectangle.setArcWidth(9);
     }
