@@ -28,4 +28,9 @@ final class ZBrick implements Brick {
     public List<int[][]> getShapeMatrix() {
         return MatrixOperations.deepCopyList(brickMatrix);
     }
+
+    @Override
+    public TetrominoType getType() {
+        return TetrominoType.Z;
+    }
 }
