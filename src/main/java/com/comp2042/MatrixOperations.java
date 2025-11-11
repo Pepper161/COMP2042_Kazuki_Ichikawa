@@ -3,6 +3,7 @@ package com.comp2042;
 import java.awt.Point;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Deque;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -74,35 +75,35 @@ public class MatrixOperations {
     }
 
     public static ClearRow checkRemoving(final int[][] matrix) {
-        int[][] tmp = new int[matrix.length][matrix[0].length];
-        Deque<int[]> newRows = new ArrayDeque<>();
-        List<Integer> clearedRows = new ArrayList<>();
+        int rows = matrix.length;
+        int cols = matrix[0].length;
+        int[][] tmp = new int[rows][cols];
+        int writeRow = rows - 1;
+        int cleared = 0;
 
-        for (int i = 0; i < matrix.length; i++) {
-            int[] tmpRow = new int[matrix[i].length];
+        for (int source = rows - 1; source >= 0; source--) {
             boolean rowToClear = true;
-            for (int j = 0; j < matrix[0].length; j++) {
-                if (matrix[i][j] == 0) {
+            for (int col = 0; col < cols; col++) {
+                if (matrix[source][col] == 0) {
                     rowToClear = false;
+                    break;
                 }
-                tmpRow[j] = matrix[i][j];
             }
             if (rowToClear) {
-                clearedRows.add(i);
+                cleared++;
             } else {
-                newRows.add(tmpRow);
+                System.arraycopy(matrix[source], 0, tmp[writeRow], 0, cols);
+                writeRow--;
             }
         }
-        for (int i = matrix.length - 1; i >= 0; i--) {
-            int[] row = newRows.pollLast();
-            if (row != null) {
-                tmp[i] = row;
-            } else {
-                break;
-            }
+
+        while (writeRow >= 0) {
+            Arrays.fill(tmp[writeRow], 0);
+            writeRow--;
         }
-        int scoreBonus = 50 * clearedRows.size() * clearedRows.size();
-        return new ClearRow(clearedRows.size(), tmp, scoreBonus);
+
+        int scoreBonus = 50 * cleared * cleared;
+        return new ClearRow(cleared, tmp, scoreBonus);
     }
 
     public static List<int[][]> deepCopyList(List<int[][]> list){
