@@ -1,4 +1,4 @@
-package com.comp2042;
+package com.comp2042.board;
 
 import com.comp2042.logic.bricks.Brick;
 import com.comp2042.logic.bricks.TetrominoType;

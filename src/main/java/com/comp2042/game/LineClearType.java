@@ -1,4 +1,4 @@
-package com.comp2042;
+package com.comp2042.game;
 
 /**
  * Represents the classification of a line clear for scoring purposes.

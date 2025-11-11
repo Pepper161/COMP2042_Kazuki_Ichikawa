@@ -1,5 +1,8 @@
-package com.comp2042;
+package com.comp2042.test;
 
+import com.comp2042.game.LineClearStats;
+import com.comp2042.game.LineClearType;
+import com.comp2042.game.Score;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;

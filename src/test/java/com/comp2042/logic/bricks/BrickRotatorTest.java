@@ -1,7 +1,7 @@
 package com.comp2042.logic.bricks;
 
-import com.comp2042.BrickRotator;
-import com.comp2042.NextShapeInfo;
+import com.comp2042.board.BrickRotator;
+import com.comp2042.board.NextShapeInfo;
 import org.junit.jupiter.api.Test;
 
 import java.awt.Point;

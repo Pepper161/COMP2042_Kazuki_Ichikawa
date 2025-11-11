@@ -1,4 +1,7 @@
-package com.comp2042;
+package com.comp2042.game.events;
+
+import com.comp2042.board.ClearRow;
+import com.comp2042.board.ViewData;
 
 public final class DownData {
     private final ClearRow clearRow;

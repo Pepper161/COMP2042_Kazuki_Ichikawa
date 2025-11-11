@@ -1,5 +1,12 @@
-package com.comp2042;
+package com.comp2042.game;
 
+import com.comp2042.board.Board;
+import com.comp2042.board.ClearRow;
+import com.comp2042.board.MatrixOperations;
+import com.comp2042.board.ViewData;
+import com.comp2042.game.events.DownData;
+import com.comp2042.game.events.EventSource;
+import com.comp2042.game.events.MoveEvent;
 import com.comp2042.logic.bricks.TetrominoType;
 
 /**

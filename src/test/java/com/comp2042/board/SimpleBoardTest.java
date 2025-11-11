@@ -1,8 +1,5 @@
 package com.comp2042.board;
 
-import com.comp2042.ClearRow;
-import com.comp2042.SimpleBoard;
-import com.comp2042.ViewData;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
