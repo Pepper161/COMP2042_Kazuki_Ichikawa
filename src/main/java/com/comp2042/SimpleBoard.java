@@ -3,6 +3,7 @@ package com.comp2042;
 import com.comp2042.logic.bricks.Brick;
 import com.comp2042.logic.bricks.BrickGenerator;
 import com.comp2042.logic.bricks.PieceGenerator;
+import com.comp2042.logic.bricks.TetrominoType;
 
 import java.awt.*;
 import java.util.List;
@@ -100,10 +101,12 @@ public class SimpleBoard implements Board {
 
     @Override
     public ViewData getViewData() {
+        int ghostY = (int) currentOffset.getY() + calculateDropDistance();
         return new ViewData(
                 brickRotator.getCurrentShape(),
                 (int) currentOffset.getX(),
                 (int) currentOffset.getY(),
+                ghostY,
                 collectNextPreview(),
                 GAME_OVER_ROW);
     }
@@ -132,6 +135,29 @@ public class SimpleBoard implements Board {
         currentGameMatrix = new int[width][height];
         score.reset();
         createNewBrick();
+    }
+
+    @Override
+    public TetrominoType getActiveTetrominoType() {
+        return brickRotator.getType();
+    }
+
+    @Override
+    public int calculateDropDistance() {
+        if (currentOffset == null) {
+            return 0;
+        }
+        Point probe = new Point(currentOffset);
+        int distance = 0;
+        while (true) {
+            probe.translate(0, 1);
+            boolean conflict = MatrixOperations.intersect(currentGameMatrix, brickRotator.getCurrentShape(), probe);
+            if (conflict) {
+                break;
+            }
+            distance++;
+        }
+        return distance;
     }
 
     private List<int[][]> collectNextPreview() {

@@ -12,5 +12,7 @@ public interface InputEventListener {
 
     ViewData onRotateCounterClockwise(MoveEvent event);
 
+    DownData onHardDrop(MoveEvent event);
+
     ViewData createNewGame();
 }

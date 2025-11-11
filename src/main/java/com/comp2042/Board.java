@@ -25,4 +25,8 @@ public interface Board {
     Score getScore();
 
     void newGame();
+
+    com.comp2042.logic.bricks.TetrominoType getActiveTetrominoType();
+
+    int calculateDropDistance();
 }
