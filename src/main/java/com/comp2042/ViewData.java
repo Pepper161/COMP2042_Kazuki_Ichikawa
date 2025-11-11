@@ -9,13 +9,20 @@ public final class ViewData {
     private final int[][] brickData;
     private final int xPosition;
     private final int yPosition;
+    private final int ghostYPosition;
     private final List<int[][]> nextBrickData;
     private final int gameOverRow;
 
-    public ViewData(int[][] brickData, int xPosition, int yPosition, List<int[][]> nextBrickData, int gameOverRow) {
+    public ViewData(int[][] brickData,
+                    int xPosition,
+                    int yPosition,
+                    int ghostYPosition,
+                    List<int[][]> nextBrickData,
+                    int gameOverRow) {
         this.brickData = brickData;
         this.xPosition = xPosition;
         this.yPosition = yPosition;
+        this.ghostYPosition = ghostYPosition;
         this.nextBrickData = nextBrickData == null ? Collections.emptyList() : nextBrickData;
         this.gameOverRow = gameOverRow;
     }
@@ -30,6 +37,10 @@ public final class ViewData {
 
     public int getyPosition() {
         return yPosition;
+    }
+
+    public int getGhostYPosition() {
+        return ghostYPosition;
     }
 
     public List<int[][]> getNextBricksData() {

@@ -10,6 +10,7 @@
 <?import java.net.URL?>
 <Pane fx:controller="com.comp2042.GuiController"
       xmlns:fx="http://javafx.com/fxml">
+    <GridPane fx:id="ghostPanel" vgap="1" hgap="1" mouseTransparent="true" pickOnBounds="false"/>
     <GridPane fx:id="brickPanel" vgap="1" hgap="1"/>
     <BorderPane styleClass="gameBoard" fx:id="gameBoard">
         <center>

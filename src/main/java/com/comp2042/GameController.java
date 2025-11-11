@@ -66,6 +66,16 @@ public class GameController implements InputEventListener {
 
 
     @Override
+    public DownData onHardDrop(MoveEvent event) {
+        if (viewGuiController.getGameState() != GameState.PLAYING) {
+            return new DownData(null, board.getViewData());
+        }
+        DownData data = logic.hardDrop(event);
+        syncBoardState();
+        return data;
+    }
+
+    @Override
     public ViewData createNewGame() {
         ViewData viewData = logic.newGame();
         syncBoardState();

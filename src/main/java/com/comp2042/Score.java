@@ -5,10 +5,12 @@ import javafx.beans.property.SimpleIntegerProperty;
 
 public final class Score {
 
+    private static final int COMBO_STEP = 50;
+
     private final IntegerProperty score = new SimpleIntegerProperty(0);
     private final IntegerProperty combo = new SimpleIntegerProperty(0);
     private final IntegerProperty backToBack = new SimpleIntegerProperty(0);
-    private boolean lastClearEligibleForB2B = false;
+    private boolean backToBackActive = false;
 
     public IntegerProperty scoreProperty() {
         return score;
@@ -26,32 +28,40 @@ public final class Score {
         score.setValue(score.getValue() + i);
     }
 
-    public void handleLineClear(int linesRemoved) {
-        if (linesRemoved <= 0) {
+    public void handleLineClear(LineClearStats stats) {
+        if (stats == null || stats.getLinesCleared() <= 0 || stats.getClearType() == LineClearType.NONE) {
             combo.set(0);
-            backToBack.set(0);
-            lastClearEligibleForB2B = false;
             return;
         }
+
         combo.set(combo.get() + 1);
-        boolean b2bCandidate = linesRemoved >= 4;
-        if (b2bCandidate) {
-            if (lastClearEligibleForB2B) {
-                backToBack.set(backToBack.get() + 1);
-            } else {
-                backToBack.set(1);
-            }
-            lastClearEligibleForB2B = true;
-        } else {
-            backToBack.set(0);
-            lastClearEligibleForB2B = false;
-        }
+        int base = stats.getClearType().getBaseScore();
+        int scoreWithB2B = applyBackToBack(base, stats.getClearType().isBackToBackEligible());
+        int comboBonus = combo.get() > 1 ? (combo.get() - 1) * COMBO_STEP : 0;
+        add(scoreWithB2B + comboBonus);
     }
 
     public void reset() {
         score.setValue(0);
         combo.set(0);
         backToBack.set(0);
-        lastClearEligibleForB2B = false;
+        backToBackActive = false;
+    }
+
+    private int applyBackToBack(int base, boolean eligible) {
+        if (!eligible) {
+            backToBackActive = false;
+            backToBack.set(0);
+            return base;
+        }
+        if (backToBackActive) {
+            backToBack.set(backToBack.get() + 1);
+            int bonus = Math.round(base * 0.5f);
+            return base + bonus;
+        } else {
+            backToBackActive = true;
+            backToBack.set(1);
+            return base;
+        }
     }
 }

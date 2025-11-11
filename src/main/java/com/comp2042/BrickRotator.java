@@ -163,6 +163,10 @@ public class BrickRotator {
         return rotations.get(index);
     }
 
+    public TetrominoType getType() {
+        return type;
+    }
+
     private NextShapeInfo createNextShape(int delta) {
         int from = currentShape;
         int to = Math.floorMod(currentShape + delta, ORIENTATION_COUNT);

@@ -45,4 +45,16 @@ public final class BrickColorPalette {
         }
         return returnPaint;
     }
+
+    public static Paint resolveGhost(int tileId) {
+        if (tileId == 0) {
+            return Color.TRANSPARENT;
+        }
+        Paint base = resolve(tileId);
+        if (base instanceof Color) {
+            Color color = (Color) base;
+            return new Color(color.getRed(), color.getGreen(), color.getBlue(), 0.35);
+        }
+        return Color.TRANSPARENT;
+    }
 }
