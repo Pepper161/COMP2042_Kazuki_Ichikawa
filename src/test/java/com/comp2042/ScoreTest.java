@@ -32,6 +32,7 @@ class ScoreTest {
         assertEquals(2, score.backToBackProperty().get());
         score.handleLineClear(new LineClearStats(LineClearType.DOUBLE, 2));
         assertEquals(0, score.backToBackProperty().get());
+    }
 
     @Test
     void tSpinScoresCorrectBaseValue() {
