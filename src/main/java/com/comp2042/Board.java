@@ -8,7 +8,9 @@ public interface Board {
 
     boolean moveBrickRight();
 
-    boolean rotateLeftBrick();
+    boolean rotateClockwise();
+
+    boolean rotateCounterClockwise();
 
     boolean createNewBrick();
 
@@ -23,4 +25,8 @@ public interface Board {
     Score getScore();
 
     void newGame();
+
+    com.comp2042.logic.bricks.TetrominoType getActiveTetrominoType();
+
+    int calculateDropDistance();
 }

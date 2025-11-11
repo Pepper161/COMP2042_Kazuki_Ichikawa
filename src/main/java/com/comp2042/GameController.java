@@ -2,16 +2,16 @@ package com.comp2042;
 
 public class GameController implements InputEventListener {
 
-    private Board board = new SimpleBoard(25, 10);
-
     private final GuiController viewGuiController;
+    private final Board board = new SimpleBoard(25, 10);
+    private final GameLogic logic = new GameLogic(board);
 
     public GameController(GuiController c) {
         viewGuiController = c;
         board.createNewBrick();
         viewGuiController.setEventListener(this);
         viewGuiController.initGameView(board.getBoardMatrix(), board.getViewData());
-        viewGuiController.bindScore(board.getScore().scoreProperty());
+        viewGuiController.bindScore(logic.getScore());
     }
 
     @Override
@@ -19,26 +19,9 @@ public class GameController implements InputEventListener {
         if (viewGuiController.getGameState() != GameState.PLAYING) {
             return new DownData(null, board.getViewData());
         }
-        boolean canMove = board.moveBrickDown();
-        ClearRow clearRow = null;
-        if (!canMove) {
-            board.mergeBrickToBackground();
-            clearRow = board.clearRows();
-            if (clearRow.getLinesRemoved() > 0) {
-                board.getScore().add(clearRow.getScoreBonus());
-            }
-            if (board.createNewBrick()) {
-                viewGuiController.gameOver();
-            }
-
-            viewGuiController.refreshGameBackground(board.getBoardMatrix());
-
-        } else {
-            if (event.getEventSource() == EventSource.USER) {
-                board.getScore().add(1);
-            }
-        }
-        return new DownData(clearRow, board.getViewData());
+        DownData downData = logic.moveDown(event);
+        syncBoardState();
+        return downData;
     }
 
     @Override
@@ -46,8 +29,9 @@ public class GameController implements InputEventListener {
         if (viewGuiController.getGameState() != GameState.PLAYING) {
             return board.getViewData();
         }
-        board.moveBrickLeft();
-        return board.getViewData();
+        ViewData data = logic.moveLeft();
+        syncBoardState();
+        return data;
     }
 
     @Override
@@ -55,24 +39,55 @@ public class GameController implements InputEventListener {
         if (viewGuiController.getGameState() != GameState.PLAYING) {
             return board.getViewData();
         }
-        board.moveBrickRight();
-        return board.getViewData();
+        ViewData data = logic.moveRight();
+        syncBoardState();
+        return data;
     }
 
     @Override
-    public ViewData onRotateEvent(MoveEvent event) {
+    public ViewData onRotateClockwise(MoveEvent event) {
         if (viewGuiController.getGameState() != GameState.PLAYING) {
             return board.getViewData();
         }
-        board.rotateLeftBrick();
-        return board.getViewData();
+        ViewData data = logic.rotateClockwise();
+        syncBoardState();
+        return data;
+    }
+
+    @Override
+    public ViewData onRotateCounterClockwise(MoveEvent event) {
+        if (viewGuiController.getGameState() != GameState.PLAYING) {
+            return board.getViewData();
+        }
+        ViewData data = logic.rotateCounterClockwise();
+        syncBoardState();
+        return data;
     }
 
 
     @Override
+    public DownData onHardDrop(MoveEvent event) {
+        if (viewGuiController.getGameState() != GameState.PLAYING) {
+            return new DownData(null, board.getViewData());
+        }
+        DownData data = logic.hardDrop(event);
+        syncBoardState();
+        return data;
+    }
+
+    @Override
     public ViewData createNewGame() {
-        board.newGame();
-        viewGuiController.refreshGameBackground(board.getBoardMatrix());
-        return board.getViewData();
+        ViewData viewData = logic.newGame();
+        syncBoardState();
+        return viewData;
+    }
+
+    private void syncBoardState() {
+        if (logic.consumeBoardRefreshFlag()) {
+            viewGuiController.refreshGameBackground(board.getBoardMatrix());
+        }
+        if (logic.consumeGameOverFlag()) {
+            viewGuiController.gameOver();
+        }
     }
 }

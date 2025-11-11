@@ -23,4 +23,9 @@ final class OBrick implements Brick {
         return MatrixOperations.deepCopyList(brickMatrix);
     }
 
+    @Override
+    public TetrominoType getType() {
+        return TetrominoType.O;
+    }
+
 }

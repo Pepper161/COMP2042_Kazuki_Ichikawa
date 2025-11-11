@@ -2,14 +2,18 @@ package com.comp2042;
 
 import com.comp2042.logic.bricks.Brick;
 import com.comp2042.logic.bricks.BrickGenerator;
-import com.comp2042.logic.bricks.RandomBrickGenerator;
+import com.comp2042.logic.bricks.PieceGenerator;
+import com.comp2042.logic.bricks.TetrominoType;
 
 import java.awt.*;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class SimpleBoard implements Board {
 
     public static final int SPAWN_ROW = -1;
     public static final int GAME_OVER_ROW = 0;
+    private static final int NEXT_PREVIEW_COUNT = 5;
 
     private final int width;
     private final int height;
@@ -23,7 +27,7 @@ public class SimpleBoard implements Board {
         this.width = width;
         this.height = height;
         currentGameMatrix = new int[width][height];
-        brickGenerator = new RandomBrickGenerator();
+        brickGenerator = new PieceGenerator();
         brickRotator = new BrickRotator();
         score = new Score();
     }
@@ -72,16 +76,13 @@ public class SimpleBoard implements Board {
     }
 
     @Override
-    public boolean rotateLeftBrick() {
-        int[][] currentMatrix = MatrixOperations.copy(currentGameMatrix);
-        NextShapeInfo nextShape = brickRotator.getNextShape();
-        boolean conflict = MatrixOperations.intersect(currentMatrix, nextShape.getShape(), (int) currentOffset.getX(), (int) currentOffset.getY());
-        if (conflict) {
-            return false;
-        } else {
-            brickRotator.setCurrentShape(nextShape.getPosition());
-            return true;
-        }
+    public boolean rotateClockwise() {
+        return attemptRotation(brickRotator.getNextShapeClockwise());
+    }
+
+    @Override
+    public boolean rotateCounterClockwise() {
+        return attemptRotation(brickRotator.getNextShapeCounterClockwise());
     }
 
     @Override
@@ -100,7 +101,14 @@ public class SimpleBoard implements Board {
 
     @Override
     public ViewData getViewData() {
-        return new ViewData(brickRotator.getCurrentShape(), (int) currentOffset.getX(), (int) currentOffset.getY(), brickGenerator.getNextBrick().getShapeMatrix().get(0), GAME_OVER_ROW);
+        int ghostY = (int) currentOffset.getY() + calculateDropDistance();
+        return new ViewData(
+                brickRotator.getCurrentShape(),
+                (int) currentOffset.getX(),
+                (int) currentOffset.getY(),
+                ghostY,
+                collectNextPreview(),
+                GAME_OVER_ROW);
     }
 
     @Override
@@ -127,5 +135,57 @@ public class SimpleBoard implements Board {
         currentGameMatrix = new int[width][height];
         score.reset();
         createNewBrick();
+    }
+
+    @Override
+    public TetrominoType getActiveTetrominoType() {
+        return brickRotator.getType();
+    }
+
+    @Override
+    public int calculateDropDistance() {
+        if (currentOffset == null) {
+            return 0;
+        }
+        Point probe = new Point(currentOffset);
+        int distance = 0;
+        while (true) {
+            probe.translate(0, 1);
+            boolean conflict = MatrixOperations.intersect(currentGameMatrix, brickRotator.getCurrentShape(), probe);
+            if (conflict) {
+                break;
+            }
+            distance++;
+        }
+        return distance;
+    }
+
+    private List<int[][]> collectNextPreview() {
+        return brickGenerator.peekUpcoming(NEXT_PREVIEW_COUNT)
+                .stream()
+                .map(brick -> {
+                    List<int[][]> rotations = brick.getShapeMatrix();
+                    if (rotations.isEmpty()) {
+                        return new int[0][0];
+                    }
+                    return MatrixOperations.copy(rotations.get(0));
+                })
+                .collect(Collectors.toList());
+    }
+
+    private boolean attemptRotation(NextShapeInfo rotationInfo) {
+        int[][] rotatedShape = rotationInfo.getShape();
+        Point[] kicks = rotationInfo.getKicks();
+        for (Point kick : kicks) {
+            Point candidateOffset = new Point(currentOffset);
+            candidateOffset.translate((int) kick.getX(), (int) kick.getY());
+            boolean conflict = MatrixOperations.intersect(currentGameMatrix, rotatedShape, candidateOffset);
+            if (!conflict) {
+                brickRotator.setCurrentShape(rotationInfo.getPosition());
+                currentOffset = candidateOffset;
+                return true;
+            }
+        }
+        return false;
     }
 }
