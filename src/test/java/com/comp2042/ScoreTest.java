@@ -41,4 +41,3 @@ class ScoreTest {
         assertEquals(1200, score.scoreProperty().get());
     }
 }
-}
