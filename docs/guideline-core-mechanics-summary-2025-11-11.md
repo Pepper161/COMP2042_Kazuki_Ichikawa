@@ -2,6 +2,16 @@
 
 This document outlines the gameplay features that now ship by default with the `feature/guideline-core-mechanics` branch, plus the enhancements implemented over the course of the recent work. It is intended for teammates who are new to the project and need a single reference for the current mechanics set.
 
+## Code Organization (2025-11 Structure)
+- `com.comp2042.app` – JavaFX entry points and the start menu controller (`Main`, `StartMenuController`).
+- `com.comp2042.game` – Gameplay controller, logic, score handling, and Guideline scoring primitives.
+- `com.comp2042.game.events` – DTOs and interfaces that describe movement inputs and tick updates.
+- `com.comp2042.board` – Matrix helpers, board implementation, previews, and the SRS rotator.
+- `com.comp2042.logic.bricks` – Immutable tetromino definitions plus the 7-Bag generator.
+- `com.comp2042.ui` – JavaFX panels (HUD, queue, overlays) and the `GuiController`.
+
+The packages map directly to the Guideline mechanics described below—logic stays headless under `game/board`, while JavaFX bindings live under `ui`.
+
 ## Baseline Gameplay
 - **Single-player JavaFX Tetris** targeting a 25×10 playfield with hidden spawn rows and a standard tick-driven gravity loop.
 - **Matrix-based board representation**, allowing collision checks, merges, line clears, and score notifications through `GameLogic`/`SimpleBoard`.
