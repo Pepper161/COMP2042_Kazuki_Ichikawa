@@ -31,11 +31,11 @@
                             <Tooltip text="Delayed Auto Shift: wait time before a held move key begins repeating."/>
                         </tooltip>
                     </Label>
-                    <Label text="?">
+                    <Button text="?" focusTraversable="false" onAction="#showInfo" id="info-das">
                         <tooltip>
                             <Tooltip text="Higher DAS = slower response when holding LEFT/RIGHT."/>
                         </tooltip>
-                    </Label>
+                    </Button>
                 </HBox>
                 <TextField fx:id="dasField" GridPane.columnIndex="1"/>
                 <HBox alignment="CENTER_LEFT" spacing="6" GridPane.rowIndex="1">
@@ -44,11 +44,11 @@
                             <Tooltip text="Auto Repeat Rate: interval between repeated moves after DAS expires."/>
                         </tooltip>
                     </Label>
-                    <Label text="?">
+                    <Button text="?" focusTraversable="false" onAction="#showInfo" id="info-arr">
                         <tooltip>
                             <Tooltip text="Lower ARR makes pieces glide faster while holding LEFT/RIGHT."/>
                         </tooltip>
-                    </Label>
+                    </Button>
                 </HBox>
                 <TextField fx:id="arrField" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
                 <HBox alignment="CENTER_LEFT" spacing="6" GridPane.rowIndex="2">
@@ -57,11 +57,11 @@
                             <Tooltip text="Boost to manual drop speed when holding the soft-drop key."/>
                         </tooltip>
                     </Label>
-                    <Label text="?">
+                    <Button text="?" focusTraversable="false" onAction="#showInfo" id="info-sdf">
                         <tooltip>
                             <Tooltip text="Higher values drop faster; 1.0 equals gravity speed."/>
                         </tooltip>
-                    </Label>
+                    </Button>
                 </HBox>
                 <TextField fx:id="sdfField" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
             </GridPane>
@@ -72,49 +72,71 @@
                     <ColumnConstraints percentWidth="45"/>
                     <ColumnConstraints percentWidth="55"/>
                 </columnConstraints>
-                <Label text="Move Left">
-                    <tooltip>
-                        <Tooltip text="Moves the active piece one column to the left."/>
-                    </tooltip>
-                </Label>
+                <HBox alignment="CENTER_LEFT" spacing="6">
+                    <Label text="Move Left">
+                        <tooltip>
+                            <Tooltip text="Moves the active piece one column to the left."/>
+                        </tooltip>
+                    </Label>
+                    <Button text="?" focusTraversable="false" onAction="#showInfo" id="info-move-left"/>
+                </HBox>
                 <TextField fx:id="leftKeyField" GridPane.columnIndex="1"/>
-                <Label text="Move Right" GridPane.rowIndex="1">
-                    <tooltip>
-                        <Tooltip text="Moves the active piece one column to the right."/>
-                    </tooltip>
-                </Label>
+                <HBox alignment="CENTER_LEFT" spacing="6" GridPane.rowIndex="1">
+                    <Label text="Move Right">
+                        <tooltip>
+                            <Tooltip text="Moves the active piece one column to the right."/>
+                        </tooltip>
+                    </Label>
+                    <Button text="?" focusTraversable="false" onAction="#showInfo" id="info-move-right"/>
+                </HBox>
                 <TextField fx:id="rightKeyField" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
-                <Label text="Soft Drop" GridPane.rowIndex="2">
-                    <tooltip>
-                        <Tooltip text="Increases fall speed while held without forcing a lock."/>
-                    </tooltip>
-                </Label>
+                <HBox alignment="CENTER_LEFT" spacing="6" GridPane.rowIndex="2">
+                    <Label text="Soft Drop">
+                        <tooltip>
+                            <Tooltip text="Increases fall speed while held without forcing a lock."/>
+                        </tooltip>
+                    </Label>
+                    <Button text="?" focusTraversable="false" onAction="#showInfo" id="info-soft-drop"/>
+                </HBox>
                 <TextField fx:id="downKeyField" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
-                <Label text="Hard Drop" GridPane.rowIndex="3">
-                    <tooltip>
-                        <Tooltip text="Instants drops the piece to the ghost position."/>
-                    </tooltip>
-                </Label>
+                <HBox alignment="CENTER_LEFT" spacing="6" GridPane.rowIndex="3">
+                    <Label text="Hard Drop">
+                        <tooltip>
+                            <Tooltip text="Instantly drops the piece to the ghost position."/>
+                        </tooltip>
+                    </Label>
+                    <Button text="?" focusTraversable="false" onAction="#showInfo" id="info-hard-drop"/>
+                </HBox>
                 <TextField fx:id="hardDropKeyField" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
-                <Label text="Rotate CW" GridPane.rowIndex="4">
-                    <tooltip>
-                        <Tooltip text="Rotates the piece clockwise (right rotation)."/>
-                    </tooltip>
-                </Label>
+                <HBox alignment="CENTER_LEFT" spacing="6" GridPane.rowIndex="4">
+                    <Label text="Rotate CW">
+                        <tooltip>
+                            <Tooltip text="Rotates the piece clockwise (right rotation)."/>
+                        </tooltip>
+                    </Label>
+                    <Button text="?" focusTraversable="false" onAction="#showInfo" id="info-rotate-cw"/>
+                </HBox>
                 <TextField fx:id="rotateCwField" GridPane.rowIndex="4" GridPane.columnIndex="1"/>
-                <Label text="Rotate CCW" GridPane.rowIndex="5">
-                    <tooltip>
-                        <Tooltip text="Rotates the piece counter-clockwise (left rotation)."/>
-                    </tooltip>
-                </Label>
+                <HBox alignment="CENTER_LEFT" spacing="6" GridPane.rowIndex="5">
+                    <Label text="Rotate CCW">
+                        <tooltip>
+                            <Tooltip text="Rotates the piece counter-clockwise (left rotation)."/>
+                        </tooltip>
+                    </Label>
+                    <Button text="?" focusTraversable="false" onAction="#showInfo" id="info-rotate-ccw"/>
+                </HBox>
                 <TextField fx:id="rotateCcwField" GridPane.rowIndex="5" GridPane.columnIndex="1"/>
-                <Label text="New Game" GridPane.rowIndex="6">
-                    <tooltip>
-                        <Tooltip text="Resets the current run instantly when pressed."/>
-                    </tooltip>
-                </Label>
+                <HBox alignment="CENTER_LEFT" spacing="6" GridPane.rowIndex="6">
+                    <Label text="New Game">
+                        <tooltip>
+                            <Tooltip text="Resets the current run instantly when pressed."/>
+                        </tooltip>
+                    </Label>
+                    <Button text="?" focusTraversable="false" onAction="#showInfo" id="info-new-game"/>
+                </HBox>
                 <TextField fx:id="newGameKeyField" GridPane.rowIndex="6" GridPane.columnIndex="1"/>
             </GridPane>
+            <Label fx:id="infoLabel" wrapText="true" textFill="#444444"/>
         </VBox>
     </center>
     <bottom>

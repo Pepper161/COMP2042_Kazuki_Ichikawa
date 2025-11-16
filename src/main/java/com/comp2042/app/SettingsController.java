@@ -4,6 +4,7 @@ import com.comp2042.config.GameSettings;
 import com.comp2042.config.GameSettingsStore;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
@@ -40,9 +41,23 @@ public class SettingsController {
     private TextField newGameKeyField;
     @FXML
     private Label statusLabel;
+    @FXML
+    private Label infoLabel;
 
     private final Map<GameSettings.Action, TextField> keyFields = new EnumMap<>(GameSettings.Action.class);
     private final GameSettingsStore store = new GameSettingsStore();
+    private final Map<String, String> infoMessages = Map.ofEntries(
+            Map.entry("info-das", "Delayed Auto Shift (DAS): delay before a held move key begins repeating. Larger values feel heavier."),
+            Map.entry("info-arr", "Auto Repeat Rate (ARR): interval between repeated moves after DAS. Smaller values slide pieces faster."),
+            Map.entry("info-sdf", "Soft Drop multiplier: scales how quickly the piece falls while holding the soft drop key."),
+            Map.entry("info-move-left", "Move Left: shifts the active piece one column to the left."),
+            Map.entry("info-move-right", "Move Right: shifts the active piece one column to the right."),
+            Map.entry("info-soft-drop", "Soft Drop: manually speeds up the descent without forcing a lock."),
+            Map.entry("info-hard-drop", "Hard Drop: drops the piece instantly to the ghost position and locks it."),
+            Map.entry("info-rotate-cw", "Rotate CW: clockwise rotation (90° to the right)."),
+            Map.entry("info-rotate-ccw", "Rotate CCW: counter-clockwise rotation (90° to the left)."),
+            Map.entry("info-new-game", "New Game: resets the playfield immediately and starts a new run.")
+    );
 
     private GameSettings initialSettings = GameSettings.defaultSettings();
     private GameSettings resultSettings;
@@ -107,6 +122,7 @@ public class SettingsController {
             entry.getValue().setText(keyCode != null ? keyCode.name() : "");
         }
         statusLabel.setText("");
+        infoLabel.setText("Select a ? icon to learn what each setting means.");
     }
 
     private GameSettings collectSettings() {
@@ -161,5 +177,15 @@ public class SettingsController {
             field.setText(event.getCode().name());
             event.consume();
         });
+    }
+
+    @FXML
+    private void showInfo(ActionEvent event) {
+        Object source = event.getSource();
+        if (!(source instanceof Button button)) {
+            return;
+        }
+        String message = infoMessages.getOrDefault(button.getId(), "");
+        infoLabel.setText(message);
     }
 }
