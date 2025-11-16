@@ -17,6 +17,11 @@ The packages map directly to the Guideline mechanics described below—logic sta
 - When no seed is provided, a random seed is generated per run and logged once play starts plus in the Game Over overlay; reuse it via the same `--seed` flag to replay a session.
 - Restarting the game from the menu or Game Over panel reinitialises the bag so deterministic runs always start from the first bag.
 
+## Input Settings (DAS / ARR / SDF)
+- The Start Menu now has a **Settings** button that opens a JavaFX dialog to tune DAS delay (ms), ARR interval (ms), and the Soft Drop multiplier.
+- Key bindings for move/rotate/drop/new game can be remapped in the same dialog; values are saved under `~/.tetrisjfx/settings.properties` so they persist across launches.
+- GUI movement respects these settings: DAS governs the delay before repeats, ARR controls repeat cadence, and the soft drop multiplier accelerates `DOWN` key auto-shift.
+
 ## Baseline Gameplay
 - **Single-player JavaFX Tetris** targeting a 25×10 playfield with hidden spawn rows and a standard tick-driven gravity loop.
 - **Matrix-based board representation**, allowing collision checks, merges, line clears, and score notifications through `GameLogic`/`SimpleBoard`.

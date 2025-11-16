@@ -2,6 +2,7 @@ package com.comp2042.ui;
 
 import com.comp2042.app.StartMenuController;
 import com.comp2042.board.ViewData;
+import com.comp2042.config.GameSettings;
 import com.comp2042.game.GameState;
 import com.comp2042.game.Score;
 import com.comp2042.game.events.DownData;
@@ -9,6 +10,7 @@ import com.comp2042.game.events.EventSource;
 import com.comp2042.game.events.EventType;
 import com.comp2042.game.events.InputEventListener;
 import com.comp2042.game.events.MoveEvent;
+import com.comp2042.ui.input.AutoRepeatHandler;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Platform;
@@ -29,7 +31,6 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
-import javafx.scene.paint.Paint;
 import javafx.scene.shape.Line;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
@@ -40,6 +41,10 @@ import javafx.util.Duration;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
+import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * JavaFX controller for the gameplay scene. It renders the board layers, handles input,
@@ -50,6 +55,7 @@ public class GuiController implements Initializable {
     private static final int BRICK_SIZE = 20;
     private static final int HIDDEN_ROWS = 2;
     private static final double GAME_OVER_GUIDE_OFFSET_ROWS = 0.5;
+    private static final double BASE_GRAVITY_INTERVAL_MS = 400;
 
     @FXML
     private GridPane gamePanel;
@@ -97,6 +103,12 @@ public class GuiController implements Initializable {
 
     private Line gameOverGuideLine;
     private int cachedGameOverRow = Integer.MIN_VALUE;
+    private GameSettings gameSettings = GameSettings.defaultSettings();
+    private final Map<KeyCode, GameSettings.Action> actionByKey = new HashMap<>();
+    private final Set<KeyCode> heldKeys = EnumSet.noneOf(KeyCode.class);
+    private AutoRepeatHandler moveLeftRepeat;
+    private AutoRepeatHandler moveRightRepeat;
+    private AutoRepeatHandler softDropRepeat;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -108,38 +120,21 @@ public class GuiController implements Initializable {
         gamePanel.setOnKeyPressed(new EventHandler<KeyEvent>() {
             @Override
             public void handle(KeyEvent keyEvent) {
-                if (gameState == GameState.PLAYING
-                        && isPause.getValue() == Boolean.FALSE
-                        && isGameOver.getValue() == Boolean.FALSE) {
-                    KeyCode code = keyEvent.getCode();
-                    if (code == KeyCode.LEFT || code == KeyCode.A) {
-                        refreshBrick(eventListener.onLeftEvent(new MoveEvent(EventType.LEFT, EventSource.USER)));
-                        keyEvent.consume();
-                    }
-                    if (code == KeyCode.RIGHT || code == KeyCode.D) {
-                        refreshBrick(eventListener.onRightEvent(new MoveEvent(EventType.RIGHT, EventSource.USER)));
-                        keyEvent.consume();
-                    }
-                    if (code == KeyCode.UP || code == KeyCode.W || code == KeyCode.X || code == KeyCode.E) {
-                        refreshBrick(eventListener.onRotateClockwise(new MoveEvent(EventType.ROTATE_CLOCKWISE, EventSource.USER)));
-                        keyEvent.consume();
-                    }
-                    if (code == KeyCode.Z || code == KeyCode.Q || code == KeyCode.SLASH) {
-                        refreshBrick(eventListener.onRotateCounterClockwise(new MoveEvent(EventType.ROTATE_COUNTERCLOCKWISE, EventSource.USER)));
-                        keyEvent.consume();
-                    }
-                    if (code == KeyCode.DOWN || code == KeyCode.S) {
-                        moveDown(new MoveEvent(EventType.DOWN, EventSource.USER));
-                        keyEvent.consume();
-                    }
-                    if (code == KeyCode.SPACE) {
-                        hardDrop(new MoveEvent(EventType.HARD_DROP, EventSource.USER));
-                        keyEvent.consume();
-                    }
+                KeyCode code = keyEvent.getCode();
+                if (!heldKeys.add(code)) {
+                    keyEvent.consume();
+                    return;
                 }
-                if (keyEvent.getCode() == KeyCode.N) {
-                    newGame(null);
-                }
+                handleKeyPressed(code);
+                keyEvent.consume();
+            }
+        });
+        gamePanel.setOnKeyReleased(new EventHandler<KeyEvent>() {
+            @Override
+            public void handle(KeyEvent keyEvent) {
+                KeyCode code = keyEvent.getCode();
+                heldKeys.remove(code);
+                handleKeyReleased(code);
             }
         });
         gameOverPanel.setVisible(false);
@@ -191,11 +186,12 @@ public class GuiController implements Initializable {
 
 
         timeLine = new Timeline(new KeyFrame(
-                Duration.millis(400),
+                Duration.millis(BASE_GRAVITY_INTERVAL_MS),
                 ae -> moveDown(new MoveEvent(EventType.DOWN, EventSource.THREAD))
         ));
         timeLine.setCycleCount(Timeline.INDEFINITE);
         updateTimelinePlayback();
+        rebuildKeyBindings();
     }
 
 
@@ -302,6 +298,42 @@ public class GuiController implements Initializable {
         handleDropResult(downData);
     }
 
+    private void performMoveLeft() {
+        if (eventListener == null) {
+            return;
+        }
+        refreshBrick(eventListener.onLeftEvent(new MoveEvent(EventType.LEFT, EventSource.USER)));
+    }
+
+    private void performMoveRight() {
+        if (eventListener == null) {
+            return;
+        }
+        refreshBrick(eventListener.onRightEvent(new MoveEvent(EventType.RIGHT, EventSource.USER)));
+    }
+
+    private void performRotateClockwise() {
+        if (eventListener == null) {
+            return;
+        }
+        refreshBrick(eventListener.onRotateClockwise(new MoveEvent(EventType.ROTATE_CLOCKWISE, EventSource.USER)));
+    }
+
+    private void performRotateCounterClockwise() {
+        if (eventListener == null) {
+            return;
+        }
+        refreshBrick(eventListener.onRotateCounterClockwise(new MoveEvent(EventType.ROTATE_COUNTERCLOCKWISE, EventSource.USER)));
+    }
+
+    private void performSoftDrop() {
+        moveDown(new MoveEvent(EventType.DOWN, EventSource.USER));
+    }
+
+    private void performHardDrop() {
+        hardDrop(new MoveEvent(EventType.HARD_DROP, EventSource.USER));
+    }
+
     public void setEventListener(InputEventListener eventListener) {
         this.eventListener = eventListener;
     }
@@ -309,6 +341,94 @@ public class GuiController implements Initializable {
     public void bindScore(Score score) {
         if (hudPanel != null && score != null) {
             hudPanel.bindScore(score);
+        }
+    }
+
+    public void setGameSettings(GameSettings settings) {
+        this.gameSettings = settings != null ? settings : GameSettings.defaultSettings();
+        heldKeys.clear();
+        rebuildKeyBindings();
+    }
+
+    private void rebuildKeyBindings() {
+        actionByKey.clear();
+        if (gameSettings == null) {
+            gameSettings = GameSettings.defaultSettings();
+        }
+        for (Map.Entry<GameSettings.Action, KeyCode> entry : gameSettings.getKeyBindings().entrySet()) {
+            if (entry.getValue() != null) {
+                actionByKey.put(entry.getValue(), entry.getKey());
+            }
+        }
+        Duration das = Duration.millis(gameSettings.getDasDelayMs());
+        Duration arr = Duration.millis(Math.max(1, gameSettings.getArrIntervalMs()));
+        moveLeftRepeat = new AutoRepeatHandler(this::performMoveLeft, das, arr);
+        moveRightRepeat = new AutoRepeatHandler(this::performMoveRight, das, arr);
+        double softDropInterval = Math.max(10d, BASE_GRAVITY_INTERVAL_MS / gameSettings.getSoftDropMultiplier());
+        softDropRepeat = new AutoRepeatHandler(this::performSoftDrop, Duration.ZERO, Duration.millis(softDropInterval));
+    }
+
+    private void handleKeyPressed(KeyCode code) {
+        GameSettings.Action action = actionByKey.get(code);
+        if (action == null) {
+            return;
+        }
+        if (action == GameSettings.Action.NEW_GAME) {
+            newGame(null);
+            return;
+        }
+        if (!isGameplayInputEnabled()) {
+            return;
+        }
+        switch (action) {
+            case MOVE_LEFT -> {
+                if (moveLeftRepeat != null) {
+                    moveLeftRepeat.start();
+                }
+            }
+            case MOVE_RIGHT -> {
+                if (moveRightRepeat != null) {
+                    moveRightRepeat.start();
+                }
+            }
+            case SOFT_DROP -> {
+                if (softDropRepeat != null) {
+                    softDropRepeat.start();
+                } else {
+                    performSoftDrop();
+                }
+            }
+            case HARD_DROP -> performHardDrop();
+            case ROTATE_CW -> performRotateClockwise();
+            case ROTATE_CCW -> performRotateCounterClockwise();
+            default -> {
+            }
+        }
+    }
+
+    private void handleKeyReleased(KeyCode code) {
+        GameSettings.Action action = actionByKey.get(code);
+        if (action == null) {
+            return;
+        }
+        switch (action) {
+            case MOVE_LEFT -> stopRepeat(moveLeftRepeat);
+            case MOVE_RIGHT -> stopRepeat(moveRightRepeat);
+            case SOFT_DROP -> stopRepeat(softDropRepeat);
+            default -> {
+            }
+        }
+    }
+
+    private boolean isGameplayInputEnabled() {
+        return gameState == GameState.PLAYING
+                && Boolean.FALSE.equals(isPause.getValue())
+                && Boolean.FALSE.equals(isGameOver.getValue());
+    }
+
+    private void stopRepeat(AutoRepeatHandler handler) {
+        if (handler != null) {
+            handler.stop();
         }
     }
 
@@ -331,6 +451,7 @@ public class GuiController implements Initializable {
     }
 
     private void startNewGameSession() {
+        stopAllRepeats();
         if (timeLine != null) {
             timeLine.stop();
         }
@@ -351,6 +472,7 @@ public class GuiController implements Initializable {
             timeLine.stop();
         }
         setGameState(GameState.MENU);
+        stopAllRepeats();
         if (gamePanel != null) {
             gamePanel.setFocusTraversable(false);
         }
@@ -394,6 +516,7 @@ public class GuiController implements Initializable {
                     gameOverPanel.setVisible(false);
                     gameOverPanel.setManaged(false);
                 }
+                stopAllRepeats();
                 break;
             case PLAYING:
                 isPause.setValue(Boolean.FALSE);
@@ -410,6 +533,7 @@ public class GuiController implements Initializable {
                     gameOverPanel.setVisible(true);
                     gameOverPanel.setManaged(true);
                 }
+                stopAllRepeats();
                 break;
             default:
                 throw new IllegalStateException("Unhandled game state: " + gameState);
@@ -462,5 +586,12 @@ public class GuiController implements Initializable {
             gameOverGuideLine.setEndY(y);
         }
         cachedGameOverRow = gameOverRow;
+    }
+
+    private void stopAllRepeats() {
+        stopRepeat(moveLeftRepeat);
+        stopRepeat(moveRightRepeat);
+        stopRepeat(softDropRepeat);
+        heldKeys.clear();
     }
 }
