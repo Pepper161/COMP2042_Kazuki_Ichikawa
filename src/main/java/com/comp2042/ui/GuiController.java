@@ -41,6 +41,10 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 
+/**
+ * JavaFX controller for the gameplay scene. It renders the board layers, handles input,
+ * and delegates gameplay actions to {@link com.comp2042.game.GameController}.
+ */
 public class GuiController implements Initializable {
 
     private static final int BRICK_SIZE = 20;
@@ -318,10 +322,6 @@ public class GuiController implements Initializable {
 
     public void newGame(ActionEvent actionEvent) {
         startNewGameSession();
-    }
-
-    public void pauseGame(ActionEvent actionEvent) {
-        gamePanel.requestFocus();
     }
 
     private void startNewGameSession() {

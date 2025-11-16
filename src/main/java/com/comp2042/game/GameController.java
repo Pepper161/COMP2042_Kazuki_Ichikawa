@@ -8,6 +8,9 @@ import com.comp2042.game.events.InputEventListener;
 import com.comp2042.game.events.MoveEvent;
 import com.comp2042.ui.GuiController;
 
+/**
+ * Wires {@link GuiController} input callbacks to {@link GameLogic} and keeps the board/score in sync.
+ */
 public class GameController implements InputEventListener {
 
     private final GuiController viewGuiController;

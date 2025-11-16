@@ -3,6 +3,9 @@ package com.comp2042.game;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 
+/**
+ * Tracks score, combo, and back-to-back counters using JavaFX properties for UI binding.
+ */
 public final class Score {
 
     private static final int COMBO_STEP = 50;

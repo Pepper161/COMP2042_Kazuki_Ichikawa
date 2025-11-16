@@ -10,6 +10,10 @@ import java.awt.*;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * Default {@link Board} implementation that holds the matrix state, active tetromino,
+ * and helper objects (rotator/generator) needed for Guideline playfields.
+ */
 public class SimpleBoard implements Board {
 
     public static final int SPAWN_ROW = -1;
