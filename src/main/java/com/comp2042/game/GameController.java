@@ -3,6 +3,7 @@ package com.comp2042.game;
 import com.comp2042.board.Board;
 import com.comp2042.board.SimpleBoard;
 import com.comp2042.board.ViewData;
+import com.comp2042.config.GameSettings;
 import com.comp2042.game.events.DownData;
 import com.comp2042.game.events.InputEventListener;
 import com.comp2042.game.events.MoveEvent;
@@ -20,9 +21,10 @@ public class GameController implements InputEventListener {
     private final Board board;
     private final GameLogic logic;
 
-    public GameController(GuiController c, GameConfig config) {
+    public GameController(GuiController c, GameConfig config, GameSettings settings) {
         viewGuiController = c;
         this.config = config != null ? config : GameConfig.defaultConfig();
+        GameSettings safeSettings = settings != null ? settings : GameSettings.defaultSettings();
         generator = this.config.seedOverride().isPresent()
                 ? new PieceGenerator(this.config.seedOverride().getAsLong())
                 : new PieceGenerator();
@@ -30,6 +32,7 @@ public class GameController implements InputEventListener {
         logic = new GameLogic(board);
         board.createNewBrick();
         viewGuiController.setEventListener(this);
+        viewGuiController.setGameSettings(safeSettings);
         viewGuiController.initGameView(board.getBoardMatrix(), board.getViewData());
         viewGuiController.bindScore(logic.getScore());
         publishSeedSummary();
