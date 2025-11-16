@@ -7,12 +7,12 @@ import java.util.Deque;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * Utility methods for copying, merging, and clearing board matrices.
+ */
 public class MatrixOperations {
 
-
-    //We don't want to instantiate this utility class
-    private MatrixOperations(){
-
+    private MatrixOperations() {
     }
 
     public static boolean intersect(final int[][] matrix, final int[][] brick, int x, int y) {
