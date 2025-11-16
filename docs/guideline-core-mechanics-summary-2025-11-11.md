@@ -12,6 +12,11 @@ This document outlines the gameplay features that now ship by default with the `
 
 The packages map directly to the Guideline mechanics described below—logic stays headless under `game/board`, while JavaFX bindings live under `ui`.
 
+## Deterministic Seeds & Debugging
+- Launch with `--seed=<long>` (e.g., `./mvnw javafx:run -Dexec.args="--seed=1234"`) to reproduce a specific 7-Bag sequence.
+- When no seed is provided, a random seed is generated per run and logged once play starts plus in the Game Over overlay; reuse it via the same `--seed` flag to replay a session.
+- Restarting the game from the menu or Game Over panel reinitialises the bag so deterministic runs always start from the first bag.
+
 ## Baseline Gameplay
 - **Single-player JavaFX Tetris** targeting a 25×10 playfield with hidden spawn rows and a standard tick-driven gravity loop.
 - **Matrix-based board representation**, allowing collision checks, merges, line clears, and score notifications through `GameLogic`/`SimpleBoard`.

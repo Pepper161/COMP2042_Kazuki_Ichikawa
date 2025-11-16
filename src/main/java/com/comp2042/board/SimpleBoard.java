@@ -29,12 +29,16 @@ public class SimpleBoard implements Board {
     private final Score score;
 
     public SimpleBoard(int width, int height) {
+        this(width, height, new PieceGenerator());
+    }
+
+    public SimpleBoard(int width, int height, BrickGenerator brickGenerator) {
         this.width = width;
         this.height = height;
-        currentGameMatrix = new int[width][height];
-        brickGenerator = new PieceGenerator();
-        brickRotator = new BrickRotator();
-        score = new Score();
+        this.brickGenerator = brickGenerator != null ? brickGenerator : new PieceGenerator();
+        this.currentGameMatrix = new int[width][height];
+        this.brickRotator = new BrickRotator();
+        this.score = new Score();
     }
 
     @Override
@@ -139,6 +143,7 @@ public class SimpleBoard implements Board {
     public void newGame() {
         currentGameMatrix = new int[width][height];
         score.reset();
+        brickGenerator.reset();
         createNewBrick();
     }
 

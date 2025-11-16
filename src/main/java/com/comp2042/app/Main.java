@@ -1,5 +1,6 @@
 package com.comp2042.app;
 
+import com.comp2042.game.GameConfig;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -7,6 +8,7 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 import java.net.URL;
+import java.util.Map;
 
 /**
  * JavaFX entry point that loads the start menu and wires it to the primary stage.
@@ -20,11 +22,13 @@ public class Main extends Application {
      */
     @Override
     public void start(Stage primaryStage) throws Exception {
+        GameConfig config = parseGameConfig();
         URL startMenu = getClass().getClassLoader().getResource("StartMenu.fxml");
         FXMLLoader fxmlLoader = new FXMLLoader(startMenu);
         Parent root = fxmlLoader.load();
         StartMenuController controller = fxmlLoader.getController();
         controller.setPrimaryStage(primaryStage);
+        controller.setGameConfig(config);
 
         primaryStage.setTitle("TetrisJFX");
         Scene scene = new Scene(root, StartMenuController.WINDOW_WIDTH, StartMenuController.WINDOW_HEIGHT);
@@ -34,5 +38,21 @@ public class Main extends Application {
 
     public static void main(String[] args) {
         launch(args);
+    }
+
+    private GameConfig parseGameConfig() {
+        Map<String, String> namedParams = getParameters() != null ? getParameters().getNamed() : Map.of();
+        String seedValue = namedParams.get("seed");
+        if (seedValue == null) {
+            return GameConfig.defaultConfig();
+        }
+        try {
+            GameConfig config = GameConfig.fromSeedParameter(seedValue);
+            System.out.println("[Game] Using deterministic seed: " + seedValue);
+            return config;
+        } catch (IllegalArgumentException ex) {
+            System.err.println("[Game] Invalid --seed value '" + seedValue + "'. Falling back to random bag.");
+            return GameConfig.defaultConfig();
+        }
     }
 }

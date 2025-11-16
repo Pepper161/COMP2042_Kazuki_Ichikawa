@@ -324,6 +324,12 @@ public class GuiController implements Initializable {
         startNewGameSession();
     }
 
+    public void updateSeedInfo(long seed, boolean deterministic) {
+        if (gameOverPanel != null) {
+            gameOverPanel.setSeedInfo(seed, deterministic);
+        }
+    }
+
     private void startNewGameSession() {
         if (timeLine != null) {
             timeLine.stop();

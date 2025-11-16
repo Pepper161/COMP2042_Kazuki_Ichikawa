@@ -6,6 +6,7 @@ import com.comp2042.board.ViewData;
 import com.comp2042.game.events.DownData;
 import com.comp2042.game.events.InputEventListener;
 import com.comp2042.game.events.MoveEvent;
+import com.comp2042.logic.bricks.PieceGenerator;
 import com.comp2042.ui.GuiController;
 
 /**
@@ -14,15 +15,24 @@ import com.comp2042.ui.GuiController;
 public class GameController implements InputEventListener {
 
     private final GuiController viewGuiController;
-    private final Board board = new SimpleBoard(25, 10);
-    private final GameLogic logic = new GameLogic(board);
+    private final GameConfig config;
+    private final PieceGenerator generator;
+    private final Board board;
+    private final GameLogic logic;
 
-    public GameController(GuiController c) {
+    public GameController(GuiController c, GameConfig config) {
         viewGuiController = c;
+        this.config = config != null ? config : GameConfig.defaultConfig();
+        generator = this.config.seedOverride().isPresent()
+                ? new PieceGenerator(this.config.seedOverride().getAsLong())
+                : new PieceGenerator();
+        board = new SimpleBoard(25, 10, generator);
+        logic = new GameLogic(board);
         board.createNewBrick();
         viewGuiController.setEventListener(this);
         viewGuiController.initGameView(board.getBoardMatrix(), board.getViewData());
         viewGuiController.bindScore(logic.getScore());
+        publishSeedSummary();
     }
 
     @Override
@@ -89,6 +99,7 @@ public class GameController implements InputEventListener {
     @Override
     public ViewData createNewGame() {
         ViewData viewData = logic.newGame();
+        publishSeedSummary();
         syncBoardState();
         return viewData;
     }
@@ -98,7 +109,20 @@ public class GameController implements InputEventListener {
             viewGuiController.refreshGameBackground(board.getBoardMatrix());
         }
         if (logic.consumeGameOverFlag()) {
+            logSeedForReplay();
             viewGuiController.gameOver();
         }
+    }
+
+    private void publishSeedSummary() {
+        long seed = generator.getCurrentSeed();
+        boolean deterministic = config.hasSeedOverride();
+        viewGuiController.updateSeedInfo(seed, deterministic);
+        System.out.println("[Game] Session seed: " + seed + (deterministic ? " (fixed)" : ""));
+    }
+
+    private void logSeedForReplay() {
+        long seed = generator.getCurrentSeed();
+        System.out.println("[Game] Game over. Replay this run with --seed=" + seed);
     }
 }
