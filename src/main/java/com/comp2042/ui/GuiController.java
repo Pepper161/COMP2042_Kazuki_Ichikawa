@@ -1,5 +1,14 @@
-package com.comp2042;
+package com.comp2042.ui;
 
+import com.comp2042.app.StartMenuController;
+import com.comp2042.board.ViewData;
+import com.comp2042.game.GameState;
+import com.comp2042.game.Score;
+import com.comp2042.game.events.DownData;
+import com.comp2042.game.events.EventSource;
+import com.comp2042.game.events.EventType;
+import com.comp2042.game.events.InputEventListener;
+import com.comp2042.game.events.MoveEvent;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Platform;

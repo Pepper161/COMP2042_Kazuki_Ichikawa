@@ -1,4 +1,4 @@
-package com.comp2042;
+package com.comp2042.board;
 
 import java.util.Collections;
 import java.util.List;

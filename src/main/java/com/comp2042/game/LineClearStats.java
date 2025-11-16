@@ -1,4 +1,4 @@
-package com.comp2042;
+package com.comp2042.game;
 
 /**
  * Immutable value object describing the outcome of a line clear.

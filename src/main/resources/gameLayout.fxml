@@ -1,6 +1,6 @@
-<?import com.comp2042.GameOverPanel?>
-<?import com.comp2042.HudPanel?>
-<?import com.comp2042.NextQueuePanel?>
+<?import com.comp2042.ui.GameOverPanel?>
+<?import com.comp2042.ui.HudPanel?>
+<?import com.comp2042.ui.NextQueuePanel?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ToggleButton?>
@@ -8,7 +8,7 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.Text?>
 <?import java.net.URL?>
-<Pane fx:controller="com.comp2042.GuiController"
+<Pane fx:controller="com.comp2042.ui.GuiController"
       xmlns:fx="http://javafx.com/fxml">
     <GridPane fx:id="ghostPanel" vgap="1" hgap="1" mouseTransparent="true" pickOnBounds="false"/>
     <GridPane fx:id="brickPanel" vgap="1" hgap="1"/>
