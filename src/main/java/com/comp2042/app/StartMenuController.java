@@ -1,5 +1,6 @@
 package com.comp2042.app;
 
+import com.comp2042.game.GameConfig;
 import com.comp2042.game.GameController;
 import com.comp2042.game.GameState;
 import com.comp2042.ui.GuiController;
@@ -23,6 +24,7 @@ public class StartMenuController {
     public static final double WINDOW_HEIGHT = 510;
 
     private Stage primaryStage;
+    private GameConfig gameConfig = GameConfig.defaultConfig();
 
     public void setPrimaryStage(Stage primaryStage) {
         this.primaryStage = primaryStage;
@@ -40,7 +42,7 @@ public class StartMenuController {
             Scene scene = new Scene(root, WINDOW_WIDTH, WINDOW_HEIGHT);
             primaryStage.setScene(scene);
             primaryStage.show();
-            new GameController(guiController);
+            new GameController(guiController, gameConfig);
             guiController.setGameState(GameState.PLAYING);
         } catch (IOException ex) {
             throw new IllegalStateException("Failed to load game layout.", ex);
@@ -56,5 +58,9 @@ public class StartMenuController {
         if (primaryStage == null) {
             throw new IllegalStateException("Primary stage has not been injected into StartMenuController.");
         }
+    }
+
+    public void setGameConfig(GameConfig gameConfig) {
+        this.gameConfig = gameConfig != null ? gameConfig : GameConfig.defaultConfig();
     }
 }

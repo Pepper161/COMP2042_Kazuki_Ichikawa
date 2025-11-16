@@ -14,10 +14,13 @@ public class GameOverPanel extends BorderPane {
     private Runnable onRestart = () -> {};
     private Runnable onExit = () -> {};
     private Runnable onMainMenu = () -> {};
+    private final Label seedLabel = new Label();
 
     public GameOverPanel() {
         final Label gameOverLabel = new Label("GAME OVER");
         gameOverLabel.getStyleClass().add("gameOverStyle");
+        seedLabel.getStyleClass().add("seedLabel");
+        seedLabel.setVisible(false);
 
         Button restartButton = new Button("Restart");
         restartButton.getStyleClass().add("ipad-dark-grey");
@@ -31,7 +34,7 @@ public class GameOverPanel extends BorderPane {
         exitButton.getStyleClass().add("ipad-dark-grey");
         exitButton.setOnAction(event -> onExit.run());
 
-        VBox container = new VBox(18, gameOverLabel, restartButton, menuButton, exitButton);
+        VBox container = new VBox(18, gameOverLabel, seedLabel, restartButton, menuButton, exitButton);
         container.setAlignment(Pos.CENTER);
         container.setFillWidth(false);
 
@@ -49,5 +52,10 @@ public class GameOverPanel extends BorderPane {
 
     public void setOnMainMenu(Runnable onMainMenu) {
         this.onMainMenu = onMainMenu != null ? onMainMenu : () -> {};
+    }
+
+    public void setSeedInfo(long seed, boolean deterministic) {
+        seedLabel.setText("Seed: " + seed + (deterministic ? " (fixed)" : ""));
+        seedLabel.setVisible(true);
     }
 }

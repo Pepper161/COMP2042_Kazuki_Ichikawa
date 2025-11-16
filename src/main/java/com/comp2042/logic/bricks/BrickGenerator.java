@@ -9,4 +9,8 @@ public interface BrickGenerator {
     Brick getNextBrick();
 
     List<Brick> peekUpcoming(int count);
+
+    default void reset() {
+        // Generators that support resetting can override.
+    }
 }
