@@ -112,8 +112,6 @@ public class GuiController implements Initializable {
     private GameSettings gameSettings = GameSettings.defaultSettings();
     private final Map<KeyCode, GameSettings.Action> actionByKey = new HashMap<>();
     private final Set<KeyCode> heldKeys = EnumSet.noneOf(KeyCode.class);
-    private AutoRepeatHandler moveLeftRepeat;
-    private AutoRepeatHandler moveRightRepeat;
     private AutoRepeatHandler softDropRepeat;
     private int currentLevel = 1;
     private int linesUntilNextLevel = LINES_PER_LEVEL;
@@ -376,8 +374,6 @@ public class GuiController implements Initializable {
         }
         Duration das = Duration.millis(gameSettings.getDasDelayMs());
         Duration arr = Duration.millis(Math.max(1, gameSettings.getArrIntervalMs()));
-        moveLeftRepeat = new AutoRepeatHandler(this::performMoveLeft, das, arr);
-        moveRightRepeat = new AutoRepeatHandler(this::performMoveRight, das, arr);
         double softDropInterval = Math.max(10d, currentGravityMs / gameSettings.getSoftDropMultiplier());
         softDropRepeat = new AutoRepeatHandler(this::performSoftDrop, Duration.ZERO, Duration.millis(softDropInterval));
     }
@@ -395,16 +391,8 @@ public class GuiController implements Initializable {
             return;
         }
         switch (action) {
-            case MOVE_LEFT -> {
-                if (moveLeftRepeat != null) {
-                    moveLeftRepeat.start();
-                }
-            }
-            case MOVE_RIGHT -> {
-                if (moveRightRepeat != null) {
-                    moveRightRepeat.start();
-                }
-            }
+            case MOVE_LEFT -> performMoveLeft();
+            case MOVE_RIGHT -> performMoveRight();
             case SOFT_DROP -> {
                 if (softDropRepeat != null) {
                     softDropRepeat.start();
@@ -425,12 +413,8 @@ public class GuiController implements Initializable {
         if (action == null) {
             return;
         }
-        switch (action) {
-            case MOVE_LEFT -> stopRepeat(moveLeftRepeat);
-            case MOVE_RIGHT -> stopRepeat(moveRightRepeat);
-            case SOFT_DROP -> stopRepeat(softDropRepeat);
-            default -> {
-            }
+        if (action == GameSettings.Action.SOFT_DROP) {
+            stopRepeat(softDropRepeat);
         }
     }
 
@@ -604,8 +588,6 @@ public class GuiController implements Initializable {
     }
 
     private void stopAllRepeats() {
-        stopRepeat(moveLeftRepeat);
-        stopRepeat(moveRightRepeat);
         stopRepeat(softDropRepeat);
         heldKeys.clear();
     }
