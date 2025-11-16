@@ -136,7 +136,7 @@
                 </HBox>
                 <TextField fx:id="newGameKeyField" GridPane.rowIndex="6" GridPane.columnIndex="1"/>
             </GridPane>
-            <Label fx:id="infoLabel" wrapText="true" textFill="#444444"/>
+            <Label fx:id="infoLabel" wrapText="true" textFill="#444444" maxWidth="Infinity"/>
         </VBox>
     </center>
     <bottom>
