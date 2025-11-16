@@ -1,6 +1,7 @@
 package com.comp2042.ui;
 
 import com.comp2042.app.StartMenuController;
+import com.comp2042.board.ClearRow;
 import com.comp2042.board.ViewData;
 import com.comp2042.config.GameSettings;
 import com.comp2042.game.GameState;
@@ -56,6 +57,11 @@ public class GuiController implements Initializable {
     private static final int HIDDEN_ROWS = 2;
     private static final double GAME_OVER_GUIDE_OFFSET_ROWS = 0.5;
     private static final double BASE_GRAVITY_INTERVAL_MS = 400;
+    private static final double MIN_GRAVITY_INTERVAL_MS = 80;
+    private static final int LINES_PER_LEVEL = 10;
+    private static final double[] LEVEL_GRAVITY_MS = {
+            400, 360, 320, 280, 240, 200, 170, 140, 120, 100, 90, 80
+    };
 
     @FXML
     private GridPane gamePanel;
@@ -109,6 +115,9 @@ public class GuiController implements Initializable {
     private AutoRepeatHandler moveLeftRepeat;
     private AutoRepeatHandler moveRightRepeat;
     private AutoRepeatHandler softDropRepeat;
+    private int currentLevel = 1;
+    private int linesUntilNextLevel = LINES_PER_LEVEL;
+    private double currentGravityMs = BASE_GRAVITY_INTERVAL_MS;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -185,13 +194,10 @@ public class GuiController implements Initializable {
         applyBrickView(brick);
 
 
-        timeLine = new Timeline(new KeyFrame(
-                Duration.millis(BASE_GRAVITY_INTERVAL_MS),
-                ae -> moveDown(new MoveEvent(EventType.DOWN, EventSource.THREAD))
-        ));
+        timeLine = new Timeline();
         timeLine.setCycleCount(Timeline.INDEFINITE);
-        updateTimelinePlayback();
         rebuildKeyBindings();
+        resetLevelTracking();
     }
 
 
@@ -271,11 +277,13 @@ public class GuiController implements Initializable {
         if (downData == null) {
             return;
         }
-        if (downData.getClearRow() != null && downData.getClearRow().getLinesRemoved() > 0) {
-            NotificationPanel notificationPanel = new NotificationPanel("+" + downData.getClearRow().getScoreBonus());
+        ClearRow clearRow = downData.getClearRow();
+        if (clearRow != null && clearRow.getLinesRemoved() > 0) {
+            NotificationPanel notificationPanel = new NotificationPanel("+" + clearRow.getScoreBonus());
             groupNotification.getChildren().add(notificationPanel);
             notificationPanel.showScore(groupNotification.getChildren());
         }
+        updateLevelProgress(clearRow);
         refreshBrick(downData.getViewData());
         gamePanel.requestFocus();
     }
@@ -344,6 +352,12 @@ public class GuiController implements Initializable {
         }
     }
 
+    public void setLevel(int level) {
+        if (hudPanel != null) {
+            hudPanel.setLevel(level);
+        }
+    }
+
     public void setGameSettings(GameSettings settings) {
         this.gameSettings = settings != null ? settings : GameSettings.defaultSettings();
         heldKeys.clear();
@@ -364,7 +378,7 @@ public class GuiController implements Initializable {
         Duration arr = Duration.millis(Math.max(1, gameSettings.getArrIntervalMs()));
         moveLeftRepeat = new AutoRepeatHandler(this::performMoveLeft, das, arr);
         moveRightRepeat = new AutoRepeatHandler(this::performMoveRight, das, arr);
-        double softDropInterval = Math.max(10d, BASE_GRAVITY_INTERVAL_MS / gameSettings.getSoftDropMultiplier());
+        double softDropInterval = Math.max(10d, currentGravityMs / gameSettings.getSoftDropMultiplier());
         softDropRepeat = new AutoRepeatHandler(this::performSoftDrop, Duration.ZERO, Duration.millis(softDropInterval));
     }
 
@@ -452,6 +466,7 @@ public class GuiController implements Initializable {
 
     private void startNewGameSession() {
         stopAllRepeats();
+        resetLevelTracking();
         if (timeLine != null) {
             timeLine.stop();
         }
@@ -593,5 +608,67 @@ public class GuiController implements Initializable {
         stopRepeat(moveRightRepeat);
         stopRepeat(softDropRepeat);
         heldKeys.clear();
+    }
+
+    private void resetLevelTracking() {
+        currentLevel = 1;
+        linesUntilNextLevel = LINES_PER_LEVEL;
+        currentGravityMs = resolveGravityInterval(currentLevel);
+        setLevel(currentLevel);
+        applyGravityInterval();
+        updateSoftDropRepeatInterval();
+    }
+
+    private void applyGravityInterval() {
+        if (timeLine == null) {
+            return;
+        }
+        timeLine.stop();
+        timeLine.getKeyFrames().setAll(new KeyFrame(
+                Duration.millis(currentGravityMs),
+                ae -> moveDown(new MoveEvent(EventType.DOWN, EventSource.THREAD))
+        ));
+        updateTimelinePlayback();
+    }
+
+    private void updateSoftDropRepeatInterval() {
+        if (softDropRepeat == null) {
+            return;
+        }
+        double softDropInterval = Math.max(10d, currentGravityMs / gameSettings.getSoftDropMultiplier());
+        softDropRepeat.configure(Duration.ZERO, Duration.millis(softDropInterval));
+    }
+
+    private void updateLevelProgress(ClearRow clearRow) {
+        if (clearRow == null) {
+            return;
+        }
+        int removed = clearRow.getLinesRemoved();
+        if (removed <= 0) {
+            return;
+        }
+        linesUntilNextLevel -= removed;
+        boolean leveledUp = false;
+        while (linesUntilNextLevel <= 0) {
+            currentLevel++;
+            linesUntilNextLevel += LINES_PER_LEVEL;
+            leveledUp = true;
+        }
+        if (leveledUp) {
+            setLevel(currentLevel);
+            currentGravityMs = resolveGravityInterval(currentLevel);
+            applyGravityInterval();
+            updateSoftDropRepeatInterval();
+        }
+    }
+
+    private double resolveGravityInterval(int level) {
+        if (level <= 0) {
+            return BASE_GRAVITY_INTERVAL_MS;
+        }
+        if (level > LEVEL_GRAVITY_MS.length) {
+            return MIN_GRAVITY_INTERVAL_MS;
+        }
+        return Math.max(MIN_GRAVITY_INTERVAL_MS, LEVEL_GRAVITY_MS[level - 1]);
     }
 }
