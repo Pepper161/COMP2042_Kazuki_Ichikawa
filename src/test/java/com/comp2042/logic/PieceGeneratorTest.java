@@ -9,7 +9,9 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
 
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 class PieceGeneratorTest {
 
@@ -47,5 +49,40 @@ class PieceGeneratorTest {
         Brick nextFromPeek = preview.get(0);
         Brick actualNext = generator.getBrick();
         assertEquals(nextFromPeek.getType(), actualNext.getType());
+    }
+
+    @Test
+    void deterministicSeedProducesRepeatableSequence() {
+        PieceGenerator seededA = new PieceGenerator(1234L);
+        PieceGenerator seededB = new PieceGenerator(1234L);
+        TetrominoType[] sequenceA = captureSequence(seededA, 21);
+        TetrominoType[] sequenceB = captureSequence(seededB, 21);
+        assertArrayEquals(sequenceA, sequenceB);
+    }
+
+    @Test
+    void resetWithFixedSeedReplaysSameSequence() {
+        PieceGenerator seeded = new PieceGenerator(777L);
+        TetrominoType[] initial = captureSequence(seeded, 14);
+        seeded.reset();
+        TetrominoType[] replay = captureSequence(seeded, 14);
+        assertArrayEquals(initial, replay);
+    }
+
+    @Test
+    void resetWithoutSeedProducesNewRandomSeed() {
+        PieceGenerator generator = new PieceGenerator();
+        long firstSeed = generator.getCurrentSeed();
+        generator.reset();
+        long secondSeed = generator.getCurrentSeed();
+        assertNotEquals(firstSeed, secondSeed, "Random runs should publish new seeds after reset");
+    }
+
+    private TetrominoType[] captureSequence(PieceGenerator generator, int count) {
+        TetrominoType[] values = new TetrominoType[count];
+        for (int i = 0; i < count; i++) {
+            values[i] = generator.getBrick().getType();
+        }
+        return values;
     }
 }
