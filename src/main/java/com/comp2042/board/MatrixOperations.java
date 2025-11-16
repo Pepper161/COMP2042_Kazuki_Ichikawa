@@ -1,8 +1,7 @@
-package com.comp2042;
+package com.comp2042.board;
 
 import java.awt.Point;
 import java.util.ArrayDeque;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Deque;
 import java.util.List;

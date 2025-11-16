@@ -1,5 +1,6 @@
-package com.comp2042;
+package com.comp2042.ui;
 
+import com.comp2042.game.Score;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.IntegerProperty;
 import javafx.scene.control.Label;
@@ -50,4 +51,3 @@ public class HudPanel extends VBox {
                 b2bProperty));
     }
 }
-

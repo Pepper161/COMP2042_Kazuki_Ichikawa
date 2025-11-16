@@ -1,5 +1,7 @@
 package com.comp2042;
 
+import com.comp2042.board.ClearRow;
+import com.comp2042.board.MatrixOperations;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
