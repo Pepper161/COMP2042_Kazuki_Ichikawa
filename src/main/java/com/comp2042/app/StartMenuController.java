@@ -1,5 +1,7 @@
 package com.comp2042.app;
 
+import com.comp2042.config.GameSettings;
+import com.comp2042.config.GameSettingsStore;
 import com.comp2042.game.GameConfig;
 import com.comp2042.game.GameController;
 import com.comp2042.game.GameState;
@@ -14,6 +16,7 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 import java.net.URL;
+import javafx.stage.Modality;
 
 /**
  * Controller for the start menu. Handles navigation into the gameplay scene.
@@ -25,6 +28,8 @@ public class StartMenuController {
 
     private Stage primaryStage;
     private GameConfig gameConfig = GameConfig.defaultConfig();
+    private final GameSettingsStore settingsStore = new GameSettingsStore();
+    private GameSettings gameSettings = settingsStore.load();
 
     public void setPrimaryStage(Stage primaryStage) {
         this.primaryStage = primaryStage;
@@ -42,7 +47,7 @@ public class StartMenuController {
             Scene scene = new Scene(root, WINDOW_WIDTH, WINDOW_HEIGHT);
             primaryStage.setScene(scene);
             primaryStage.show();
-            new GameController(guiController, gameConfig);
+            new GameController(guiController, gameConfig, gameSettings);
             guiController.setGameState(GameState.PLAYING);
         } catch (IOException ex) {
             throw new IllegalStateException("Failed to load game layout.", ex);
@@ -52,6 +57,29 @@ public class StartMenuController {
     @FXML
     private void onExit(ActionEvent event) {
         Platform.exit();
+    }
+
+    @FXML
+    private void onSettings(ActionEvent event) {
+        ensurePrimaryStageBound();
+        try {
+            URL settingsUrl = getClass().getClassLoader().getResource("SettingsDialog.fxml");
+            FXMLLoader loader = new FXMLLoader(settingsUrl);
+            Parent root = loader.load();
+            SettingsController controller = loader.getController();
+            Stage dialog = new Stage();
+            dialog.setTitle("Settings");
+            dialog.initOwner(primaryStage);
+            dialog.initModality(Modality.WINDOW_MODAL);
+            controller.setDialogStage(dialog);
+            controller.setInitialSettings(gameSettings);
+            Scene scene = new Scene(root, 420, 520);
+            dialog.setScene(scene);
+            dialog.showAndWait();
+            controller.getResult().ifPresent(result -> gameSettings = result);
+        } catch (IOException ex) {
+            throw new IllegalStateException("Failed to load settings dialog.", ex);
+        }
     }
 
     private void ensurePrimaryStageBound() {

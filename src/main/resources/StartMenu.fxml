@@ -12,6 +12,7 @@
         <VBox fx:id="menuContainer" alignment="CENTER" spacing="24">
             <Label fx:id="titleLabel" text="TetrisJFX" styleClass="menu-title"/>
             <Button fx:id="startButton" text="Start" onAction="#onStart" prefWidth="160" styleClass="ipad-dark-grey"/>
+            <Button fx:id="settingsButton" text="Settings" onAction="#onSettings" prefWidth="160" styleClass="ipad-dark-grey"/>
             <Button fx:id="exitButton" text="Exit" onAction="#onExit" prefWidth="160" styleClass="ipad-dark-grey"/>
         </VBox>
     </center>
