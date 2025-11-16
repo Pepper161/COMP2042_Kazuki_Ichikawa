@@ -14,7 +14,10 @@
             xmlns:fx="http://javafx.com/fxml"
             fx:controller="com.comp2042.app.SettingsController">
     <center>
-        <VBox spacing="18" padding="20">
+        <VBox spacing="18">
+            <padding>
+                <Insets top="20" right="20" bottom="20" left="20"/>
+            </padding>
             <Label text="入力設定 (DAS / ARR / SDF)" styleClass="menu-title"/>
             <GridPane hgap="10" vgap="10">
                 <columnConstraints>
@@ -53,7 +56,10 @@
         </VBox>
     </center>
     <bottom>
-        <HBox spacing="12" alignment="CENTER_RIGHT" padding="12">
+        <HBox spacing="12" alignment="CENTER_RIGHT">
+            <padding>
+                <Insets top="12" right="12" bottom="12" left="12"/>
+            </padding>
             <Label fx:id="statusLabel" textFill="#cc3333"/>
             <Region HBox.hgrow="ALWAYS"/>
             <Button text="Cancel" onAction="#onCancel" styleClass="ipad-dark-grey"/>
