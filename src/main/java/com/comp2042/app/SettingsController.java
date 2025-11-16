@@ -8,6 +8,8 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 import java.util.EnumMap;
@@ -73,6 +75,12 @@ public class SettingsController {
         wireKeyField(rotateCcwField, GameSettings.Action.ROTATE_CCW);
         wireKeyField(newGameKeyField, GameSettings.Action.NEW_GAME);
         populateFields();
+        if (infoLabel != null) {
+            infoLabel.setWrapText(true);
+            infoLabel.setMaxWidth(Double.MAX_VALUE);
+            VBox.setVgrow(infoLabel, Priority.NEVER);
+            infoLabel.setText("Select a ? icon to learn what each setting means.");
+        }
     }
 
     public void setDialogStage(Stage dialogStage) {
@@ -122,7 +130,6 @@ public class SettingsController {
             entry.getValue().setText(keyCode != null ? keyCode.name() : "");
         }
         statusLabel.setText("");
-        infoLabel.setText("Select a ? icon to learn what each setting means.");
     }
 
     private GameSettings collectSettings() {

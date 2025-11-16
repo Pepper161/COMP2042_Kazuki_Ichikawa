@@ -73,7 +73,7 @@ public class StartMenuController {
             dialog.initModality(Modality.WINDOW_MODAL);
             controller.setDialogStage(dialog);
             controller.setInitialSettings(gameSettings);
-            Scene scene = new Scene(root, 420, 520);
+            Scene scene = new Scene(root, 520, 620);
             dialog.setScene(scene);
             dialog.showAndWait();
             controller.getResult().ifPresent(result -> gameSettings = result);
