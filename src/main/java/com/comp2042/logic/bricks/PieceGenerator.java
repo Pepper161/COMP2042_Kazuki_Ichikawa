@@ -6,6 +6,8 @@ import java.util.Collections;
 import java.util.Deque;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * Implements the Guideline 7-bag randomiser. Every bag contains one instance of
@@ -14,9 +16,18 @@ import java.util.List;
 public class PieceGenerator implements BrickGenerator {
 
     private final Deque<Brick> queue = new ArrayDeque<>();
+    private final Random random = new Random();
+    private final Long fixedSeed;
+    private long activeSeed;
 
     public PieceGenerator() {
-        refillBag();
+        this.fixedSeed = null;
+        reseed(ThreadLocalRandom.current().nextLong());
+    }
+
+    public PieceGenerator(long seed) {
+        this.fixedSeed = seed;
+        reseed(seed);
     }
 
     @Override
@@ -53,6 +64,19 @@ public class PieceGenerator implements BrickGenerator {
         return preview;
     }
 
+    @Override
+    public void reset() {
+        if (fixedSeed != null) {
+            reseed(fixedSeed);
+        } else {
+            reseed(ThreadLocalRandom.current().nextLong());
+        }
+    }
+
+    public long getCurrentSeed() {
+        return activeSeed;
+    }
+
     private void ensureQueueSize(int minSize) {
         while (queue.size() < minSize) {
             refillBag();
@@ -68,7 +92,14 @@ public class PieceGenerator implements BrickGenerator {
         bag.add(new SBrick());
         bag.add(new TBrick());
         bag.add(new ZBrick());
-        Collections.shuffle(bag);
+        Collections.shuffle(bag, random);
         queue.addAll(bag);
+    }
+
+    private void reseed(long seed) {
+        activeSeed = seed;
+        random.setSeed(seed);
+        queue.clear();
+        refillBag();
     }
 }
