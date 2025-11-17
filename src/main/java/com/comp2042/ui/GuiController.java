@@ -3,6 +3,7 @@ package com.comp2042.ui;
 import com.comp2042.app.StartMenuController;
 import com.comp2042.board.ClearRow;
 import com.comp2042.board.ViewData;
+import com.comp2042.audio.BackgroundMusicManager;
 import com.comp2042.config.GameSettings;
 import com.comp2042.game.GameState;
 import com.comp2042.game.Score;
@@ -484,6 +485,7 @@ public class GuiController implements Initializable {
         ViewData freshState = eventListener.createNewGame();
         applyBrickView(freshState);
         setGameState(GameState.PLAYING);
+        BackgroundMusicManager.getInstance().playGameTheme();
     }
 
     private void returnToMainMenu() {
@@ -509,6 +511,7 @@ public class GuiController implements Initializable {
             Scene menuScene = new Scene(menuRoot, width, height);
             primaryStage.setScene(menuScene);
             primaryStage.show();
+            BackgroundMusicManager.getInstance().playMenuTheme();
         } catch (IOException e) {
             throw new IllegalStateException("Failed to load StartMenu.fxml", e);
         }

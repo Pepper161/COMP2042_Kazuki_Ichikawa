@@ -26,12 +26,14 @@ public final class GameSettings {
     private final long arrIntervalMs;
     private final double softDropMultiplier;
     private final EnumMap<Action, KeyCode> keyBindings;
+    private final boolean bgmEnabled;
 
     private GameSettings(Builder builder) {
         this.dasDelayMs = builder.dasDelayMs;
         this.arrIntervalMs = builder.arrIntervalMs;
         this.softDropMultiplier = builder.softDropMultiplier;
         this.keyBindings = new EnumMap<>(builder.keyBindings);
+        this.bgmEnabled = builder.bgmEnabled;
     }
 
     public static Builder builder() {
@@ -62,6 +64,10 @@ public final class GameSettings {
         return Collections.unmodifiableMap(keyBindings);
     }
 
+    public boolean isBgmEnabled() {
+        return bgmEnabled;
+    }
+
     public Builder toBuilder() {
         return builder().from(this);
     }
@@ -72,6 +78,7 @@ public final class GameSettings {
         private long arrIntervalMs = 60;
         private double softDropMultiplier = 8.0;
         private final EnumMap<Action, KeyCode> keyBindings = new EnumMap<>(Action.class);
+        private boolean bgmEnabled = true;
 
         private Builder() {
             keyBindings.put(Action.MOVE_LEFT, KeyCode.LEFT);
@@ -92,6 +99,7 @@ public final class GameSettings {
             setSoftDropMultiplier(settings.softDropMultiplier);
             keyBindings.clear();
             keyBindings.putAll(settings.keyBindings);
+            setBgmEnabled(settings.isBgmEnabled());
             return this;
         }
 
@@ -112,6 +120,11 @@ public final class GameSettings {
 
         public Builder setKey(Action action, KeyCode keyCode) {
             keyBindings.put(Objects.requireNonNull(action), Objects.requireNonNull(keyCode));
+            return this;
+        }
+
+        public Builder setBgmEnabled(boolean enabled) {
+            this.bgmEnabled = enabled;
             return this;
         }
 

@@ -66,6 +66,10 @@ public class GameSettingsStore {
         parseLong(properties.getProperty("dasDelayMs")).ifPresent(builder::setDasDelayMs);
         parseLong(properties.getProperty("arrIntervalMs")).ifPresent(builder::setArrIntervalMs);
         parseDouble(properties.getProperty("softDropMultiplier")).ifPresent(builder::setSoftDropMultiplier);
+        String bgmValue = properties.getProperty("bgmEnabled");
+        if (bgmValue != null) {
+            builder.setBgmEnabled(Boolean.parseBoolean(bgmValue));
+        }
         for (GameSettings.Action action : GameSettings.Action.values()) {
             String value = properties.getProperty(KEY_PREFIX + action.name());
             if (value == null || value.isBlank()) {
@@ -85,6 +89,7 @@ public class GameSettingsStore {
         properties.setProperty("dasDelayMs", Long.toString(settings.getDasDelayMs()));
         properties.setProperty("arrIntervalMs", Long.toString(settings.getArrIntervalMs()));
         properties.setProperty("softDropMultiplier", Double.toString(settings.getSoftDropMultiplier()));
+        properties.setProperty("bgmEnabled", Boolean.toString(settings.isBgmEnabled()));
         for (var entry : settings.getKeyBindings().entrySet()) {
             properties.setProperty(KEY_PREFIX + entry.getKey().name(), entry.getValue().name());
         }
