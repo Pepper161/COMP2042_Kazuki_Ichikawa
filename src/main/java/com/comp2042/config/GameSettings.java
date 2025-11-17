@@ -68,8 +68,8 @@ public final class GameSettings {
 
     public static final class Builder {
 
-        private long dasDelayMs = 150;
-        private long arrIntervalMs = 30;
+        private long dasDelayMs = 220;
+        private long arrIntervalMs = 60;
         private double softDropMultiplier = 8.0;
         private final EnumMap<Action, KeyCode> keyBindings = new EnumMap<>(Action.class);
 
