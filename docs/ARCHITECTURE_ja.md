@@ -15,7 +15,7 @@ JavaFX落下パズル。表示層(GuiController,GameOverPanel,NotificationPanel)
 - `target/`：生成物（追跡外）。
 
 ## 起動フロー
-MainがJavaFXを起動しFXMLをロード。`fx:controller="com.comp2042.ui.GuiController"`でフィールドを結線し、GuiController.initializeがGrid初期化とTimeline開始、直後にGameControllerがBoardを準備し周期的なDOWNイベントを投げる。
+MainがJavaFXを起動しFXMLをロード。`fx:controller="com.comp2042.ui.GuiController"`でフィールドを結線し、GuiController.initializeがGrid初期化とTimelineを設定する。GuiControllerのTimeline（gravity tick）が`moveDown`を定期実行し、各 tick で GameController へ通知して Board を進める。GameController は Board/Score を初期化し、GuiController への ViewData 更新を担当する。
 
 ## 入力処理
 GuiControllerがキー入力をMoveEvent化し、EventTypeとEventSourceでUSER/THREADを識別してInputEventListener実装のGameControllerへ渡す。GameControllerは種別に応じて移動・回転・加点を処理する。
