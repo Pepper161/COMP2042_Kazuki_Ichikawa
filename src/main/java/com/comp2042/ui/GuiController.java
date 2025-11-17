@@ -778,10 +778,7 @@ public class GuiController implements Initializable {
             Scene scene = new Scene(root, 520, 620);
             dialog.setScene(scene);
             dialog.showAndWait();
-            controller.getResult().ifPresent(result -> {
-                gameSettings = result;
-                applyAudioPreferences();
-            });
+            controller.getResult().ifPresent(this::setGameSettings);
         } catch (IOException ex) {
             throw new IllegalStateException("Failed to load SettingsDialog.fxml", ex);
         }
