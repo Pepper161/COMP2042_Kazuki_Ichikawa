@@ -1,8 +1,7 @@
 package com.comp2042.audio;
 
 import javafx.application.Platform;
-import javafx.scene.media.Media;
-import javafx.scene.media.MediaPlayer;
+import javafx.scene.media.AudioClip;
 
 import java.net.URL;
 
@@ -18,15 +17,15 @@ public final class BackgroundMusicManager {
 
     private static final BackgroundMusicManager INSTANCE = new BackgroundMusicManager();
 
-    private final MediaPlayer menuPlayer;
-    private final MediaPlayer gamePlayer;
-    private MediaPlayer currentPlayer;
+    private final AudioClip menuClip;
+    private final AudioClip gameClip;
+    private AudioClip currentClip;
     private Mode currentMode = Mode.MENU;
     private boolean enabled = true;
 
     private BackgroundMusicManager() {
-        menuPlayer = createLoopingPlayer("audio/menu_theme.wav");
-        gamePlayer = createLoopingPlayer("audio/game_theme.wav");
+        menuClip = createLoopingClip("audio/menu_theme.wav");
+        gameClip = createLoopingClip("audio/game_theme.wav");
     }
 
     public static BackgroundMusicManager getInstance() {
@@ -45,12 +44,12 @@ public final class BackgroundMusicManager {
 
     public void playMenuTheme() {
         currentMode = Mode.MENU;
-        playPlayer(menuPlayer);
+        playClip(menuClip);
     }
 
     public void playGameTheme() {
         currentMode = Mode.GAME;
-        playPlayer(gamePlayer);
+        playClip(gameClip);
     }
 
     public void stopAll() {
@@ -59,47 +58,45 @@ public final class BackgroundMusicManager {
 
     private void resumeCurrentMode() {
         switch (currentMode) {
-            case GAME -> playPlayer(gamePlayer);
-            case MENU -> playPlayer(menuPlayer);
+            case GAME -> playClip(gameClip);
+            case MENU -> playClip(menuClip);
             default -> {
             }
         }
     }
 
-    private void playPlayer(MediaPlayer player) {
-        if (!enabled || player == null) {
+    private void playClip(AudioClip clip) {
+        if (!enabled || clip == null) {
             return;
         }
-        Runnable action = () -> {
-            if (currentPlayer != null && currentPlayer != player) {
-                currentPlayer.stop();
+        runOnFxThread(() -> {
+            if (currentClip != null && currentClip != clip) {
+                currentClip.stop();
             }
-            currentPlayer = player;
-            currentPlayer.stop();
-            currentPlayer.play();
-        };
-        runOnFxThread(action);
+            currentClip = clip;
+            currentClip.stop();
+            currentClip.play();
+        });
     }
 
     private void stopCurrent() {
-        if (currentPlayer == null) {
+        if (currentClip == null) {
             return;
         }
-        runOnFxThread(() -> currentPlayer.stop());
-        currentPlayer = null;
+        runOnFxThread(() -> currentClip.stop());
+        currentClip = null;
     }
 
-    private MediaPlayer createLoopingPlayer(String resourcePath) {
+    private AudioClip createLoopingClip(String resourcePath) {
         URL resource = getClass().getClassLoader().getResource(resourcePath);
         if (resource == null) {
             System.err.println("[Audio] Missing resource: " + resourcePath);
             return null;
         }
-        Media media = new Media(resource.toExternalForm());
-        MediaPlayer player = new MediaPlayer(media);
-        player.setCycleCount(MediaPlayer.INDEFINITE);
-        player.setVolume(0.35);
-        return player;
+        AudioClip clip = new AudioClip(resource.toExternalForm());
+        clip.setCycleCount(AudioClip.INDEFINITE);
+        clip.setVolume(0.35);
+        return clip;
     }
 
     private void runOnFxThread(Runnable action) {
