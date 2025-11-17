@@ -101,7 +101,7 @@ class SimpleBoardTest {
 
     private static final class SingleCellBrick implements Brick {
 
-        private final List<int[][]> rotations = List.of(new int[][]{
+        private final List<int[][]> rotations = Collections.singletonList(new int[][]{
                 {1}
         });
 
