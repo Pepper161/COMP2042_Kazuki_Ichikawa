@@ -457,6 +457,8 @@ public class GuiController implements Initializable {
 
     public void gameOver() {
         setGameState(GameState.GAME_OVER);
+        BackgroundMusicManager.getInstance().playGameOverJingle();
+        BackgroundMusicManager.getInstance().playMenuTheme();
     }
 
     public void newGame(ActionEvent actionEvent) {

@@ -19,6 +19,7 @@ public final class BackgroundMusicManager {
 
     private final AudioClip menuClip;
     private final AudioClip gameClip;
+    private final AudioClip gameOverClip;
     private AudioClip currentClip;
     private Mode currentMode = Mode.MENU;
     private boolean enabled = true;
@@ -26,6 +27,7 @@ public final class BackgroundMusicManager {
     private BackgroundMusicManager() {
         menuClip = createLoopingClip("audio/menu_theme.wav");
         gameClip = createLoopingClip("audio/game_theme.wav");
+        gameOverClip = createSingleShotClip("audio/game_over.wav");
     }
 
     public static BackgroundMusicManager getInstance() {
@@ -52,8 +54,14 @@ public final class BackgroundMusicManager {
         playClip(gameClip);
     }
 
-    public void stopAll() {
-        stopCurrent();
+    public void playGameOverJingle() {
+        if (!enabled || gameOverClip == null) {
+            return;
+        }
+        runOnFxThread(() -> {
+            gameOverClip.stop();
+            gameOverClip.play();
+        });
     }
 
     private void resumeCurrentMode() {
@@ -96,6 +104,18 @@ public final class BackgroundMusicManager {
         AudioClip clip = new AudioClip(resource.toExternalForm());
         clip.setCycleCount(AudioClip.INDEFINITE);
         clip.setVolume(0.35);
+        return clip;
+    }
+
+    private AudioClip createSingleShotClip(String resourcePath) {
+        URL resource = getClass().getClassLoader().getResource(resourcePath);
+        if (resource == null) {
+            System.err.println("[Audio] Missing resource: " + resourcePath);
+            return null;
+        }
+        AudioClip clip = new AudioClip(resource.toExternalForm());
+        clip.setCycleCount(1);
+        clip.setVolume(0.5);
         return clip;
     }
 
