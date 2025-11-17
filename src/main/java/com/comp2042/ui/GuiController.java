@@ -790,12 +790,15 @@ public class GuiController implements Initializable {
         manager.setEnabled(gameSettings.isBgmEnabled());
         manager.setMasterVolume(gameSettings.getBgmVolume());
         if (!gameSettings.isBgmEnabled()) {
+            manager.stopBackgroundMusic();
             return;
         }
         switch (gameState) {
             case PLAYING -> manager.playGameTheme();
-            case PAUSED -> manager.playMenuTheme();
             case MENU, GAME_OVER -> manager.playMenuTheme();
+            case PAUSED -> {
+                // keep current track while paused
+            }
             default -> {
             }
         }

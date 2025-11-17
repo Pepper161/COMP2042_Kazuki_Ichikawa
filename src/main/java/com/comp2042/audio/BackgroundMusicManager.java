@@ -23,7 +23,7 @@ public final class BackgroundMusicManager {
     private final AudioClip lineClearClip;
     private AudioClip currentClip;
     private Mode currentMode = Mode.MENU;
-    private boolean enabled = true;
+    private boolean backgroundEnabled = true;
     private double masterVolume = 0.35;
 
     private BackgroundMusicManager() {
@@ -38,8 +38,8 @@ public final class BackgroundMusicManager {
     }
 
     public void setEnabled(boolean enabled) {
-        boolean wasEnabled = this.enabled;
-        this.enabled = enabled;
+        boolean wasEnabled = this.backgroundEnabled;
+        this.backgroundEnabled = enabled;
         if (!enabled) {
             stopCurrent();
         } else if (!wasEnabled) {
@@ -58,7 +58,7 @@ public final class BackgroundMusicManager {
     }
 
     public void playGameOverJingle() {
-        if (!enabled || gameOverClip == null) {
+        if (gameOverClip == null) {
             return;
         }
         runOnFxThread(() -> {
@@ -68,7 +68,7 @@ public final class BackgroundMusicManager {
     }
 
     public void playLineClear() {
-        if (!enabled || lineClearClip == null) {
+        if (lineClearClip == null) {
             return;
         }
         runOnFxThread(() -> {
@@ -93,7 +93,7 @@ public final class BackgroundMusicManager {
     }
 
     private void playClip(AudioClip clip) {
-        if (!enabled || clip == null) {
+        if (!backgroundEnabled || clip == null) {
             return;
         }
         runOnFxThread(() -> {
@@ -104,6 +104,10 @@ public final class BackgroundMusicManager {
             currentClip.stop();
             currentClip.play();
         });
+    }
+
+    public void stopBackgroundMusic() {
+        stopCurrent();
     }
 
     private void stopCurrent() {
