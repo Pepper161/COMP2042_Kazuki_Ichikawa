@@ -20,6 +20,7 @@ public final class BackgroundMusicManager {
     private final AudioClip menuClip;
     private final AudioClip gameClip;
     private final AudioClip gameOverClip;
+    private final AudioClip lineClearClip;
     private AudioClip currentClip;
     private Mode currentMode = Mode.MENU;
     private boolean enabled = true;
@@ -28,7 +29,8 @@ public final class BackgroundMusicManager {
     private BackgroundMusicManager() {
         menuClip = createLoopingClip("audio/menu_theme.wav");
         gameClip = createLoopingClip("audio/game_theme.wav");
-        gameOverClip = createSingleShotClip("audio/game_over.wav");
+        gameOverClip = createSingleShotClip("audio/game_over.wav", 1.2);
+        lineClearClip = createSingleShotClip("audio/line_clear.wav", 0.8);
     }
 
     public static BackgroundMusicManager getInstance() {
@@ -62,6 +64,16 @@ public final class BackgroundMusicManager {
         runOnFxThread(() -> {
             gameOverClip.stop();
             gameOverClip.play();
+        });
+    }
+
+    public void playLineClear() {
+        if (!enabled || lineClearClip == null) {
+            return;
+        }
+        runOnFxThread(() -> {
+            lineClearClip.stop();
+            lineClearClip.play();
         });
     }
 
@@ -114,7 +126,7 @@ public final class BackgroundMusicManager {
         return clip;
     }
 
-    private AudioClip createSingleShotClip(String resourcePath) {
+    private AudioClip createSingleShotClip(String resourcePath, double volumeMultiplier) {
         URL resource = getClass().getClassLoader().getResource(resourcePath);
         if (resource == null) {
             System.err.println("[Audio] Missing resource: " + resourcePath);
@@ -122,7 +134,7 @@ public final class BackgroundMusicManager {
         }
         AudioClip clip = new AudioClip(resource.toExternalForm());
         clip.setCycleCount(1);
-        clip.setVolume(Math.max(0.0, Math.min(1.0, masterVolume * 1.2)));
+        clip.setVolume(Math.max(0.0, Math.min(1.0, masterVolume * volumeMultiplier)));
         return clip;
     }
 
