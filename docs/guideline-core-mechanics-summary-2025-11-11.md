@@ -22,6 +22,11 @@ The packages map directly to the Guideline mechanics described below—logic sta
 - Key bindings for move/rotate/drop/new game can be remapped in the same dialog; values are saved under `~/.tetrisjfx/settings.properties` so they persist across launches.
 - GUI movement respects these settings: DAS governs the delay before repeats, ARR controls repeat cadence, and the soft drop multiplier accelerates `DOWN` key auto-shift.
 
+## Level Progression
+- Level increases every 10 cleared lines; the HUD now displays the current level.
+- Each level shortens the gravity interval following a curve (L1≈400 ms → L10≈100 ms, capped at 80 ms from L12 onward), so pieces fall faster as the run continues.
+- Soft-drop speed scales with the live gravity value, so tuning DAS/ARR still feels consistent as the game accelerates.
+
 ## Baseline Gameplay
 - **Single-player JavaFX Tetris** targeting a 25×10 playfield with hidden spawn rows and a standard tick-driven gravity loop.
 - **Matrix-based board representation**, allowing collision checks, merges, line clears, and score notifications through `GameLogic`/`SimpleBoard`.
