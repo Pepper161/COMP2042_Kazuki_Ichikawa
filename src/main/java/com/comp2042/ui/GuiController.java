@@ -305,12 +305,13 @@ public class GuiController implements Initializable {
         }
         ClearRow clearRow = downData.getClearRow();
         if (clearRow != null && clearRow.getLinesRemoved() > 0) {
-            NotificationPanel notificationPanel = new NotificationPanel("+" + clearRow.getScoreBonus());
-            groupNotification.getChildren().add(notificationPanel);
-            notificationPanel.showScore(groupNotification.getChildren());
-        }
-        updateLevelProgress(clearRow);
-        refreshBrick(downData.getViewData());
+                NotificationPanel notificationPanel = new NotificationPanel("+" + clearRow.getScoreBonus());
+                groupNotification.getChildren().add(notificationPanel);
+                notificationPanel.showScore(groupNotification.getChildren());
+                BackgroundMusicManager.getInstance().playLineClear();
+            }
+            updateLevelProgress(clearRow);
+            refreshBrick(downData.getViewData());
         gamePanel.requestFocus();
     }
 
