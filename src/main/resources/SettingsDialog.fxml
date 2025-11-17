@@ -67,7 +67,7 @@
                 <TextField fx:id="sdfField" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
             </GridPane>
 
-            <CheckBox fx:id="bgmCheckBox" text="Enable background music (menu & gameplay)" />
+            <CheckBox fx:id="bgmCheckBox" text="Enable background music (menu &amp; gameplay)" />
 
             <Label text="Key Bindings" styleClass="menu-title"/>
             <GridPane hgap="10" vgap="10">
