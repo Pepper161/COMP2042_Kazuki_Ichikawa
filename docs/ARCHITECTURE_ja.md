@@ -50,6 +50,10 @@ GuiControllerがキー入力をMoveEvent化し、EventTypeとEventSourceでUSER/
 - `com.comp2042.config.GameSettings` で設定を保持し、`GameSettingsStore` が `~/.tetrisjfx/settings.properties` へ永続化。
 - `GuiController` は `GameSettings` を受け取り、`AutoRepeatHandler` で長押し挙動を再現（左/右/ソフトドロップ）。New Game キーもここでリマップされる。
 
+### BGM 管理
+- `BackgroundMusicManager` が JavaFX `MediaPlayer` でメニュー用 / ゲーム用の BGM をループ再生。StartMenu 表示時はメニュー曲、Playing ではゲーム曲へ切替。
+- Settings ダイアログの「Enable background music」で ON/OFF を切り替え、設定は `GameSettings`/`GameSettingsStore` 経由で永続化。OFF の場合は即座に全プレイヤーを停止。
+
 ### レベル進行 / 重力カーブ
 - `GuiController` が合計ライン数を監視し、10行ごとにレベル+1。Level1=400ms から Level10≈100ms まで徐々に落下間隔を短縮するテーブルを持つ。
 - HUD (`HudPanel`) に Level 表示を追加し、レベルアップ時に即座に描画とタイムライン速度を更新。

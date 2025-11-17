@@ -5,6 +5,7 @@ import com.comp2042.config.GameSettingsStore;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
@@ -45,6 +46,8 @@ public class SettingsController {
     private Label statusLabel;
     @FXML
     private Label infoLabel;
+    @FXML
+    private CheckBox bgmCheckBox;
 
     private final Map<GameSettings.Action, TextField> keyFields = new EnumMap<>(GameSettings.Action.class);
     private final GameSettingsStore store = new GameSettingsStore();
@@ -125,6 +128,9 @@ public class SettingsController {
         dasField.setText(Long.toString(initialSettings.getDasDelayMs()));
         arrField.setText(Long.toString(initialSettings.getArrIntervalMs()));
         sdfField.setText(Double.toString(initialSettings.getSoftDropMultiplier()));
+        if (bgmCheckBox != null) {
+            bgmCheckBox.setSelected(initialSettings.isBgmEnabled());
+        }
         for (Map.Entry<GameSettings.Action, TextField> entry : keyFields.entrySet()) {
             KeyCode keyCode = initialSettings.getKey(entry.getKey());
             entry.getValue().setText(keyCode != null ? keyCode.name() : "");
@@ -137,6 +143,7 @@ public class SettingsController {
         builder.setDasDelayMs(parseLongField(dasField, "DAS"));
         builder.setArrIntervalMs(parseLongField(arrField, "ARR"));
         builder.setSoftDropMultiplier(parseDoubleField(sdfField, "Soft Drop"));
+        builder.setBgmEnabled(bgmCheckBox == null || bgmCheckBox.isSelected());
         for (Map.Entry<GameSettings.Action, TextField> entry : keyFields.entrySet()) {
             builder.setKey(entry.getKey(), parseKey(entry.getValue(), entry.getKey().name()));
         }

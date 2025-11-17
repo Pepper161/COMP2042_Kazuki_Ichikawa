@@ -1,5 +1,6 @@
 package com.comp2042.app;
 
+import com.comp2042.audio.BackgroundMusicManager;
 import com.comp2042.config.GameSettings;
 import com.comp2042.config.GameSettingsStore;
 import com.comp2042.game.GameConfig;
@@ -30,9 +31,12 @@ public class StartMenuController {
     private GameConfig gameConfig = GameConfig.defaultConfig();
     private final GameSettingsStore settingsStore = new GameSettingsStore();
     private GameSettings gameSettings = settingsStore.load();
+    private final BackgroundMusicManager musicManager = BackgroundMusicManager.getInstance();
 
     public void setPrimaryStage(Stage primaryStage) {
         this.primaryStage = primaryStage;
+        musicManager.setEnabled(gameSettings.isBgmEnabled());
+        musicManager.playMenuTheme();
     }
 
     @FXML
@@ -49,6 +53,7 @@ public class StartMenuController {
             primaryStage.show();
             new GameController(guiController, gameConfig, gameSettings);
             guiController.setGameState(GameState.PLAYING);
+            musicManager.playGameTheme();
         } catch (IOException ex) {
             throw new IllegalStateException("Failed to load game layout.", ex);
         }
@@ -76,7 +81,13 @@ public class StartMenuController {
             Scene scene = new Scene(root, 520, 620);
             dialog.setScene(scene);
             dialog.showAndWait();
-            controller.getResult().ifPresent(result -> gameSettings = result);
+            controller.getResult().ifPresent(result -> {
+                gameSettings = result;
+                musicManager.setEnabled(gameSettings.isBgmEnabled());
+                if (gameSettings.isBgmEnabled()) {
+                    musicManager.playMenuTheme();
+                }
+            });
         } catch (IOException ex) {
             throw new IllegalStateException("Failed to load settings dialog.", ex);
         }
