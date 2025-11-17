@@ -27,6 +27,7 @@ public final class GameSettings {
     private final double softDropMultiplier;
     private final EnumMap<Action, KeyCode> keyBindings;
     private final boolean bgmEnabled;
+    private final double bgmVolume;
 
     private GameSettings(Builder builder) {
         this.dasDelayMs = builder.dasDelayMs;
@@ -34,6 +35,7 @@ public final class GameSettings {
         this.softDropMultiplier = builder.softDropMultiplier;
         this.keyBindings = new EnumMap<>(builder.keyBindings);
         this.bgmEnabled = builder.bgmEnabled;
+        this.bgmVolume = builder.bgmVolume;
     }
 
     public static Builder builder() {
@@ -68,6 +70,10 @@ public final class GameSettings {
         return bgmEnabled;
     }
 
+    public double getBgmVolume() {
+        return bgmVolume;
+    }
+
     public Builder toBuilder() {
         return builder().from(this);
     }
@@ -79,6 +85,7 @@ public final class GameSettings {
         private double softDropMultiplier = 8.0;
         private final EnumMap<Action, KeyCode> keyBindings = new EnumMap<>(Action.class);
         private boolean bgmEnabled = true;
+        private double bgmVolume = 0.35;
 
         private Builder() {
             keyBindings.put(Action.MOVE_LEFT, KeyCode.LEFT);
@@ -100,6 +107,7 @@ public final class GameSettings {
             keyBindings.clear();
             keyBindings.putAll(settings.keyBindings);
             setBgmEnabled(settings.isBgmEnabled());
+            setBgmVolume(settings.getBgmVolume());
             return this;
         }
 
@@ -125,6 +133,11 @@ public final class GameSettings {
 
         public Builder setBgmEnabled(boolean enabled) {
             this.bgmEnabled = enabled;
+            return this;
+        }
+
+        public Builder setBgmVolume(double volume) {
+            this.bgmVolume = Math.max(0.0, Math.min(1.0, volume));
             return this;
         }
 
