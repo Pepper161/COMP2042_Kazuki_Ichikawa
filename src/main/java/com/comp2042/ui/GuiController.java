@@ -781,7 +781,6 @@ public class GuiController implements Initializable {
             controller.getResult().ifPresent(result -> {
                 gameSettings = result;
                 applyAudioPreferences();
-                updatePauseVolumeSlider();
             });
         } catch (IOException ex) {
             throw new IllegalStateException("Failed to load SettingsDialog.fxml", ex);
