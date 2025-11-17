@@ -7,6 +7,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.Slider;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.Priority;
@@ -48,6 +49,8 @@ public class SettingsController {
     private Label infoLabel;
     @FXML
     private CheckBox bgmCheckBox;
+    @FXML
+    private Slider bgmVolumeSlider;
 
     private final Map<GameSettings.Action, TextField> keyFields = new EnumMap<>(GameSettings.Action.class);
     private final GameSettingsStore store = new GameSettingsStore();
@@ -83,6 +86,10 @@ public class SettingsController {
             infoLabel.setMaxWidth(Double.MAX_VALUE);
             VBox.setVgrow(infoLabel, Priority.NEVER);
             infoLabel.setText("Select a ? icon to learn what each setting means.");
+        }
+        if (bgmVolumeSlider != null) {
+            bgmVolumeSlider.setMin(0);
+            bgmVolumeSlider.setMax(100);
         }
     }
 
@@ -131,6 +138,9 @@ public class SettingsController {
         if (bgmCheckBox != null) {
             bgmCheckBox.setSelected(initialSettings.isBgmEnabled());
         }
+        if (bgmVolumeSlider != null) {
+            bgmVolumeSlider.setValue(initialSettings.getBgmVolume() * 100.0);
+        }
         for (Map.Entry<GameSettings.Action, TextField> entry : keyFields.entrySet()) {
             KeyCode keyCode = initialSettings.getKey(entry.getKey());
             entry.getValue().setText(keyCode != null ? keyCode.name() : "");
@@ -144,6 +154,9 @@ public class SettingsController {
         builder.setArrIntervalMs(parseLongField(arrField, "ARR"));
         builder.setSoftDropMultiplier(parseDoubleField(sdfField, "Soft Drop"));
         builder.setBgmEnabled(bgmCheckBox == null || bgmCheckBox.isSelected());
+        if (bgmVolumeSlider != null) {
+            builder.setBgmVolume(bgmVolumeSlider.getValue() / 100.0);
+        }
         for (Map.Entry<GameSettings.Action, TextField> entry : keyFields.entrySet()) {
             builder.setKey(entry.getKey(), parseKey(entry.getValue(), entry.getKey().name()));
         }

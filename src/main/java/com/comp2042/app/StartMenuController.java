@@ -36,6 +36,7 @@ public class StartMenuController {
     public void setPrimaryStage(Stage primaryStage) {
         this.primaryStage = primaryStage;
         musicManager.setEnabled(gameSettings.isBgmEnabled());
+        musicManager.setMasterVolume(gameSettings.getBgmVolume());
         musicManager.playMenuTheme();
     }
 
@@ -84,6 +85,7 @@ public class StartMenuController {
             controller.getResult().ifPresent(result -> {
                 gameSettings = result;
                 musicManager.setEnabled(gameSettings.isBgmEnabled());
+                musicManager.setMasterVolume(gameSettings.getBgmVolume());
                 if (gameSettings.isBgmEnabled()) {
                     musicManager.playMenuTheme();
                 }

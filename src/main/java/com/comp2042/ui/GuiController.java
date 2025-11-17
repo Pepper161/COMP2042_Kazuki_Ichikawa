@@ -1,10 +1,12 @@
 package com.comp2042.ui;
 
+import com.comp2042.app.SettingsController;
 import com.comp2042.app.StartMenuController;
 import com.comp2042.board.ClearRow;
 import com.comp2042.board.ViewData;
 import com.comp2042.audio.BackgroundMusicManager;
 import com.comp2042.config.GameSettings;
+import com.comp2042.config.GameSettingsStore;
 import com.comp2042.game.GameState;
 import com.comp2042.game.Score;
 import com.comp2042.game.events.DownData;
@@ -27,16 +29,19 @@ import javafx.geometry.Pos;
 import javafx.scene.Group;
 import javafx.scene.Parent;
 import javafx.scene.effect.Reflection;
+import javafx.scene.control.Slider;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import javafx.scene.Scene;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
@@ -90,6 +95,10 @@ public class GuiController implements Initializable {
 
     @FXML
     private Pane guidePane;
+    @FXML
+    private VBox pauseOverlay;
+    @FXML
+    private Slider pauseVolumeSlider;
 
     private Rectangle[][] displayMatrix;
 
@@ -111,6 +120,7 @@ public class GuiController implements Initializable {
     private Line gameOverGuideLine;
     private int cachedGameOverRow = Integer.MIN_VALUE;
     private GameSettings gameSettings = GameSettings.defaultSettings();
+    private final GameSettingsStore settingsStore = new GameSettingsStore();
     private final Map<KeyCode, GameSettings.Action> actionByKey = new HashMap<>();
     private final Set<KeyCode> heldKeys = EnumSet.noneOf(KeyCode.class);
     private AutoRepeatHandler moveLeftRepeat;
@@ -119,6 +129,7 @@ public class GuiController implements Initializable {
     private int currentLevel = 1;
     private int linesUntilNextLevel = LINES_PER_LEVEL;
     private double currentGravityMs = BASE_GRAVITY_INTERVAL_MS;
+    private boolean updatingPauseSlider = false;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -131,6 +142,11 @@ public class GuiController implements Initializable {
             @Override
             public void handle(KeyEvent keyEvent) {
                 KeyCode code = keyEvent.getCode();
+                if (code == KeyCode.ESCAPE) {
+                    handleEscapeKey();
+                    keyEvent.consume();
+                    return;
+                }
                 if (!heldKeys.add(code)) {
                     keyEvent.consume();
                     return;
@@ -157,6 +173,15 @@ public class GuiController implements Initializable {
         reflection.setFraction(0.8);
         reflection.setTopOpacity(0.9);
         reflection.setTopOffset(-12);
+        if (pauseOverlay != null) {
+            pauseOverlay.setVisible(false);
+            pauseOverlay.setManaged(false);
+        }
+        if (pauseVolumeSlider != null) {
+            pauseVolumeSlider.setMin(0);
+            pauseVolumeSlider.setMax(100);
+            pauseVolumeSlider.valueProperty().addListener((obs, oldVal, newVal) -> onPauseVolumeChanged(newVal.doubleValue()));
+        }
     }
 
     public void initGameView(int[][] boardMatrix, ViewData brick) {
@@ -361,6 +386,8 @@ public class GuiController implements Initializable {
 
     public void setGameSettings(GameSettings settings) {
         this.gameSettings = settings != null ? settings : GameSettings.defaultSettings();
+        applyAudioPreferences();
+        updatePauseVolumeSlider();
         heldKeys.clear();
         rebuildKeyBindings();
     }
@@ -425,6 +452,31 @@ public class GuiController implements Initializable {
         }
     }
 
+    private void handleEscapeKey() {
+        if (gameState == GameState.PLAYING) {
+            pauseGame();
+        } else if (gameState == GameState.PAUSED) {
+            resumeGame();
+        }
+    }
+
+    private void pauseGame() {
+        if (gameState != GameState.PLAYING) {
+            return;
+        }
+        setGameState(GameState.PAUSED);
+    }
+
+    private void resumeGame() {
+        if (gameState != GameState.PAUSED) {
+            return;
+        }
+        setGameState(GameState.PLAYING);
+        if (gamePanel != null) {
+            gamePanel.requestFocus();
+        }
+    }
+
     private void handleKeyReleased(KeyCode code) {
         GameSettings.Action action = actionByKey.get(code);
         if (action == null) {
@@ -474,6 +526,7 @@ public class GuiController implements Initializable {
     private void startNewGameSession() {
         stopAllRepeats();
         resetLevelTracking();
+        setPauseOverlayVisible(false);
         if (timeLine != null) {
             timeLine.stop();
         }
@@ -495,6 +548,7 @@ public class GuiController implements Initializable {
             timeLine.stop();
         }
         setGameState(GameState.MENU);
+        setPauseOverlayVisible(false);
         stopAllRepeats();
         if (gamePanel != null) {
             gamePanel.setFocusTraversable(false);
@@ -540,6 +594,7 @@ public class GuiController implements Initializable {
                     gameOverPanel.setVisible(false);
                     gameOverPanel.setManaged(false);
                 }
+                setPauseOverlayVisible(false);
                 stopAllRepeats();
                 break;
             case PLAYING:
@@ -549,6 +604,17 @@ public class GuiController implements Initializable {
                     gameOverPanel.setVisible(false);
                     gameOverPanel.setManaged(false);
                 }
+                setPauseOverlayVisible(false);
+                break;
+            case PAUSED:
+                isPause.setValue(Boolean.TRUE);
+                isGameOver.setValue(Boolean.FALSE);
+                if (gameOverPanel != null) {
+                    gameOverPanel.setVisible(false);
+                    gameOverPanel.setManaged(false);
+                }
+                setPauseOverlayVisible(true);
+                stopAllRepeats();
                 break;
             case GAME_OVER:
                 isPause.setValue(Boolean.TRUE);
@@ -557,6 +623,7 @@ public class GuiController implements Initializable {
                     gameOverPanel.setVisible(true);
                     gameOverPanel.setManaged(true);
                 }
+                setPauseOverlayVisible(false);
                 stopAllRepeats();
                 break;
             default:
@@ -619,6 +686,16 @@ public class GuiController implements Initializable {
         heldKeys.clear();
     }
 
+    private void setPauseOverlayVisible(boolean visible) {
+        if (pauseOverlay != null) {
+            pauseOverlay.setVisible(visible);
+            pauseOverlay.setManaged(visible);
+        }
+        if (!visible && pauseVolumeSlider != null) {
+            pauseVolumeSlider.setDisable(false);
+        }
+    }
+
     private void resetLevelTracking() {
         currentLevel = 1;
         linesUntilNextLevel = LINES_PER_LEVEL;
@@ -679,5 +756,80 @@ public class GuiController implements Initializable {
             return MIN_GRAVITY_INTERVAL_MS;
         }
         return Math.max(MIN_GRAVITY_INTERVAL_MS, LEVEL_GRAVITY_MS[level - 1]);
+    }
+
+    private void onPauseVolumeChanged(double sliderValue) {
+        if (updatingPauseSlider) {
+            return;
+        }
+        double newVolume = sliderValue / 100.0;
+        gameSettings = gameSettings.toBuilder().setBgmVolume(newVolume).build();
+        BackgroundMusicManager manager = BackgroundMusicManager.getInstance();
+        manager.setMasterVolume(newVolume);
+        settingsStore.save(gameSettings);
+    }
+
+    private void updatePauseVolumeSlider() {
+        if (pauseVolumeSlider != null) {
+            updatingPauseSlider = true;
+            pauseVolumeSlider.setValue(gameSettings.getBgmVolume() * 100.0);
+            updatingPauseSlider = false;
+        }
+    }
+
+    @FXML
+    private void onPauseResume(ActionEvent event) {
+        resumeGame();
+    }
+
+    @FXML
+    private void onPauseSettings(ActionEvent event) {
+        openSettingsDialog();
+    }
+
+    @FXML
+    private void onPauseMainMenu(ActionEvent event) {
+        returnToMainMenu();
+    }
+
+    private void openSettingsDialog() {
+        if (primaryStage == null) {
+            return;
+        }
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("SettingsDialog.fxml"));
+            Parent root = loader.load();
+            SettingsController controller = loader.getController();
+            Stage dialog = new Stage();
+            dialog.setTitle("Settings");
+            dialog.initOwner(primaryStage);
+            dialog.initModality(Modality.WINDOW_MODAL);
+            controller.setDialogStage(dialog);
+            controller.setInitialSettings(gameSettings);
+            Scene scene = new Scene(root, 520, 620);
+            dialog.setScene(scene);
+            dialog.showAndWait();
+            controller.getResult().ifPresent(result -> {
+                gameSettings = result;
+                applyAudioPreferences();
+                updatePauseVolumeSlider();
+            });
+        } catch (IOException ex) {
+            throw new IllegalStateException("Failed to load SettingsDialog.fxml", ex);
+        }
+    }
+
+    private void applyAudioPreferences() {
+        BackgroundMusicManager manager = BackgroundMusicManager.getInstance();
+        manager.setEnabled(gameSettings.isBgmEnabled());
+        manager.setMasterVolume(gameSettings.getBgmVolume());
+        if (!gameSettings.isBgmEnabled()) {
+            return;
+        }
+        if (gameState == GameState.PLAYING) {
+            manager.playGameTheme();
+        } else {
+            manager.playMenuTheme();
+        }
     }
 }

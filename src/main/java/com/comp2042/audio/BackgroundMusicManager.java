@@ -23,6 +23,7 @@ public final class BackgroundMusicManager {
     private AudioClip currentClip;
     private Mode currentMode = Mode.MENU;
     private boolean enabled = true;
+    private double masterVolume = 0.35;
 
     private BackgroundMusicManager() {
         menuClip = createLoopingClip("audio/menu_theme.wav");
@@ -64,6 +65,12 @@ public final class BackgroundMusicManager {
         });
     }
 
+    public void setMasterVolume(double volume) {
+        masterVolume = Math.max(0.0, Math.min(1.0, volume));
+        applyVolume(menuClip);
+        applyVolume(gameClip);
+    }
+
     private void resumeCurrentMode() {
         switch (currentMode) {
             case GAME -> playClip(gameClip);
@@ -103,7 +110,7 @@ public final class BackgroundMusicManager {
         }
         AudioClip clip = new AudioClip(resource.toExternalForm());
         clip.setCycleCount(AudioClip.INDEFINITE);
-        clip.setVolume(0.35);
+        applyVolume(clip);
         return clip;
     }
 
@@ -115,8 +122,14 @@ public final class BackgroundMusicManager {
         }
         AudioClip clip = new AudioClip(resource.toExternalForm());
         clip.setCycleCount(1);
-        clip.setVolume(0.5);
+        clip.setVolume(Math.max(0.0, Math.min(1.0, masterVolume * 1.2)));
         return clip;
+    }
+
+    private void applyVolume(AudioClip clip) {
+        if (clip != null) {
+            clip.setVolume(masterVolume);
+        }
     }
 
     private void runOnFxThread(Runnable action) {
