@@ -29,7 +29,6 @@ import javafx.geometry.Pos;
 import javafx.scene.Group;
 import javafx.scene.Parent;
 import javafx.scene.effect.Reflection;
-import javafx.scene.control.Slider;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.GridPane;
@@ -97,8 +96,6 @@ public class GuiController implements Initializable {
     private Pane guidePane;
     @FXML
     private VBox pauseOverlay;
-    @FXML
-    private Slider pauseVolumeSlider;
 
     private Rectangle[][] displayMatrix;
 
@@ -129,7 +126,6 @@ public class GuiController implements Initializable {
     private int currentLevel = 1;
     private int linesUntilNextLevel = LINES_PER_LEVEL;
     private double currentGravityMs = BASE_GRAVITY_INTERVAL_MS;
-    private boolean updatingPauseSlider = false;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -176,11 +172,6 @@ public class GuiController implements Initializable {
         if (pauseOverlay != null) {
             pauseOverlay.setVisible(false);
             pauseOverlay.setManaged(false);
-        }
-        if (pauseVolumeSlider != null) {
-            pauseVolumeSlider.setMin(0);
-            pauseVolumeSlider.setMax(100);
-            pauseVolumeSlider.valueProperty().addListener((obs, oldVal, newVal) -> onPauseVolumeChanged(newVal.doubleValue()));
         }
     }
 
@@ -388,7 +379,6 @@ public class GuiController implements Initializable {
     public void setGameSettings(GameSettings settings) {
         this.gameSettings = settings != null ? settings : GameSettings.defaultSettings();
         applyAudioPreferences();
-        updatePauseVolumeSlider();
         heldKeys.clear();
         rebuildKeyBindings();
     }
@@ -692,9 +682,6 @@ public class GuiController implements Initializable {
             pauseOverlay.setVisible(visible);
             pauseOverlay.setManaged(visible);
         }
-        if (!visible && pauseVolumeSlider != null) {
-            pauseVolumeSlider.setDisable(false);
-        }
     }
 
     private void resetLevelTracking() {
@@ -757,25 +744,6 @@ public class GuiController implements Initializable {
             return MIN_GRAVITY_INTERVAL_MS;
         }
         return Math.max(MIN_GRAVITY_INTERVAL_MS, LEVEL_GRAVITY_MS[level - 1]);
-    }
-
-    private void onPauseVolumeChanged(double sliderValue) {
-        if (updatingPauseSlider) {
-            return;
-        }
-        double newVolume = sliderValue / 100.0;
-        gameSettings = gameSettings.toBuilder().setBgmVolume(newVolume).build();
-        BackgroundMusicManager manager = BackgroundMusicManager.getInstance();
-        manager.setMasterVolume(newVolume);
-        settingsStore.save(gameSettings);
-    }
-
-    private void updatePauseVolumeSlider() {
-        if (pauseVolumeSlider != null) {
-            updatingPauseSlider = true;
-            pauseVolumeSlider.setValue(gameSettings.getBgmVolume() * 100.0);
-            updatingPauseSlider = false;
-        }
     }
 
     @FXML
