@@ -463,6 +463,7 @@ public class GuiController implements Initializable {
             return;
         }
         setGameState(GameState.PLAYING);
+        BackgroundMusicManager.getInstance().playGameTheme();
         if (gamePanel != null) {
             gamePanel.requestFocus();
         }
@@ -791,10 +792,12 @@ public class GuiController implements Initializable {
         if (!gameSettings.isBgmEnabled()) {
             return;
         }
-        if (gameState == GameState.PLAYING) {
-            manager.playGameTheme();
-        } else {
-            manager.playMenuTheme();
+        switch (gameState) {
+            case PLAYING -> manager.playGameTheme();
+            case PAUSED -> manager.playMenuTheme();
+            case MENU, GAME_OVER -> manager.playMenuTheme();
+            default -> {
+            }
         }
     }
 }
