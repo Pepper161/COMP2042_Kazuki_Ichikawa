@@ -1,10 +1,11 @@
 package com.comp2042.ui;
 
+import com.comp2042.app.HelpDialogService;
 import com.comp2042.app.SettingsController;
 import com.comp2042.app.StartMenuController;
+import com.comp2042.audio.BackgroundMusicManager;
 import com.comp2042.board.ClearRow;
 import com.comp2042.board.ViewData;
-import com.comp2042.audio.BackgroundMusicManager;
 import com.comp2042.config.GameSettings;
 import com.comp2042.config.GameSettingsStore;
 import com.comp2042.game.GameState;
@@ -16,6 +17,7 @@ import com.comp2042.game.events.InputEventListener;
 import com.comp2042.game.events.MoveEvent;
 import com.comp2042.game.stats.HighScoreEntry;
 import com.comp2042.game.stats.HighScoreService;
+import com.comp2042.help.HelpContentProvider;
 import com.comp2042.ui.input.AutoRepeatHandler;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
@@ -33,6 +35,8 @@ import javafx.scene.Parent;
 import javafx.scene.effect.Reflection;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.control.Button;
+import javafx.scene.control.Tooltip;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
@@ -103,6 +107,8 @@ public class GuiController implements Initializable {
     @FXML
     private Pane guidePane;
     @FXML
+    private Button helpHintButton;
+    @FXML
     private VBox pauseOverlay;
 
     private Rectangle[][] displayMatrix;
@@ -135,6 +141,7 @@ public class GuiController implements Initializable {
     private int linesUntilNextLevel = LINES_PER_LEVEL;
     private double currentGravityMs = BASE_GRAVITY_INTERVAL_MS;
     private final HighScoreService highScoreService = new HighScoreService();
+    private final HelpContentProvider helpContentProvider = HelpContentProvider.getInstance();
     private Score boundScore;
     private Instant sessionStartInstant;
 
@@ -170,6 +177,10 @@ public class GuiController implements Initializable {
                 handleKeyReleased(code);
             }
         });
+        if (helpHintButton != null) {
+            helpHintButton.setFocusTraversable(false);
+            helpHintButton.setTooltip(buildHelpTooltip());
+        }
         gameOverPanel.setVisible(false);
         gameOverPanel.setManaged(false);
         gameOverPanel.setOnRestart(this::startNewGameSession);
@@ -780,6 +791,15 @@ public class GuiController implements Initializable {
         returnToMainMenu();
     }
 
+    @FXML
+    private void onShowHelp(ActionEvent event) {
+        Stage owner = primaryStage;
+        if (owner == null && helpHintButton != null && helpHintButton.getScene() != null) {
+            owner = (Stage) helpHintButton.getScene().getWindow();
+        }
+        HelpDialogService.showHelp(owner, helpContentProvider.getMarkdown());
+    }
+
     private void openSettingsDialog() {
         if (primaryStage == null) {
             return;
@@ -853,5 +873,16 @@ public class GuiController implements Initializable {
 
     private String describeCurrentMode() {
         return "Classic";
+    }
+
+    private Tooltip buildHelpTooltip() {
+        List<String> shortcuts = helpContentProvider.getShortcutSummaries();
+        String text = shortcuts.isEmpty()
+                ? "Esc: Pause\nN: Restart"
+                : String.join(System.lineSeparator(), shortcuts);
+        Tooltip tooltip = new Tooltip(text);
+        tooltip.setShowDelay(Duration.millis(200));
+        tooltip.setHideDelay(Duration.ZERO);
+        return tooltip;
     }
 }
