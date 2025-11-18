@@ -33,6 +33,7 @@ public class GameController implements InputEventListener {
         board.createNewBrick();
         viewGuiController.setEventListener(this);
         viewGuiController.setGameSettings(safeSettings);
+        viewGuiController.setGameMode(this.config.getMode());
         viewGuiController.initGameView(board.getBoardMatrix(), board.getViewData());
         viewGuiController.bindScore(logic.getScore());
         publishSeedSummary();

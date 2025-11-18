@@ -20,6 +20,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.TextAlignment;
@@ -57,9 +58,16 @@ public class StartMenuController {
     private Button clearScoresButton;
 
     @FXML
+    private ChoiceBox<GameConfig.GameMode> modeChoice;
+
+    @FXML
     public void initialize() {
         if (leaderboardContainer != null) {
             leaderboardContainer.getStyleClass().add("leaderboard-container");
+        }
+        if (modeChoice != null) {
+            modeChoice.getItems().setAll(GameConfig.GameMode.values());
+            modeChoice.setValue(gameConfig.getMode());
         }
         refreshLeaderboard();
     }
@@ -73,6 +81,7 @@ public class StartMenuController {
 
     @FXML
     private void onStart(ActionEvent event) {
+        GameConfig configToUse = resolveSelectedConfig();
         ensurePrimaryStageBound();
         try {
             URL layoutUrl = getClass().getClassLoader().getResource("gameLayout.fxml");
@@ -83,7 +92,7 @@ public class StartMenuController {
             Scene scene = new Scene(root, WINDOW_WIDTH, WINDOW_HEIGHT);
             primaryStage.setScene(scene);
             primaryStage.show();
-            new GameController(guiController, gameConfig, gameSettings);
+            new GameController(guiController, configToUse, gameSettings);
             guiController.setGameState(GameState.PLAYING);
             musicManager.playGameTheme();
         } catch (IOException ex) {
@@ -198,5 +207,13 @@ public class StartMenuController {
                 entry.getScore(),
                 entry.getMode(),
                 entry.formattedDuration());
+    }
+
+    private GameConfig resolveSelectedConfig() {
+        if (modeChoice == null || modeChoice.getValue() == null) {
+            return gameConfig;
+        }
+        gameConfig = gameConfig.withMode(modeChoice.getValue());
+        return gameConfig;
     }
 }
