@@ -630,6 +630,7 @@ public class GuiController implements Initializable {
             case MENU:
                 isPause.setValue(Boolean.TRUE);
                 isGameOver.setValue(Boolean.FALSE);
+                stopModeTimer();
                 if (gameOverPanel != null) {
                     gameOverPanel.setVisible(false);
                     gameOverPanel.setManaged(false);
@@ -645,10 +646,12 @@ public class GuiController implements Initializable {
                     gameOverPanel.setManaged(false);
                 }
                 setPauseOverlayVisible(false);
+                resumeModeTimerIfNeeded();
                 break;
             case PAUSED:
                 isPause.setValue(Boolean.TRUE);
                 isGameOver.setValue(Boolean.FALSE);
+                pauseModeTimer();
                 if (gameOverPanel != null) {
                     gameOverPanel.setVisible(false);
                     gameOverPanel.setManaged(false);
@@ -659,6 +662,7 @@ public class GuiController implements Initializable {
             case GAME_OVER:
                 isPause.setValue(Boolean.TRUE);
                 isGameOver.setValue(Boolean.TRUE);
+                stopModeTimer();
                 if (gameOverPanel != null) {
                     gameOverPanel.setVisible(true);
                     gameOverPanel.setManaged(true);
@@ -944,6 +948,18 @@ public class GuiController implements Initializable {
         if (modeTimer != null) {
             modeTimer.stop();
             modeTimer = null;
+        }
+    }
+
+    private void pauseModeTimer() {
+        if (modeTimer != null) {
+            modeTimer.pause();
+        }
+    }
+
+    private void resumeModeTimerIfNeeded() {
+        if (modeTimer != null && gameMode == GameConfig.GameMode.TIMED) {
+            modeTimer.play();
         }
     }
 
