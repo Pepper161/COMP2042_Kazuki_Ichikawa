@@ -598,8 +598,8 @@ public class GuiController implements Initializable {
             StartMenuController menuController = loader.getController();
             menuController.setPrimaryStage(primaryStage);
             Scene currentScene = primaryStage.getScene();
-            double width = currentScene != null ? currentScene.getWidth() : StartMenuController.WINDOW_WIDTH;
-            double height = currentScene != null ? currentScene.getHeight() : StartMenuController.WINDOW_HEIGHT;
+            double width = currentScene != null ? currentScene.getWidth() : StartMenuController.MENU_WINDOW_WIDTH;
+            double height = currentScene != null ? currentScene.getHeight() : StartMenuController.MENU_WINDOW_HEIGHT;
             Scene menuScene = new Scene(menuRoot, width, height);
             primaryStage.setScene(menuScene);
             primaryStage.show();
