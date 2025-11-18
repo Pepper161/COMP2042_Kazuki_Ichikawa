@@ -27,6 +27,9 @@ public class HudPanel extends VBox {
         b2bLabel.getStyleClass().add("hud-label");
         levelLabel.getStyleClass().add("hud-label");
         modeLabel.getStyleClass().add("hud-label");
+        modeLabel.setWrapText(true);
+        modeLabel.setMaxWidth(160);
+        modeLabel.setAlignment(Pos.TOP_LEFT);
         getChildren().addAll(scoreLabel, comboLabel, b2bLabel, levelLabel, modeLabel);
     }
 
@@ -60,6 +63,6 @@ public class HudPanel extends VBox {
     }
 
     public void setModeStatus(String status) {
-        modeLabel.setText(status != null ? status : "");
+        modeLabel.setText(status != null ? status : "Mode:");
     }
 }
