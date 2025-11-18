@@ -78,6 +78,48 @@
     -fx-effect: dropshadow(two-pass-box, rgba(0, 0, 0, 0.6), 4, 0.0, 0, 2);
 }
 
+.menu-subtitle {
+    -fx-font-family: "Let's go Digital";
+    -fx-font-size: 24;
+    -fx-text-fill: #f8f8f8;
+}
+
+.leaderboard-placeholder {
+    -fx-text-fill: #e0e0e0;
+    -fx-font-size: 14;
+    -fx-alignment: center;
+}
+
+.leaderboard-entry {
+    -fx-font-family: "Let's go Digital";
+    -fx-font-size: 16;
+    -fx-text-fill: #e5e5e5;
+}
+
+.leaderboard-highlight {
+    -fx-text-fill: yellow;
+    -fx-font-weight: bold;
+}
+
+.leaderboard-list {
+    -fx-background-color: rgba(0, 0, 0, 0.5);
+    -fx-border-color: rgba(255, 255, 255, 0.25);
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+    -fx-padding: 4;
+}
+
+.leaderboard-list .list-cell {
+    -fx-background-color: transparent;
+    -fx-text-fill: #f0f0f0;
+    -fx-font-family: "Let's go Digital";
+    -fx-font-size: 16;
+}
+
+.leaderboard-list .list-cell:filled:selected {
+    -fx-background-color: rgba(255, 255, 255, 0.15);
+}
+
 .game-over-panel {
     -fx-background-color: rgba(0, 0, 0, 0.78);
     -fx-padding: 24;
