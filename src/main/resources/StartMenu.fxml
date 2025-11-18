@@ -13,6 +13,7 @@
             <Label fx:id="titleLabel" text="TetrisJFX" styleClass="menu-title"/>
             <Button fx:id="startButton" text="Start" onAction="#onStart" prefWidth="160" styleClass="ipad-dark-grey"/>
             <Button fx:id="settingsButton" text="Settings" onAction="#onSettings" prefWidth="160" styleClass="ipad-dark-grey"/>
+            <Button fx:id="helpButton" text="Help" onAction="#onHelp" prefWidth="160" styleClass="ipad-dark-grey"/>
             <Button fx:id="exitButton" text="Exit" onAction="#onExit" prefWidth="160" styleClass="ipad-dark-grey"/>
             <Label text="Leaderboard" styleClass="menu-subtitle"/>
             <VBox fx:id="leaderboardContainer"
