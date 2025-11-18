@@ -101,23 +101,15 @@
     -fx-font-weight: bold;
 }
 
-.leaderboard-list {
+.leaderboard-container {
     -fx-background-color: rgba(0, 0, 0, 0.5);
     -fx-border-color: rgba(255, 255, 255, 0.25);
+    -fx-border-width: 1;
     -fx-border-radius: 8;
     -fx-background-radius: 8;
-    -fx-padding: 4;
-}
-
-.leaderboard-list .list-cell {
-    -fx-background-color: transparent;
-    -fx-text-fill: #f0f0f0;
-    -fx-font-family: "Let's go Digital";
-    -fx-font-size: 16;
-}
-
-.leaderboard-list .list-cell:filled:selected {
-    -fx-background-color: rgba(255, 255, 255, 0.15);
+    -fx-padding: 8;
+    -fx-min-width: 220;
+    -fx-max-width: 220;
 }
 
 .game-over-panel {
