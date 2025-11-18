@@ -566,6 +566,7 @@ public class GuiController implements Initializable {
         if (gameOverPanel != null) {
             gameOverPanel.setVisible(false);
             gameOverPanel.setManaged(false);
+            gameOverPanel.resetTitle();
         }
         markSessionStart();
         resetModeObjectivesInternal();
@@ -937,7 +938,7 @@ public class GuiController implements Initializable {
             if (remainingModeSeconds <= 0) {
                 stopModeTimer();
                 showNotification("Time up!");
-                gameOver();
+                finishModeRun("Time up!");
             }
         }));
         modeTimer.setCycleCount(Timeline.INDEFINITE);
@@ -970,10 +971,17 @@ public class GuiController implements Initializable {
         fixedLinesCleared += linesRemoved;
         if (fixedLinesCleared >= FIXED_LINES_TARGET) {
             showNotification("Mission complete!");
-            gameOver();
+            finishModeRun("Mission complete!");
         } else {
             updateModeStatus();
         }
+    }
+
+    private void finishModeRun(String title) {
+        if (gameOverPanel != null && title != null) {
+            gameOverPanel.setTitle(title);
+        }
+        gameOver();
     }
 
     private void updateModeStatus() {

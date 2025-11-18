@@ -14,17 +14,20 @@ import java.util.List;
  */
 public class GameOverPanel extends BorderPane {
 
+    public static final String DEFAULT_TITLE = "GAME OVER";
+
     private Runnable onRestart = () -> {};
     private Runnable onExit = () -> {};
     private Runnable onMainMenu = () -> {};
+    private Runnable onSaveReplay = () -> {};
+    private final Label titleLabel = new Label(DEFAULT_TITLE);
     private final Label seedLabel = new Label();
     private final Label leaderboardTitle = new Label("Top Scores");
     private final VBox leaderboardContainer = new VBox(4);
     private final Label emptyLeaderboardLabel = new Label("No runs recorded yet.");
 
     public GameOverPanel() {
-        final Label gameOverLabel = new Label("GAME OVER");
-        gameOverLabel.getStyleClass().add("gameOverStyle");
+        titleLabel.getStyleClass().add("gameOverStyle");
         seedLabel.getStyleClass().add("seedLabel");
         seedLabel.setVisible(false);
 
@@ -35,6 +38,10 @@ public class GameOverPanel extends BorderPane {
         Button restartButton = new Button("Restart");
         restartButton.getStyleClass().add("ipad-dark-grey");
         restartButton.setOnAction(event -> onRestart.run());
+
+        Button saveReplayButton = new Button("Save Replay");
+        saveReplayButton.getStyleClass().add("ipad-dark-grey");
+        saveReplayButton.setOnAction(event -> onSaveReplay.run());
 
         Button menuButton = new Button("Main Menu");
         menuButton.getStyleClass().add("ipad-dark-grey");
@@ -47,7 +54,7 @@ public class GameOverPanel extends BorderPane {
         VBox leaderboardBox = new VBox(6, leaderboardTitle, emptyLeaderboardLabel, leaderboardContainer);
         leaderboardBox.setAlignment(Pos.CENTER);
 
-        VBox container = new VBox(18, gameOverLabel, seedLabel, leaderboardBox, restartButton, menuButton, exitButton);
+        VBox container = new VBox(18, titleLabel, seedLabel, leaderboardBox, restartButton, saveReplayButton, menuButton, exitButton);
         container.setAlignment(Pos.CENTER);
         container.setFillWidth(false);
 
@@ -65,6 +72,10 @@ public class GameOverPanel extends BorderPane {
 
     public void setOnMainMenu(Runnable onMainMenu) {
         this.onMainMenu = onMainMenu != null ? onMainMenu : () -> {};
+    }
+
+    public void setOnSaveReplay(Runnable onSaveReplay) {
+        this.onSaveReplay = onSaveReplay != null ? onSaveReplay : () -> {};
     }
 
     public void setSeedInfo(long seed, boolean deterministic) {
@@ -99,5 +110,13 @@ public class GameOverPanel extends BorderPane {
                 entry.getScore(),
                 entry.getMode(),
                 entry.formattedDuration());
+    }
+
+    public void setTitle(String title) {
+        titleLabel.setText(title != null ? title : DEFAULT_TITLE);
+    }
+
+    public void resetTitle() {
+        setTitle(DEFAULT_TITLE);
     }
 }
