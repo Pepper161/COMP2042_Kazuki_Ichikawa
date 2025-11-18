@@ -10,17 +10,18 @@ import com.comp2042.game.stats.HighScoreEntry;
 import com.comp2042.game.stats.HighScoreService;
 import com.comp2042.ui.GuiController;
 import javafx.application.Platform;
-import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Pos;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
-import javafx.scene.control.ListView;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
+import javafx.scene.layout.VBox;
+import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
 
 import java.io.IOException;
@@ -45,7 +46,7 @@ public class StartMenuController {
     private final HighScoreService highScoreService = new HighScoreService();
 
     @FXML
-    private ListView<String> leaderboardList;
+    private VBox leaderboardContainer;
 
     @FXML
     private Label leaderboardEmptyLabel;
@@ -55,10 +56,8 @@ public class StartMenuController {
 
     @FXML
     public void initialize() {
-        if (leaderboardList != null) {
-            leaderboardList.setFocusTraversable(false);
-            leaderboardList.setMouseTransparent(true);
-            leaderboardList.getStyleClass().add("leaderboard-list");
+        if (leaderboardContainer != null) {
+            leaderboardContainer.getStyleClass().add("leaderboard-container");
         }
         refreshLeaderboard();
     }
@@ -152,29 +151,37 @@ public class StartMenuController {
     }
 
     private void refreshLeaderboard() {
-        if (leaderboardList == null || leaderboardEmptyLabel == null || clearScoresButton == null) {
+        if (leaderboardContainer == null || leaderboardEmptyLabel == null || clearScoresButton == null) {
             return;
         }
         List<HighScoreEntry> entries = highScoreService.fetchLeaderboard();
-        ObservableList<String> items = leaderboardList.getItems();
-        items.clear();
+        leaderboardContainer.getChildren().clear();
         if (entries.isEmpty()) {
             leaderboardEmptyLabel.setManaged(true);
             leaderboardEmptyLabel.setVisible(true);
-            leaderboardList.setManaged(false);
-            leaderboardList.setVisible(false);
+            leaderboardContainer.setManaged(false);
+            leaderboardContainer.setVisible(false);
             clearScoresButton.setDisable(true);
+            clearScoresButton.setVisible(false);
+            clearScoresButton.setManaged(false);
             return;
         }
         int rank = 1;
         for (HighScoreEntry entry : entries) {
-            items.add(formatEntry(rank++, entry));
+            Label row = new Label(formatEntry(rank++, entry));
+            row.getStyleClass().add("leaderboard-entry");
+            row.setAlignment(Pos.CENTER);
+            row.setTextAlignment(TextAlignment.CENTER);
+            row.setMaxWidth(Double.MAX_VALUE);
+            leaderboardContainer.getChildren().add(row);
         }
-        leaderboardList.setManaged(true);
-        leaderboardList.setVisible(true);
+        leaderboardContainer.setManaged(true);
+        leaderboardContainer.setVisible(true);
         leaderboardEmptyLabel.setVisible(false);
         leaderboardEmptyLabel.setManaged(false);
         clearScoresButton.setDisable(false);
+        clearScoresButton.setManaged(true);
+        clearScoresButton.setVisible(true);
     }
 
     private String formatEntry(int rank, HighScoreEntry entry) {

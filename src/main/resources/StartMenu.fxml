@@ -1,7 +1,6 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
-<?import javafx.scene.control.ListView?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.VBox?>
 <?import java.net.URL?>
@@ -16,15 +15,15 @@
             <Button fx:id="settingsButton" text="Settings" onAction="#onSettings" prefWidth="160" styleClass="ipad-dark-grey"/>
             <Button fx:id="exitButton" text="Exit" onAction="#onExit" prefWidth="160" styleClass="ipad-dark-grey"/>
             <Label text="Leaderboard" styleClass="menu-subtitle"/>
-            <ListView fx:id="leaderboardList"
-                      prefWidth="220"
-                      prefHeight="180"
-                      maxHeight="220"
-                      visible="false"
-                      managed="false"/>
+            <VBox fx:id="leaderboardContainer"
+                  alignment="CENTER"
+                  spacing="4"
+                  visible="false"
+                  managed="false"/>
             <Label fx:id="leaderboardEmptyLabel"
                    text="Play your first game to record a high score."
                    wrapText="true"
+                   maxWidth="220"
                    alignment="CENTER"
                    styleClass="leaderboard-placeholder"/>
             <Button fx:id="clearScoresButton"
@@ -32,7 +31,9 @@
                     onAction="#onClearScores"
                     prefWidth="160"
                     styleClass="ipad-dark-grey"
-                    disable="true"/>
+                    disable="true"
+                    visible="false"
+                    managed="false"/>
         </VBox>
     </center>
     <padding>
