@@ -36,6 +36,7 @@ public class GameController implements InputEventListener {
         viewGuiController.setGameMode(this.config.getMode());
         viewGuiController.initGameView(board.getBoardMatrix(), board.getViewData());
         viewGuiController.bindScore(logic.getScore());
+        viewGuiController.prepareModeSession();
         publishSeedSummary();
     }
 
