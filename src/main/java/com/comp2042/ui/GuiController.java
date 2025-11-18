@@ -568,7 +568,7 @@ public class GuiController implements Initializable {
             gameOverPanel.setManaged(false);
         }
         markSessionStart();
-        resetModeObjectives();
+        resetModeObjectivesInternal();
         if (eventListener == null) {
             return;
         }
@@ -906,7 +906,11 @@ public class GuiController implements Initializable {
         return tooltip;
     }
 
-    private void resetModeObjectives() {
+    public void prepareModeSession() {
+        resetModeObjectivesInternal();
+    }
+
+    private void resetModeObjectivesInternal() {
         stopModeTimer();
         fixedLinesCleared = 0;
         switch (gameMode) {
