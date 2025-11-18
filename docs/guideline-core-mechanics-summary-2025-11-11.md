@@ -17,10 +17,11 @@ The packages map directly to the Guideline mechanics described below—logic sta
 - When no seed is provided, a random seed is generated per run and logged once play starts plus in the Game Over overlay; reuse it via the same `--seed` flag to replay a session.
 - Restarting the game from the menu or Game Over panel reinitialises the bag so deterministic runs always start from the first bag.
 
-## Input Settings (DAS / ARR / SDF)
+## Input Settings (DAS / ARR / SDF / BGM)
 - The Start Menu now has a **Settings** button that opens a JavaFX dialog to tune DAS delay (ms), ARR interval (ms), and the Soft Drop multiplier.
 - Key bindings for move/rotate/drop/new game can be remapped in the same dialog; values are saved under `~/.tetrisjfx/settings.properties` so they persist across launches.
 - GUI movement respects these settings: DAS governs the delay before repeats, ARR controls repeat cadence, and the soft drop multiplier accelerates `DOWN` key auto-shift.
+- Background music (menu/gameplay) can be toggled via the same dialog; the selection is persisted so muted sessions stay quiet across restarts. Menu/Game themes use free audio from [Pixabay](https://pixabay.com/ja/music/search/tetris/), the Game Over jingle comes from [Pixabay SFX](https://pixabay.com/sound-effects/game-over-38511/), and the line-clear effect uses [Pop 94319](https://pixabay.com/sound-effects/game-over-38511/). All fall under Pixabay’s Content License (credit optional, but noted here).
 
 ## Level Progression
 - Level increases every 10 cleared lines; the HUD now displays the current level.

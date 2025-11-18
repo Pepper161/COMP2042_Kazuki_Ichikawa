@@ -15,7 +15,7 @@ JavaFX落下パズル。表示層(GuiController,GameOverPanel,NotificationPanel)
 - `target/`：生成物（追跡外）。
 
 ## 起動フロー
-MainがJavaFXを起動しFXMLをロード。`fx:controller="com.comp2042.ui.GuiController"`でフィールドを結線し、GuiController.initializeがGrid初期化とTimeline開始、直後にGameControllerがBoardを準備し周期的なDOWNイベントを投げる。
+MainがJavaFXを起動しFXMLをロード。`fx:controller="com.comp2042.ui.GuiController"`でフィールドを結線し、GuiController.initializeがGrid初期化とTimelineを設定する。GuiControllerのTimeline（gravity tick）が`moveDown`を定期実行し、各 tick で GameController へ通知して Board を進める。GameController は Board/Score を初期化し、GuiController への ViewData 更新を担当する。
 
 ## 入力処理
 GuiControllerがキー入力をMoveEvent化し、EventTypeとEventSourceでUSER/THREADを識別してInputEventListener実装のGameControllerへ渡す。GameControllerは種別に応じて移動・回転・加点を処理する。
@@ -49,6 +49,10 @@ GuiControllerがキー入力をMoveEvent化し、EventTypeとEventSourceでUSER/
 - StartMenu に追加した Settings ダイアログで DAS 遅延 / ARR 間隔 / ソフトドロップ倍率とキーバインドを編集できる。
 - `com.comp2042.config.GameSettings` で設定を保持し、`GameSettingsStore` が `~/.tetrisjfx/settings.properties` へ永続化。
 - `GuiController` は `GameSettings` を受け取り、`AutoRepeatHandler` で長押し挙動を再現（左/右/ソフトドロップ）。New Game キーもここでリマップされる。
+
+### BGM 管理
+- `BackgroundMusicManager` が JavaFX `MediaPlayer` でメニュー用 / ゲーム用の BGM をループ再生。StartMenu 表示時はメニュー曲、Playing ではゲーム曲へ切替。
+- Settings ダイアログの「Enable background music」で ON/OFF を切り替え、設定は `GameSettings`/`GameSettingsStore` 経由で永続化。OFF の場合は即座に全プレイヤーを停止。
 
 ### レベル進行 / 重力カーブ
 - `GuiController` が合計ライン数を監視し、10行ごとにレベル+1。Level1=400ms から Level10≈100ms まで徐々に落下間隔を短縮するテーブルを持つ。

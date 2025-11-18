@@ -1,9 +1,12 @@
 package com.comp2042.ui;
 
+import com.comp2042.app.SettingsController;
 import com.comp2042.app.StartMenuController;
 import com.comp2042.board.ClearRow;
 import com.comp2042.board.ViewData;
+import com.comp2042.audio.BackgroundMusicManager;
 import com.comp2042.config.GameSettings;
+import com.comp2042.config.GameSettingsStore;
 import com.comp2042.game.GameState;
 import com.comp2042.game.Score;
 import com.comp2042.game.events.DownData;
@@ -31,11 +34,13 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import javafx.scene.Scene;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
@@ -89,6 +94,8 @@ public class GuiController implements Initializable {
 
     @FXML
     private Pane guidePane;
+    @FXML
+    private VBox pauseOverlay;
 
     private Rectangle[][] displayMatrix;
 
@@ -110,6 +117,7 @@ public class GuiController implements Initializable {
     private Line gameOverGuideLine;
     private int cachedGameOverRow = Integer.MIN_VALUE;
     private GameSettings gameSettings = GameSettings.defaultSettings();
+    private final GameSettingsStore settingsStore = new GameSettingsStore();
     private final Map<KeyCode, GameSettings.Action> actionByKey = new HashMap<>();
     private final Set<KeyCode> heldKeys = EnumSet.noneOf(KeyCode.class);
     private AutoRepeatHandler moveLeftRepeat;
@@ -130,6 +138,11 @@ public class GuiController implements Initializable {
             @Override
             public void handle(KeyEvent keyEvent) {
                 KeyCode code = keyEvent.getCode();
+                if (code == KeyCode.ESCAPE) {
+                    handleEscapeKey();
+                    keyEvent.consume();
+                    return;
+                }
                 if (!heldKeys.add(code)) {
                     keyEvent.consume();
                     return;
@@ -156,6 +169,10 @@ public class GuiController implements Initializable {
         reflection.setFraction(0.8);
         reflection.setTopOpacity(0.9);
         reflection.setTopOffset(-12);
+        if (pauseOverlay != null) {
+            pauseOverlay.setVisible(false);
+            pauseOverlay.setManaged(false);
+        }
     }
 
     public void initGameView(int[][] boardMatrix, ViewData brick) {
@@ -279,12 +296,13 @@ public class GuiController implements Initializable {
         }
         ClearRow clearRow = downData.getClearRow();
         if (clearRow != null && clearRow.getLinesRemoved() > 0) {
-            NotificationPanel notificationPanel = new NotificationPanel("+" + clearRow.getScoreBonus());
-            groupNotification.getChildren().add(notificationPanel);
-            notificationPanel.showScore(groupNotification.getChildren());
-        }
-        updateLevelProgress(clearRow);
-        refreshBrick(downData.getViewData());
+                NotificationPanel notificationPanel = new NotificationPanel("+" + clearRow.getScoreBonus());
+                groupNotification.getChildren().add(notificationPanel);
+                notificationPanel.showScore(groupNotification.getChildren());
+                BackgroundMusicManager.getInstance().playLineClear();
+            }
+            updateLevelProgress(clearRow);
+            refreshBrick(downData.getViewData());
         gamePanel.requestFocus();
     }
 
@@ -360,6 +378,7 @@ public class GuiController implements Initializable {
 
     public void setGameSettings(GameSettings settings) {
         this.gameSettings = settings != null ? settings : GameSettings.defaultSettings();
+        applyAudioPreferences();
         heldKeys.clear();
         rebuildKeyBindings();
     }
@@ -424,6 +443,32 @@ public class GuiController implements Initializable {
         }
     }
 
+    private void handleEscapeKey() {
+        if (gameState == GameState.PLAYING) {
+            pauseGame();
+        } else if (gameState == GameState.PAUSED) {
+            resumeGame();
+        }
+    }
+
+    private void pauseGame() {
+        if (gameState != GameState.PLAYING) {
+            return;
+        }
+        setGameState(GameState.PAUSED);
+    }
+
+    private void resumeGame() {
+        if (gameState != GameState.PAUSED) {
+            return;
+        }
+        setGameState(GameState.PLAYING);
+        BackgroundMusicManager.getInstance().playGameTheme();
+        if (gamePanel != null) {
+            gamePanel.requestFocus();
+        }
+    }
+
     private void handleKeyReleased(KeyCode code) {
         GameSettings.Action action = actionByKey.get(code);
         if (action == null) {
@@ -456,6 +501,8 @@ public class GuiController implements Initializable {
 
     public void gameOver() {
         setGameState(GameState.GAME_OVER);
+        BackgroundMusicManager.getInstance().playGameOverJingle();
+        BackgroundMusicManager.getInstance().playMenuTheme();
     }
 
     public void newGame(ActionEvent actionEvent) {
@@ -471,6 +518,7 @@ public class GuiController implements Initializable {
     private void startNewGameSession() {
         stopAllRepeats();
         resetLevelTracking();
+        setPauseOverlayVisible(false);
         if (timeLine != null) {
             timeLine.stop();
         }
@@ -484,6 +532,7 @@ public class GuiController implements Initializable {
         ViewData freshState = eventListener.createNewGame();
         applyBrickView(freshState);
         setGameState(GameState.PLAYING);
+        BackgroundMusicManager.getInstance().playGameTheme();
     }
 
     private void returnToMainMenu() {
@@ -491,6 +540,7 @@ public class GuiController implements Initializable {
             timeLine.stop();
         }
         setGameState(GameState.MENU);
+        setPauseOverlayVisible(false);
         stopAllRepeats();
         if (gamePanel != null) {
             gamePanel.setFocusTraversable(false);
@@ -509,6 +559,7 @@ public class GuiController implements Initializable {
             Scene menuScene = new Scene(menuRoot, width, height);
             primaryStage.setScene(menuScene);
             primaryStage.show();
+            BackgroundMusicManager.getInstance().playMenuTheme();
         } catch (IOException e) {
             throw new IllegalStateException("Failed to load StartMenu.fxml", e);
         }
@@ -535,6 +586,7 @@ public class GuiController implements Initializable {
                     gameOverPanel.setVisible(false);
                     gameOverPanel.setManaged(false);
                 }
+                setPauseOverlayVisible(false);
                 stopAllRepeats();
                 break;
             case PLAYING:
@@ -544,6 +596,17 @@ public class GuiController implements Initializable {
                     gameOverPanel.setVisible(false);
                     gameOverPanel.setManaged(false);
                 }
+                setPauseOverlayVisible(false);
+                break;
+            case PAUSED:
+                isPause.setValue(Boolean.TRUE);
+                isGameOver.setValue(Boolean.FALSE);
+                if (gameOverPanel != null) {
+                    gameOverPanel.setVisible(false);
+                    gameOverPanel.setManaged(false);
+                }
+                setPauseOverlayVisible(true);
+                stopAllRepeats();
                 break;
             case GAME_OVER:
                 isPause.setValue(Boolean.TRUE);
@@ -552,6 +615,7 @@ public class GuiController implements Initializable {
                     gameOverPanel.setVisible(true);
                     gameOverPanel.setManaged(true);
                 }
+                setPauseOverlayVisible(false);
                 stopAllRepeats();
                 break;
             default:
@@ -614,6 +678,13 @@ public class GuiController implements Initializable {
         heldKeys.clear();
     }
 
+    private void setPauseOverlayVisible(boolean visible) {
+        if (pauseOverlay != null) {
+            pauseOverlay.setVisible(visible);
+            pauseOverlay.setManaged(visible);
+        }
+    }
+
     private void resetLevelTracking() {
         currentLevel = 1;
         linesUntilNextLevel = LINES_PER_LEVEL;
@@ -674,5 +745,62 @@ public class GuiController implements Initializable {
             return MIN_GRAVITY_INTERVAL_MS;
         }
         return Math.max(MIN_GRAVITY_INTERVAL_MS, LEVEL_GRAVITY_MS[level - 1]);
+    }
+
+    @FXML
+    private void onPauseResume(ActionEvent event) {
+        resumeGame();
+    }
+
+    @FXML
+    private void onPauseSettings(ActionEvent event) {
+        openSettingsDialog();
+    }
+
+    @FXML
+    private void onPauseMainMenu(ActionEvent event) {
+        returnToMainMenu();
+    }
+
+    private void openSettingsDialog() {
+        if (primaryStage == null) {
+            return;
+        }
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("SettingsDialog.fxml"));
+            Parent root = loader.load();
+            SettingsController controller = loader.getController();
+            Stage dialog = new Stage();
+            dialog.setTitle("Settings");
+            dialog.initOwner(primaryStage);
+            dialog.initModality(Modality.WINDOW_MODAL);
+            controller.setDialogStage(dialog);
+            controller.setInitialSettings(gameSettings);
+            Scene scene = new Scene(root, 520, 620);
+            dialog.setScene(scene);
+            dialog.showAndWait();
+            controller.getResult().ifPresent(this::setGameSettings);
+        } catch (IOException ex) {
+            throw new IllegalStateException("Failed to load SettingsDialog.fxml", ex);
+        }
+    }
+
+    private void applyAudioPreferences() {
+        BackgroundMusicManager manager = BackgroundMusicManager.getInstance();
+        manager.setEnabled(gameSettings.isBgmEnabled());
+        manager.setMasterVolume(gameSettings.getBgmVolume());
+        if (!gameSettings.isBgmEnabled()) {
+            manager.stopBackgroundMusic();
+            return;
+        }
+        switch (gameState) {
+            case PLAYING -> manager.playGameTheme();
+            case MENU, GAME_OVER -> manager.playMenuTheme();
+            case PAUSED -> {
+                // keep current track while paused
+            }
+            default -> {
+            }
+        }
     }
 }

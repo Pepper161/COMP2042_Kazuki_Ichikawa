@@ -6,5 +6,6 @@ package com.comp2042.game;
 public enum GameState {
     MENU,
     PLAYING,
+    PAUSED,
     GAME_OVER
 }
