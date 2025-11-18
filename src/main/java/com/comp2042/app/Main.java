@@ -31,7 +31,7 @@ public class Main extends Application {
         controller.setGameConfig(config);
 
         primaryStage.setTitle("TetrisJFX");
-        Scene scene = new Scene(root, StartMenuController.WINDOW_WIDTH, StartMenuController.WINDOW_HEIGHT);
+        Scene scene = new Scene(root, StartMenuController.MENU_WINDOW_WIDTH, StartMenuController.MENU_WINDOW_HEIGHT);
         primaryStage.setScene(scene);
         primaryStage.show();
     }
