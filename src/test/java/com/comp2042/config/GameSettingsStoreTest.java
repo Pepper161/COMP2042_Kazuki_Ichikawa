@@ -36,6 +36,7 @@ class GameSettingsStoreTest {
                 .setKey(GameSettings.Action.ROTATE_CW, KeyCode.E)
                 .setKey(GameSettings.Action.ROTATE_CCW, KeyCode.Q)
                 .setKey(GameSettings.Action.NEW_GAME, KeyCode.P)
+                .setBgmEnabled(false)
                 .build();
         store.save(custom);
         GameSettings reloaded = store.load();
@@ -44,5 +45,6 @@ class GameSettingsStoreTest {
         assertEquals(custom.getSoftDropMultiplier(), reloaded.getSoftDropMultiplier(), 0.0001);
         assertEquals(custom.getKey(GameSettings.Action.MOVE_LEFT), reloaded.getKey(GameSettings.Action.MOVE_LEFT));
         assertEquals(custom.getKey(GameSettings.Action.NEW_GAME), reloaded.getKey(GameSettings.Action.NEW_GAME));
+        assertEquals(custom.isBgmEnabled(), reloaded.isBgmEnabled());
     }
 }

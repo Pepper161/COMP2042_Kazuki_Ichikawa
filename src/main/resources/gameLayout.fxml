@@ -29,6 +29,14 @@
             <GameOverPanel fx:id="gameOverPanel"/>
         </VBox>
     </Group>
+    <VBox fx:id="pauseOverlay" alignment="CENTER" spacing="12" visible="false" managed="false" layoutX="60" layoutY="140" prefWidth="360">
+        <Label text="Paused" styleClass="menu-title"/>
+        <HBox spacing="10" alignment="CENTER">
+            <Button text="Resume" onAction="#onPauseResume"/>
+            <Button text="Settings" onAction="#onPauseSettings"/>
+            <Button text="Main Menu" onAction="#onPauseMainMenu"/>
+        </HBox>
+    </VBox>
     <stylesheets>
         <URL value="@window_style.css"/>
     </stylesheets>
