@@ -1,12 +1,12 @@
 # Controls
-- Move Left: Left Arrow / A
-- Move Right: Right Arrow / D
-- Soft Drop: Down Arrow / S
-- Hard Drop: Space
-- Rotate (CW): Up Arrow / X
-- Rotate (CCW): Z / Shift
-- Hold/New Game: N
-- Pause: Esc
+- Move Left: Left Arrow
+- Move Right: Right Arrow
+- Soft Drop: Down Arrow (adds +1 point per cell)
+- Hard Drop: Space (adds +2 points per cell)
+- Rotate (CW): Up Arrow
+- Rotate (CCW): Z
+- New Game (while playing) / Quick Restart: N
+- Pause / Resume: Esc
 
 # Scoring
 - Single (1 line): 100 pts
@@ -17,18 +17,18 @@
 - Hard Drop: +2 pts per cell
 - Combo: +50 pts per extra consecutive clear
 - Back-to-Back Bonus: +50% on eligible clears
+- T-Spins also award base points (800/1200/1600) and qualify for back-to-back
 
 # HUD Icons
-- Score: Current points for this run
-- Combo: Consecutive line clears counter
-- B2B: Back-to-back streak indicator
-- Level: Speed tier (rises every cleared line)
-- Lines: Total cleared lines
-- Seed: RNG seed shown on Game Over for replays
+- Score: Current run points
+- Combo: Current combo chain (resets on empty drops)
+- B2B: Back-to-back streak counter for Tetris/T-Spin chains
+- Level: Gravity tier (rises every cleared line)
+- Seed: Game Over overlay shows the RNG seed for replays
 
 # Shortcuts
-- Esc: Pause / menu
-- N: Restart current run
-- Space: Hard Drop instantly locks the piece
-- Arrow Down: Accelerate drop speed
+- Esc: Pause/resume or return to menu
+- N: Start a fresh game immediately
+- Space: Hard Drop to instantly lock the piece
+- Arrow Down: Accelerate descent without locking
 - Arrow Left/Right: Move piece horizontally (DAS/ARR respected)
