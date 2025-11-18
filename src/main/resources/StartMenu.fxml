@@ -9,11 +9,31 @@
             xmlns:fx="http://javafx.com/fxml"
             fx:controller="com.comp2042.app.StartMenuController">
     <center>
-        <VBox fx:id="menuContainer" alignment="CENTER" spacing="24">
+        <VBox fx:id="menuContainer" alignment="CENTER" spacing="18">
             <Label fx:id="titleLabel" text="TetrisJFX" styleClass="menu-title"/>
             <Button fx:id="startButton" text="Start" onAction="#onStart" prefWidth="160" styleClass="ipad-dark-grey"/>
             <Button fx:id="settingsButton" text="Settings" onAction="#onSettings" prefWidth="160" styleClass="ipad-dark-grey"/>
             <Button fx:id="exitButton" text="Exit" onAction="#onExit" prefWidth="160" styleClass="ipad-dark-grey"/>
+            <Label text="Leaderboard" styleClass="menu-subtitle"/>
+            <VBox fx:id="leaderboardContainer"
+                  alignment="CENTER"
+                  spacing="4"
+                  visible="false"
+                  managed="false"/>
+            <Label fx:id="leaderboardEmptyLabel"
+                   text="Play your first game to record a high score."
+                   wrapText="true"
+                   maxWidth="220"
+                   alignment="CENTER"
+                   styleClass="leaderboard-placeholder"/>
+            <Button fx:id="clearScoresButton"
+                    text="Clear Scores"
+                    onAction="#onClearScores"
+                    prefWidth="160"
+                    styleClass="ipad-dark-grey"
+                    disable="true"
+                    visible="false"
+                    managed="false"/>
         </VBox>
     </center>
     <padding>
