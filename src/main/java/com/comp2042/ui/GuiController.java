@@ -14,6 +14,8 @@ import com.comp2042.game.events.EventSource;
 import com.comp2042.game.events.EventType;
 import com.comp2042.game.events.InputEventListener;
 import com.comp2042.game.events.MoveEvent;
+import com.comp2042.game.stats.HighScoreEntry;
+import com.comp2042.game.stats.HighScoreService;
 import com.comp2042.ui.input.AutoRepeatHandler;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
@@ -46,9 +48,11 @@ import javafx.util.Duration;
 
 import java.io.IOException;
 import java.net.URL;
+import java.time.Instant;
 import java.util.ResourceBundle;
 import java.util.EnumSet;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -63,9 +67,13 @@ public class GuiController implements Initializable {
     private static final double GAME_OVER_GUIDE_OFFSET_ROWS = 0.5;
     private static final double BASE_GRAVITY_INTERVAL_MS = 400;
     private static final double MIN_GRAVITY_INTERVAL_MS = 80;
-    private static final int LINES_PER_LEVEL = 10;
+    private static final int LINES_PER_LEVEL = 1;
     private static final double[] LEVEL_GRAVITY_MS = {
-            400, 360, 320, 280, 240, 200, 170, 140, 120, 100, 90, 80
+            400, 390, 380, 370, 360, 350, 340, 330, 320, 310,
+            300, 290, 280, 270, 260, 250, 240, 230, 220, 210,
+            200, 190, 185, 180, 175, 170, 165, 160, 155, 150,
+            145, 140, 135, 130, 125, 120, 115, 110, 105, 100,
+            95, 90, 85, 80
     };
 
     @FXML
@@ -126,6 +134,9 @@ public class GuiController implements Initializable {
     private int currentLevel = 1;
     private int linesUntilNextLevel = LINES_PER_LEVEL;
     private double currentGravityMs = BASE_GRAVITY_INTERVAL_MS;
+    private final HighScoreService highScoreService = new HighScoreService();
+    private Score boundScore;
+    private Instant sessionStartInstant;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -365,6 +376,7 @@ public class GuiController implements Initializable {
     }
 
     public void bindScore(Score score) {
+        boundScore = score;
         if (hudPanel != null && score != null) {
             hudPanel.bindScore(score);
         }
@@ -503,6 +515,7 @@ public class GuiController implements Initializable {
         setGameState(GameState.GAME_OVER);
         BackgroundMusicManager.getInstance().playGameOverJingle();
         BackgroundMusicManager.getInstance().playMenuTheme();
+        recordLeaderboardResult();
     }
 
     public void newGame(ActionEvent actionEvent) {
@@ -526,6 +539,7 @@ public class GuiController implements Initializable {
             gameOverPanel.setVisible(false);
             gameOverPanel.setManaged(false);
         }
+        markSessionStart();
         if (eventListener == null) {
             return;
         }
@@ -577,7 +591,11 @@ public class GuiController implements Initializable {
             updateTimelinePlayback();
             return;
         }
+        GameState previousState = gameState;
         gameState = newGameState;
+        if (gameState == GameState.PLAYING && previousState != GameState.PLAYING && sessionStartInstant == null) {
+            markSessionStart();
+        }
         switch (gameState) {
             case MENU:
                 isPause.setValue(Boolean.TRUE);
@@ -802,5 +820,38 @@ public class GuiController implements Initializable {
             default -> {
             }
         }
+    }
+
+    private void recordLeaderboardResult() {
+        List<HighScoreEntry> leaderboard;
+        HighScoreEntry highlight = null;
+        if (boundScore != null) {
+            java.time.Duration elapsed = computeSessionDuration();
+            HighScoreEntry newEntry = HighScoreEntry.create(boundScore.scoreProperty().get(), describeCurrentMode(), elapsed);
+            leaderboard = highScoreService.recordScore(newEntry);
+            boolean onBoard = leaderboard.stream().anyMatch(newEntry::equals);
+            highlight = onBoard ? newEntry : null;
+        } else {
+            leaderboard = highScoreService.fetchLeaderboard();
+        }
+        sessionStartInstant = null;
+        if (gameOverPanel != null) {
+            gameOverPanel.setLeaderboard(leaderboard, highlight);
+        }
+    }
+
+    private java.time.Duration computeSessionDuration() {
+        if (sessionStartInstant == null) {
+            return java.time.Duration.ZERO;
+        }
+        return java.time.Duration.between(sessionStartInstant, Instant.now());
+    }
+
+    private void markSessionStart() {
+        sessionStartInstant = Instant.now();
+    }
+
+    private String describeCurrentMode() {
+        return "Classic";
     }
 }
