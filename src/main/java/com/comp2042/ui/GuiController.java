@@ -67,9 +67,13 @@ public class GuiController implements Initializable {
     private static final double GAME_OVER_GUIDE_OFFSET_ROWS = 0.5;
     private static final double BASE_GRAVITY_INTERVAL_MS = 400;
     private static final double MIN_GRAVITY_INTERVAL_MS = 80;
-    private static final int LINES_PER_LEVEL = 10;
+    private static final int LINES_PER_LEVEL = 1;
     private static final double[] LEVEL_GRAVITY_MS = {
-            400, 360, 320, 280, 240, 200, 170, 140, 120, 100, 90, 80
+            400, 390, 380, 370, 360, 350, 340, 330, 320, 310,
+            300, 290, 280, 270, 260, 250, 240, 230, 220, 210,
+            200, 190, 185, 180, 175, 170, 165, 160, 155, 150,
+            145, 140, 135, 130, 125, 120, 115, 110, 105, 100,
+            95, 90, 85, 80
     };
 
     @FXML
