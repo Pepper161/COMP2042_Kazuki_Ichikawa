@@ -896,7 +896,7 @@ public class GuiController implements Initializable {
     }
 
     private String describeCurrentMode() {
-        return "Classic";
+        return gameMode != null ? gameMode.toString() : "Classic";
     }
 
     private Tooltip buildHelpTooltip() {
