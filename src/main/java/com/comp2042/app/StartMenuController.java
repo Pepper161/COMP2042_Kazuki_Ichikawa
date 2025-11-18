@@ -60,7 +60,6 @@ public class StartMenuController {
     private Button clearScoresButton;
 
     @FXML
-    @FXML
     public void initialize() {
         if (leaderboardContainer != null) {
             leaderboardContainer.getStyleClass().add("leaderboard-container");
