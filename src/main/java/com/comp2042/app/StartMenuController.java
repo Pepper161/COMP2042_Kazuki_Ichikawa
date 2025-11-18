@@ -6,17 +6,27 @@ import com.comp2042.config.GameSettingsStore;
 import com.comp2042.game.GameConfig;
 import com.comp2042.game.GameController;
 import com.comp2042.game.GameState;
+import com.comp2042.game.stats.HighScoreEntry;
+import com.comp2042.game.stats.HighScoreService;
 import com.comp2042.ui.GuiController;
 import javafx.application.Platform;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.Label;
+import javafx.scene.control.ListView;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.List;
+import java.util.Optional;
 import javafx.stage.Modality;
 
 /**
@@ -32,6 +42,26 @@ public class StartMenuController {
     private final GameSettingsStore settingsStore = new GameSettingsStore();
     private GameSettings gameSettings = settingsStore.load();
     private final BackgroundMusicManager musicManager = BackgroundMusicManager.getInstance();
+    private final HighScoreService highScoreService = new HighScoreService();
+
+    @FXML
+    private ListView<String> leaderboardList;
+
+    @FXML
+    private Label leaderboardEmptyLabel;
+
+    @FXML
+    private Button clearScoresButton;
+
+    @FXML
+    public void initialize() {
+        if (leaderboardList != null) {
+            leaderboardList.setFocusTraversable(false);
+            leaderboardList.setMouseTransparent(true);
+            leaderboardList.getStyleClass().add("leaderboard-list");
+        }
+        refreshLeaderboard();
+    }
 
     public void setPrimaryStage(Stage primaryStage) {
         this.primaryStage = primaryStage;
@@ -95,6 +125,22 @@ public class StartMenuController {
         }
     }
 
+    @FXML
+    private void onClearScores(ActionEvent event) {
+        Alert confirmation = new Alert(Alert.AlertType.CONFIRMATION);
+        confirmation.setTitle("Clear Leaderboard");
+        confirmation.setHeaderText("Remove all stored high scores?");
+        confirmation.setContentText("This action cannot be undone.");
+        if (primaryStage != null) {
+            confirmation.initOwner(primaryStage);
+        }
+        Optional<ButtonType> result = confirmation.showAndWait();
+        if (result.isPresent() && result.get() == ButtonType.OK) {
+            highScoreService.clear();
+            refreshLeaderboard();
+        }
+    }
+
     private void ensurePrimaryStageBound() {
         if (primaryStage == null) {
             throw new IllegalStateException("Primary stage has not been injected into StartMenuController.");
@@ -103,5 +149,39 @@ public class StartMenuController {
 
     public void setGameConfig(GameConfig gameConfig) {
         this.gameConfig = gameConfig != null ? gameConfig : GameConfig.defaultConfig();
+    }
+
+    private void refreshLeaderboard() {
+        if (leaderboardList == null || leaderboardEmptyLabel == null || clearScoresButton == null) {
+            return;
+        }
+        List<HighScoreEntry> entries = highScoreService.fetchLeaderboard();
+        ObservableList<String> items = leaderboardList.getItems();
+        items.clear();
+        if (entries.isEmpty()) {
+            leaderboardEmptyLabel.setManaged(true);
+            leaderboardEmptyLabel.setVisible(true);
+            leaderboardList.setManaged(false);
+            leaderboardList.setVisible(false);
+            clearScoresButton.setDisable(true);
+            return;
+        }
+        int rank = 1;
+        for (HighScoreEntry entry : entries) {
+            items.add(formatEntry(rank++, entry));
+        }
+        leaderboardList.setManaged(true);
+        leaderboardList.setVisible(true);
+        leaderboardEmptyLabel.setVisible(false);
+        leaderboardEmptyLabel.setManaged(false);
+        clearScoresButton.setDisable(false);
+    }
+
+    private String formatEntry(int rank, HighScoreEntry entry) {
+        return String.format("#%d %s pts · %s · %s",
+                rank,
+                entry.getScore(),
+                entry.getMode(),
+                entry.formattedDuration());
     }
 }
