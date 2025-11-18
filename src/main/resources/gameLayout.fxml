@@ -23,6 +23,12 @@
 
     <HudPanel fx:id="hudPanel" layoutX="240" layoutY="20"/>
     <NextQueuePanel fx:id="nextQueuePanel" layoutX="360" layoutY="20"/>
+    <Button fx:id="helpHintButton"
+            text="?"
+            layoutX="500"
+            layoutY="20"
+            onAction="#onShowHelp"
+            styleClass="help-hint-button"/>
 
     <Group fx:id="groupNotification" layoutX="14" layoutY="203">
         <VBox alignment="CENTER">

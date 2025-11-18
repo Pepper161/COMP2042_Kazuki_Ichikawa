@@ -8,6 +8,7 @@ import com.comp2042.game.GameController;
 import com.comp2042.game.GameState;
 import com.comp2042.game.stats.HighScoreEntry;
 import com.comp2042.game.stats.HighScoreService;
+import com.comp2042.help.HelpContentProvider;
 import com.comp2042.ui.GuiController;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
@@ -44,6 +45,7 @@ public class StartMenuController {
     private GameSettings gameSettings = settingsStore.load();
     private final BackgroundMusicManager musicManager = BackgroundMusicManager.getInstance();
     private final HighScoreService highScoreService = new HighScoreService();
+    private final HelpContentProvider helpContentProvider = HelpContentProvider.getInstance();
 
     @FXML
     private VBox leaderboardContainer;
@@ -138,6 +140,12 @@ public class StartMenuController {
             highScoreService.clear();
             refreshLeaderboard();
         }
+    }
+
+    @FXML
+    private void onHelp(ActionEvent event) {
+        ensurePrimaryStageBound();
+        HelpDialogService.showHelp(primaryStage, helpContentProvider.getMarkdown());
     }
 
     private void ensurePrimaryStageBound() {
