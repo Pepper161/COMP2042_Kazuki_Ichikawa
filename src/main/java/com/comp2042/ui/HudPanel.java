@@ -16,6 +16,7 @@ public class HudPanel extends VBox {
     private final Label comboLabel = new Label("Combo: 0");
     private final Label b2bLabel = new Label("B2B: --");
     private final Label levelLabel = new Label("Level: 1");
+    private final Label modeLabel = new Label("Mode: Endless");
 
     public HudPanel() {
         setSpacing(6);
@@ -25,7 +26,8 @@ public class HudPanel extends VBox {
         comboLabel.getStyleClass().add("hud-label");
         b2bLabel.getStyleClass().add("hud-label");
         levelLabel.getStyleClass().add("hud-label");
-        getChildren().addAll(scoreLabel, comboLabel, b2bLabel, levelLabel);
+        modeLabel.getStyleClass().add("hud-label");
+        getChildren().addAll(scoreLabel, comboLabel, b2bLabel, levelLabel, modeLabel);
     }
 
     public void bindScore(Score score) {
@@ -55,5 +57,9 @@ public class HudPanel extends VBox {
 
     public void setLevel(int level) {
         levelLabel.setText("Level: " + level);
+    }
+
+    public void setModeStatus(String status) {
+        modeLabel.setText(status != null ? status : "");
     }
 }

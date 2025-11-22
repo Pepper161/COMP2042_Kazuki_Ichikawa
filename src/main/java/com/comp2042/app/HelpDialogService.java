@@ -1,5 +1,6 @@
 package com.comp2042.app;
 
+import com.comp2042.config.ResourceManager;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -13,14 +14,12 @@ import java.io.IOException;
  */
 public final class HelpDialogService {
 
-    private static final String HELP_DIALOG_FXML = "HelpDialog.fxml";
-
     private HelpDialogService() {
     }
 
     public static void showHelp(Stage owner, String markdown) {
         try {
-            FXMLLoader loader = new FXMLLoader(HelpDialogService.class.getClassLoader().getResource(HELP_DIALOG_FXML));
+            FXMLLoader loader = new FXMLLoader(ResourceManager.getUrl(ResourceManager.Asset.HELP_DIALOG_FXML));
             Parent root = loader.load();
             HelpDialogController controller = loader.getController();
             controller.setContent(markdown);

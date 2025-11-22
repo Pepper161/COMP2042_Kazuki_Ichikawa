@@ -3,6 +3,7 @@ package com.comp2042.app;
 import com.comp2042.audio.BackgroundMusicManager;
 import com.comp2042.config.GameSettings;
 import com.comp2042.config.GameSettingsStore;
+import com.comp2042.config.ResourceManager;
 import com.comp2042.game.GameConfig;
 import com.comp2042.game.GameController;
 import com.comp2042.game.GameState;
@@ -20,6 +21,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.ChoiceDialog;
 import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.TextAlignment;
@@ -36,8 +38,10 @@ import javafx.stage.Modality;
  */
 public class StartMenuController {
 
-    public static final double WINDOW_WIDTH = 300;
-    public static final double WINDOW_HEIGHT = 510;
+    public static final double MENU_WINDOW_WIDTH = 420;
+    public static final double MENU_WINDOW_HEIGHT = 700;
+    public static final double GAME_WINDOW_WIDTH = 540;
+    public static final double GAME_WINDOW_HEIGHT = 720;
 
     private Stage primaryStage;
     private GameConfig gameConfig = GameConfig.defaultConfig();
@@ -66,6 +70,11 @@ public class StartMenuController {
 
     public void setPrimaryStage(Stage primaryStage) {
         this.primaryStage = primaryStage;
+        primaryStage.setResizable(true);
+        primaryStage.setMinWidth(MENU_WINDOW_WIDTH);
+        primaryStage.setMinHeight(MENU_WINDOW_HEIGHT);
+        primaryStage.setMaxWidth(Double.MAX_VALUE);
+        primaryStage.setMaxHeight(Double.MAX_VALUE);
         musicManager.setEnabled(gameSettings.isBgmEnabled());
         musicManager.setMasterVolume(gameSettings.getBgmVolume());
         musicManager.playMenuTheme();
@@ -73,15 +82,25 @@ public class StartMenuController {
 
     @FXML
     private void onStart(ActionEvent event) {
+        GameConfig.GameMode selected = promptModeSelection();
+        if (selected == null) {
+            return;
+        }
+        gameConfig = gameConfig.withMode(selected);
         ensurePrimaryStageBound();
         try {
-            URL layoutUrl = getClass().getClassLoader().getResource("gameLayout.fxml");
+            URL layoutUrl = ResourceManager.getUrl(ResourceManager.Asset.GAME_LAYOUT_FXML);
             FXMLLoader loader = new FXMLLoader(layoutUrl);
             Parent root = loader.load();
             GuiController guiController = loader.getController();
             guiController.setPrimaryStage(primaryStage);
-            Scene scene = new Scene(root, WINDOW_WIDTH, WINDOW_HEIGHT);
+            Scene scene = new Scene(root, GAME_WINDOW_WIDTH, GAME_WINDOW_HEIGHT);
             primaryStage.setScene(scene);
+            primaryStage.setResizable(false);
+            primaryStage.setMinWidth(GAME_WINDOW_WIDTH);
+            primaryStage.setMinHeight(GAME_WINDOW_HEIGHT);
+            primaryStage.setMaxWidth(GAME_WINDOW_WIDTH);
+            primaryStage.setMaxHeight(GAME_WINDOW_HEIGHT);
             primaryStage.show();
             new GameController(guiController, gameConfig, gameSettings);
             guiController.setGameState(GameState.PLAYING);
@@ -100,7 +119,7 @@ public class StartMenuController {
     private void onSettings(ActionEvent event) {
         ensurePrimaryStageBound();
         try {
-            URL settingsUrl = getClass().getClassLoader().getResource("SettingsDialog.fxml");
+            URL settingsUrl = ResourceManager.getUrl(ResourceManager.Asset.SETTINGS_DIALOG_FXML);
             FXMLLoader loader = new FXMLLoader(settingsUrl);
             Parent root = loader.load();
             SettingsController controller = loader.getController();
@@ -198,5 +217,17 @@ public class StartMenuController {
                 entry.getScore(),
                 entry.getMode(),
                 entry.formattedDuration());
+    }
+
+    private GameConfig.GameMode promptModeSelection() {
+        ChoiceDialog<GameConfig.GameMode> dialog = new ChoiceDialog<>(gameConfig.getMode(), GameConfig.GameMode.values());
+        dialog.setTitle("Select Game Mode");
+        dialog.setHeaderText("Choose a game mode");
+        dialog.setContentText("Mode:");
+        if (primaryStage != null) {
+            dialog.initOwner(primaryStage);
+        }
+        Optional<GameConfig.GameMode> result = dialog.showAndWait();
+        return result.orElse(null);
     }
 }
