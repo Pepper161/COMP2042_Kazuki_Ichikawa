@@ -20,6 +20,8 @@ public class GameSettingsStore {
 
     private static final String FILE_NAME = "settings.properties";
     private static final String KEY_PREFIX = "key.";
+    private static final String COLOR_ASSIST_KEY = "colorAssistMode";
+    private static final String OUTLINE_KEY = "outlineEnabled";
 
     private final Path baseDirectory;
     private final Path settingsFile;
@@ -71,6 +73,18 @@ public class GameSettingsStore {
             builder.setBgmEnabled(Boolean.parseBoolean(bgmValue));
         }
         parseDouble(properties.getProperty("bgmVolume")).ifPresent(builder::setBgmVolume);
+        String assistValue = properties.getProperty(COLOR_ASSIST_KEY);
+        if (assistValue != null) {
+            try {
+                builder.setColorAssistMode(GameSettings.ColorAssistMode.valueOf(assistValue.trim()));
+            } catch (IllegalArgumentException ignored) {
+                builder.setColorAssistMode(GameSettings.ColorAssistMode.CLASSIC);
+            }
+        }
+        String outlineValue = properties.getProperty(OUTLINE_KEY);
+        if (outlineValue != null) {
+            builder.setPieceOutlineEnabled(Boolean.parseBoolean(outlineValue));
+        }
         for (GameSettings.Action action : GameSettings.Action.values()) {
             String value = properties.getProperty(KEY_PREFIX + action.name());
             if (value == null || value.isBlank()) {
@@ -92,6 +106,8 @@ public class GameSettingsStore {
         properties.setProperty("softDropMultiplier", Double.toString(settings.getSoftDropMultiplier()));
         properties.setProperty("bgmEnabled", Boolean.toString(settings.isBgmEnabled()));
         properties.setProperty("bgmVolume", Double.toString(settings.getBgmVolume()));
+        properties.setProperty(COLOR_ASSIST_KEY, settings.getColorAssistMode().name());
+        properties.setProperty(OUTLINE_KEY, Boolean.toString(settings.isPieceOutlineEnabled()));
         for (var entry : settings.getKeyBindings().entrySet()) {
             properties.setProperty(KEY_PREFIX + entry.getKey().name(), entry.getValue().name());
         }
