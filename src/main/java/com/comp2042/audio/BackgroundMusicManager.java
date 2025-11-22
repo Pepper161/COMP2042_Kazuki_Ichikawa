@@ -1,5 +1,6 @@
 package com.comp2042.audio;
 
+import com.comp2042.config.ResourceManager;
 import javafx.application.Platform;
 import javafx.scene.media.AudioClip;
 
@@ -27,10 +28,10 @@ public final class BackgroundMusicManager {
     private double masterVolume = 0.35;
 
     private BackgroundMusicManager() {
-        menuClip = createLoopingClip("audio/menu_theme.wav");
-        gameClip = createLoopingClip("audio/game_theme.wav");
-        gameOverClip = createSingleShotClip("audio/game_over.wav", 1.2);
-        lineClearClip = createSingleShotClip("audio/line_clear.wav", 0.8);
+        menuClip = createLoopingClip(ResourceManager.Asset.AUDIO_MENU_THEME);
+        gameClip = createLoopingClip(ResourceManager.Asset.AUDIO_GAME_THEME);
+        gameOverClip = createSingleShotClip(ResourceManager.Asset.AUDIO_GAME_OVER, 1.2);
+        lineClearClip = createSingleShotClip(ResourceManager.Asset.AUDIO_LINE_CLEAR, 0.8);
     }
 
     public static BackgroundMusicManager getInstance() {
@@ -118,24 +119,16 @@ public final class BackgroundMusicManager {
         currentClip = null;
     }
 
-    private AudioClip createLoopingClip(String resourcePath) {
-        URL resource = getClass().getClassLoader().getResource(resourcePath);
-        if (resource == null) {
-            System.err.println("[Audio] Missing resource: " + resourcePath);
-            return null;
-        }
+    private AudioClip createLoopingClip(ResourceManager.Asset asset) {
+        URL resource = ResourceManager.getUrl(asset);
         AudioClip clip = new AudioClip(resource.toExternalForm());
         clip.setCycleCount(AudioClip.INDEFINITE);
         applyVolume(clip);
         return clip;
     }
 
-    private AudioClip createSingleShotClip(String resourcePath, double volumeMultiplier) {
-        URL resource = getClass().getClassLoader().getResource(resourcePath);
-        if (resource == null) {
-            System.err.println("[Audio] Missing resource: " + resourcePath);
-            return null;
-        }
+    private AudioClip createSingleShotClip(ResourceManager.Asset asset, double volumeMultiplier) {
+        URL resource = ResourceManager.getUrl(asset);
         AudioClip clip = new AudioClip(resource.toExternalForm());
         clip.setCycleCount(1);
         clip.setVolume(Math.max(0.0, Math.min(1.0, masterVolume * volumeMultiplier)));
