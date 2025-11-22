@@ -3,6 +3,7 @@ package com.comp2042.app;
 import com.comp2042.audio.BackgroundMusicManager;
 import com.comp2042.config.GameSettings;
 import com.comp2042.config.GameSettingsStore;
+import com.comp2042.config.ResourceManager;
 import com.comp2042.game.GameConfig;
 import com.comp2042.game.GameController;
 import com.comp2042.game.GameState;
@@ -75,7 +76,7 @@ public class StartMenuController {
     private void onStart(ActionEvent event) {
         ensurePrimaryStageBound();
         try {
-            URL layoutUrl = getClass().getClassLoader().getResource("gameLayout.fxml");
+            URL layoutUrl = ResourceManager.getUrl(ResourceManager.Asset.GAME_LAYOUT_FXML);
             FXMLLoader loader = new FXMLLoader(layoutUrl);
             Parent root = loader.load();
             GuiController guiController = loader.getController();
@@ -100,7 +101,7 @@ public class StartMenuController {
     private void onSettings(ActionEvent event) {
         ensurePrimaryStageBound();
         try {
-            URL settingsUrl = getClass().getClassLoader().getResource("SettingsDialog.fxml");
+            URL settingsUrl = ResourceManager.getUrl(ResourceManager.Asset.SETTINGS_DIALOG_FXML);
             FXMLLoader loader = new FXMLLoader(settingsUrl);
             Parent root = loader.load();
             SettingsController controller = loader.getController();
