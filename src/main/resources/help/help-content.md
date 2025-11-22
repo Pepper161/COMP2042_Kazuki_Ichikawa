@@ -8,6 +8,11 @@
 - New Game (while playing) / Quick Restart: N
 - Pause / Resume: Esc
 
+# Accessibility
+- Settings &rarr; Accessibility lets you switch between the Classic palette and a High Contrast option with bold stripes for colorblind support.
+- Enable "Piece Outlines" to draw dark borders around active, locked, ghost, and NEXT preview tiles for clearer shapes.
+- These options are applied instantly in-game so you can tailor readability without restarting.
+
 # Scoring
 - Single (1 line): 100 pts
 - Double (2 lines): 300 pts

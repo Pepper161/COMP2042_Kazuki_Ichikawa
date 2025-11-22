@@ -6,6 +6,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
 import javafx.scene.control.TextField;
@@ -51,6 +52,10 @@ public class SettingsController {
     private CheckBox bgmCheckBox;
     @FXML
     private Slider bgmVolumeSlider;
+    @FXML
+    private ComboBox<GameSettings.ColorAssistMode> colorAssistCombo;
+    @FXML
+    private CheckBox outlineCheckBox;
 
     private final Map<GameSettings.Action, TextField> keyFields = new EnumMap<>(GameSettings.Action.class);
     private final GameSettingsStore store = new GameSettingsStore();
@@ -64,7 +69,9 @@ public class SettingsController {
             Map.entry("info-hard-drop", "Hard Drop: drops the piece instantly to the ghost position and locks it."),
             Map.entry("info-rotate-cw", "Rotate CW: clockwise rotation (90° to the right)."),
             Map.entry("info-rotate-ccw", "Rotate CCW: counter-clockwise rotation (90° to the left)."),
-            Map.entry("info-new-game", "New Game: resets the playfield immediately and starts a new run.")
+            Map.entry("info-new-game", "New Game: resets the playfield immediately and starts a new run."),
+            Map.entry("info-color-assist", "Use High Contrast to apply bold palettes and stripe patterns tailored for common color vision deficiencies."),
+            Map.entry("info-outline", "Adds a dark outline around pieces and previews so shapes remain readable regardless of fill colour.")
     );
 
     private GameSettings initialSettings = GameSettings.defaultSettings();
@@ -141,6 +148,15 @@ public class SettingsController {
         if (bgmVolumeSlider != null) {
             bgmVolumeSlider.setValue(initialSettings.getBgmVolume() * 100.0);
         }
+        if (colorAssistCombo != null) {
+            if (colorAssistCombo.getItems().isEmpty()) {
+                colorAssistCombo.getItems().addAll(GameSettings.ColorAssistMode.values());
+            }
+            colorAssistCombo.setValue(initialSettings.getColorAssistMode());
+        }
+        if (outlineCheckBox != null) {
+            outlineCheckBox.setSelected(initialSettings.isPieceOutlineEnabled());
+        }
         for (Map.Entry<GameSettings.Action, TextField> entry : keyFields.entrySet()) {
             KeyCode keyCode = initialSettings.getKey(entry.getKey());
             entry.getValue().setText(keyCode != null ? keyCode.name() : "");
@@ -157,6 +173,11 @@ public class SettingsController {
         if (bgmVolumeSlider != null) {
             builder.setBgmVolume(bgmVolumeSlider.getValue() / 100.0);
         }
+        GameSettings.ColorAssistMode assistMode = colorAssistCombo != null && colorAssistCombo.getValue() != null
+                ? colorAssistCombo.getValue()
+                : GameSettings.ColorAssistMode.CLASSIC;
+        builder.setColorAssistMode(assistMode);
+        builder.setPieceOutlineEnabled(outlineCheckBox != null && outlineCheckBox.isSelected());
         for (Map.Entry<GameSettings.Action, TextField> entry : keyFields.entrySet()) {
             builder.setKey(entry.getKey(), parseKey(entry.getValue(), entry.getKey().name()));
         }

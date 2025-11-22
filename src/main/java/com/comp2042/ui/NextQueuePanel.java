@@ -5,6 +5,7 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.shape.Rectangle;
+import javafx.scene.paint.Color;
 
 import java.util.List;
 
@@ -21,6 +22,7 @@ public class NextQueuePanel extends VBox {
 
     private final VBox queueContainer = new VBox(8);
     private final QueueSlot[] slots = new QueueSlot[MAX_QUEUE];
+    private boolean outlinesEnabled;
 
     public NextQueuePanel() {
         setSpacing(6);
@@ -48,6 +50,21 @@ public class NextQueuePanel extends VBox {
         }
     }
 
+    public void setOutlinesEnabled(boolean enabled) {
+        outlinesEnabled = enabled;
+        refreshAppearance();
+    }
+
+    public void refreshColors() {
+        refreshAppearance();
+    }
+
+    private void refreshAppearance() {
+        for (QueueSlot slot : slots) {
+            slot.repaint();
+        }
+    }
+
     private QueueSlot createSlot() {
         GridPane grid = new GridPane();
         grid.setHgap(1);
@@ -68,9 +85,31 @@ public class NextQueuePanel extends VBox {
         return new QueueSlot(grid, cells);
     }
 
-    private static final class QueueSlot {
+    private void applyOutline(Rectangle cell) {
+        if (outlinesEnabled) {
+            cell.setStroke(Color.rgb(15, 15, 20, 0.7));
+            cell.setStrokeWidth(0.6);
+        } else {
+            cell.setStrokeWidth(0);
+            cell.setStroke(null);
+        }
+    }
+
+    private static int[][] copyMatrix(int[][] matrix) {
+        if (matrix == null) {
+            return null;
+        }
+        int[][] copy = new int[matrix.length][];
+        for (int i = 0; i < matrix.length; i++) {
+            copy[i] = matrix[i] != null ? matrix[i].clone() : null;
+        }
+        return copy;
+    }
+
+    private final class QueueSlot {
         private final GridPane grid;
         private final Rectangle[][] cells;
+        private int[][] lastMatrix;
 
         private QueueSlot(GridPane grid, Rectangle[][] cells) {
             this.grid = grid;
@@ -78,17 +117,29 @@ public class NextQueuePanel extends VBox {
         }
 
         private void apply(int[][] matrix) {
+            this.lastMatrix = copyMatrix(matrix);
+            repaint();
+        }
+
+        private void repaint() {
             for (int row = 0; row < cells.length; row++) {
                 for (int col = 0; col < cells[row].length; col++) {
-                    int value = 0;
-                    if (matrix != null
-                            && row < matrix.length
-                            && col < matrix[row].length) {
-                        value = matrix[row][col];
-                    }
-                    cells[row][col].setFill(BrickColorPalette.resolve(value));
+                    int value = resolveValue(row, col);
+                    Rectangle cell = cells[row][col];
+                    cell.setFill(BrickColorPalette.resolve(value));
+                    applyOutline(cell);
                 }
             }
+        }
+
+        private int resolveValue(int row, int col) {
+            if (lastMatrix == null
+                    || row >= lastMatrix.length
+                    || lastMatrix[row] == null
+                    || col >= lastMatrix[row].length) {
+                return 0;
+            }
+            return lastMatrix[row][col];
         }
     }
 }
