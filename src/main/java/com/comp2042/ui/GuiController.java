@@ -327,6 +327,7 @@ public class GuiController implements Initializable {
         }
         rectangle.setArcHeight(9);
         rectangle.setArcWidth(9);
+        applyOutline(rectangle);
     }
 
     private void applyOutline(Rectangle rectangle) {
