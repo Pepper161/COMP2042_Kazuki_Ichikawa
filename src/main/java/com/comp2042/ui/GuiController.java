@@ -8,6 +8,7 @@ import com.comp2042.board.ClearRow;
 import com.comp2042.board.ViewData;
 import com.comp2042.config.GameSettings;
 import com.comp2042.config.GameSettingsStore;
+import com.comp2042.game.GameConfig;
 import com.comp2042.game.GameState;
 import com.comp2042.game.Score;
 import com.comp2042.game.events.DownData;
@@ -71,6 +72,8 @@ public class GuiController implements Initializable {
     private static final double GAME_OVER_GUIDE_OFFSET_ROWS = 0.5;
     private static final double BASE_GRAVITY_INTERVAL_MS = 400;
     private static final double MIN_GRAVITY_INTERVAL_MS = 80;
+    private static final int TIMED_MODE_SECONDS = 180;
+    private static final int FIXED_LINES_TARGET = 40;
     private static final int LINES_PER_LEVEL = 1;
     private static final double[] LEVEL_GRAVITY_MS = {
             400, 390, 380, 370, 360, 350, 340, 330, 320, 310,
@@ -144,6 +147,12 @@ public class GuiController implements Initializable {
     private final HelpContentProvider helpContentProvider = HelpContentProvider.getInstance();
     private Score boundScore;
     private Instant sessionStartInstant;
+    private long lastSeed;
+    private boolean lastSeedDeterministic;
+    private GameConfig.GameMode gameMode = GameConfig.GameMode.ENDLESS;
+    private Timeline modeTimer;
+    private long remainingModeSeconds;
+    private int fixedLinesCleared;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -399,6 +408,11 @@ public class GuiController implements Initializable {
         }
     }
 
+    public void setGameMode(GameConfig.GameMode mode) {
+        this.gameMode = mode != null ? mode : GameConfig.GameMode.ENDLESS;
+        updateModeStatus();
+    }
+
     public void setGameSettings(GameSettings settings) {
         this.gameSettings = settings != null ? settings : GameSettings.defaultSettings();
         applyAudioPreferences();
@@ -523,6 +537,7 @@ public class GuiController implements Initializable {
     }
 
     public void gameOver() {
+        stopModeTimer();
         setGameState(GameState.GAME_OVER);
         BackgroundMusicManager.getInstance().playGameOverJingle();
         BackgroundMusicManager.getInstance().playMenuTheme();
@@ -534,6 +549,8 @@ public class GuiController implements Initializable {
     }
 
     public void updateSeedInfo(long seed, boolean deterministic) {
+        lastSeed = seed;
+        lastSeedDeterministic = deterministic;
         if (gameOverPanel != null) {
             gameOverPanel.setSeedInfo(seed, deterministic);
         }
@@ -551,6 +568,7 @@ public class GuiController implements Initializable {
             gameOverPanel.setManaged(false);
         }
         markSessionStart();
+        resetModeObjectivesInternal();
         if (eventListener == null) {
             return;
         }
@@ -564,6 +582,7 @@ public class GuiController implements Initializable {
         if (timeLine != null) {
             timeLine.stop();
         }
+        stopModeTimer();
         setGameState(GameState.MENU);
         setPauseOverlayVisible(false);
         stopAllRepeats();
@@ -579,8 +598,8 @@ public class GuiController implements Initializable {
             StartMenuController menuController = loader.getController();
             menuController.setPrimaryStage(primaryStage);
             Scene currentScene = primaryStage.getScene();
-            double width = currentScene != null ? currentScene.getWidth() : StartMenuController.WINDOW_WIDTH;
-            double height = currentScene != null ? currentScene.getHeight() : StartMenuController.WINDOW_HEIGHT;
+            double width = currentScene != null ? currentScene.getWidth() : StartMenuController.MENU_WINDOW_WIDTH;
+            double height = currentScene != null ? currentScene.getHeight() : StartMenuController.MENU_WINDOW_HEIGHT;
             Scene menuScene = new Scene(menuRoot, width, height);
             primaryStage.setScene(menuScene);
             primaryStage.show();
@@ -611,6 +630,7 @@ public class GuiController implements Initializable {
             case MENU:
                 isPause.setValue(Boolean.TRUE);
                 isGameOver.setValue(Boolean.FALSE);
+                stopModeTimer();
                 if (gameOverPanel != null) {
                     gameOverPanel.setVisible(false);
                     gameOverPanel.setManaged(false);
@@ -626,10 +646,12 @@ public class GuiController implements Initializable {
                     gameOverPanel.setManaged(false);
                 }
                 setPauseOverlayVisible(false);
+                resumeModeTimerIfNeeded();
                 break;
             case PAUSED:
                 isPause.setValue(Boolean.TRUE);
                 isGameOver.setValue(Boolean.FALSE);
+                pauseModeTimer();
                 if (gameOverPanel != null) {
                     gameOverPanel.setVisible(false);
                     gameOverPanel.setManaged(false);
@@ -640,6 +662,7 @@ public class GuiController implements Initializable {
             case GAME_OVER:
                 isPause.setValue(Boolean.TRUE);
                 isGameOver.setValue(Boolean.TRUE);
+                stopModeTimer();
                 if (gameOverPanel != null) {
                     gameOverPanel.setVisible(true);
                     gameOverPanel.setManaged(true);
@@ -764,6 +787,7 @@ public class GuiController implements Initializable {
             applyGravityInterval();
             updateSoftDropRepeatInterval();
         }
+        handleModeLineProgress(removed);
     }
 
     private double resolveGravityInterval(int level) {
@@ -872,7 +896,7 @@ public class GuiController implements Initializable {
     }
 
     private String describeCurrentMode() {
-        return "Classic";
+        return gameMode != null ? gameMode.toString() : "Classic";
     }
 
     private Tooltip buildHelpTooltip() {
@@ -884,5 +908,93 @@ public class GuiController implements Initializable {
         tooltip.setShowDelay(Duration.millis(200));
         tooltip.setHideDelay(Duration.ZERO);
         return tooltip;
+    }
+
+    public void prepareModeSession() {
+        resetModeObjectivesInternal();
+    }
+
+    private void resetModeObjectivesInternal() {
+        stopModeTimer();
+        fixedLinesCleared = 0;
+        switch (gameMode) {
+            case TIMED -> startModeTimer();
+            case FIXED_LINES -> {
+                remainingModeSeconds = 0;
+                updateModeStatus();
+            }
+            default -> updateModeStatus();
+        }
+    }
+
+    private void startModeTimer() {
+        stopModeTimer();
+        remainingModeSeconds = TIMED_MODE_SECONDS;
+        updateModeStatus();
+        modeTimer = new Timeline(new KeyFrame(Duration.seconds(1), ae -> {
+            remainingModeSeconds = Math.max(0, remainingModeSeconds - 1);
+            updateModeStatus();
+            if (remainingModeSeconds <= 0) {
+                stopModeTimer();
+                showNotification("Time up!");
+                gameOver();
+            }
+        }));
+        modeTimer.setCycleCount(Timeline.INDEFINITE);
+        modeTimer.play();
+    }
+
+    private void stopModeTimer() {
+        if (modeTimer != null) {
+            modeTimer.stop();
+            modeTimer = null;
+        }
+    }
+
+    private void pauseModeTimer() {
+        if (modeTimer != null) {
+            modeTimer.pause();
+        }
+    }
+
+    private void resumeModeTimerIfNeeded() {
+        if (modeTimer != null && gameMode == GameConfig.GameMode.TIMED) {
+            modeTimer.play();
+        }
+    }
+
+    private void handleModeLineProgress(int linesRemoved) {
+        if (gameMode != GameConfig.GameMode.FIXED_LINES || linesRemoved <= 0) {
+            return;
+        }
+        fixedLinesCleared += linesRemoved;
+        if (fixedLinesCleared >= FIXED_LINES_TARGET) {
+            showNotification("Mission complete!");
+            gameOver();
+        } else {
+            updateModeStatus();
+        }
+    }
+
+    private void updateModeStatus() {
+        if (hudPanel == null) {
+            return;
+        }
+        String status;
+        switch (gameMode) {
+            case TIMED -> status = String.format("Mode: Timed (%ds left)", Math.max(0, remainingModeSeconds));
+            case FIXED_LINES -> status = String.format("Mode: 40 lines (%d left)", Math.max(0, FIXED_LINES_TARGET - fixedLinesCleared));
+            default -> status = "Mode: Endless";
+        }
+        hudPanel.setModeStatus(status);
+    }
+
+    private void showNotification(String text) {
+        if (groupNotification == null || text == null || text.isBlank()) {
+            return;
+        }
+        NotificationPanel panel = new NotificationPanel(text);
+        groupNotification.getChildren().add(panel);
+        panel.showScore(groupNotification.getChildren());
     }
 }
