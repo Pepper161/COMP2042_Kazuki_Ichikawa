@@ -1,4 +1,4 @@
-package com.comp2042.test;
+package com.comp2042;
 
 import com.comp2042.game.LineClearStats;
 import com.comp2042.game.LineClearType;
