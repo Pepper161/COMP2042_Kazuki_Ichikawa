@@ -1,5 +1,6 @@
 package com.comp2042.app;
 
+import com.comp2042.config.ResourceManager;
 import com.comp2042.game.GameConfig;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -23,7 +24,7 @@ public class Main extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception {
         GameConfig config = parseGameConfig();
-        URL startMenu = getClass().getClassLoader().getResource("StartMenu.fxml");
+        URL startMenu = ResourceManager.getUrl(ResourceManager.Asset.START_MENU_FXML);
         FXMLLoader fxmlLoader = new FXMLLoader(startMenu);
         Parent root = fxmlLoader.load();
         StartMenuController controller = fxmlLoader.getController();
