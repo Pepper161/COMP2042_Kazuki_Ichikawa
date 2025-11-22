@@ -4,6 +4,7 @@ import com.comp2042.app.HelpDialogService;
 import com.comp2042.app.SettingsController;
 import com.comp2042.app.StartMenuController;
 import com.comp2042.audio.BackgroundMusicManager;
+import com.comp2042.config.ResourceManager;
 import com.comp2042.board.ClearRow;
 import com.comp2042.board.ViewData;
 import com.comp2042.config.GameSettings;
@@ -156,7 +157,7 @@ public class GuiController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        Font.loadFont(getClass().getClassLoader().getResource("digital.ttf").toExternalForm(), 38);
+        Font.loadFont(ResourceManager.getExternalForm(ResourceManager.Asset.DIGITAL_FONT), 38);
         gamePanel.setFocusTraversable(true);
         gamePanel.requestFocus();
         StackPane.setAlignment(gamePanel, Pos.TOP_LEFT);
@@ -593,7 +594,7 @@ public class GuiController implements Initializable {
             throw new IllegalStateException("Primary stage has not been set on GuiController.");
         }
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("StartMenu.fxml"));
+            FXMLLoader loader = new FXMLLoader(ResourceManager.getUrl(ResourceManager.Asset.START_MENU_FXML));
             Parent menuRoot = loader.load();
             StartMenuController menuController = loader.getController();
             menuController.setPrimaryStage(primaryStage);
@@ -605,7 +606,7 @@ public class GuiController implements Initializable {
             primaryStage.show();
             BackgroundMusicManager.getInstance().playMenuTheme();
         } catch (IOException e) {
-            throw new IllegalStateException("Failed to load StartMenu.fxml", e);
+            throw new IllegalStateException("Failed to load " + ResourceManager.Asset.START_MENU_FXML.path(), e);
         }
     }
 
@@ -829,7 +830,7 @@ public class GuiController implements Initializable {
             return;
         }
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("SettingsDialog.fxml"));
+            FXMLLoader loader = new FXMLLoader(ResourceManager.getUrl(ResourceManager.Asset.SETTINGS_DIALOG_FXML));
             Parent root = loader.load();
             SettingsController controller = loader.getController();
             Stage dialog = new Stage();
@@ -843,7 +844,7 @@ public class GuiController implements Initializable {
             dialog.showAndWait();
             controller.getResult().ifPresent(this::setGameSettings);
         } catch (IOException ex) {
-            throw new IllegalStateException("Failed to load SettingsDialog.fxml", ex);
+            throw new IllegalStateException("Failed to load " + ResourceManager.Asset.SETTINGS_DIALOG_FXML.path(), ex);
         }
     }
 

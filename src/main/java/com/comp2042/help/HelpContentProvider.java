@@ -1,5 +1,7 @@
 package com.comp2042.help;
 
+import com.comp2042.config.ResourceManager;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -15,7 +17,6 @@ import java.util.List;
  */
 public final class HelpContentProvider {
 
-    private static final String RESOURCE_PATH = "help/help-content.md";
     private static final String SHORTCUTS_HEADING = "Shortcuts";
 
     private final String markdown;
@@ -39,11 +40,7 @@ public final class HelpContentProvider {
     }
 
     private static String loadResourceMarkdown() {
-        ClassLoader loader = HelpContentProvider.class.getClassLoader();
-        try (InputStream in = loader.getResourceAsStream(RESOURCE_PATH)) {
-            if (in == null) {
-                throw new IllegalStateException("Missing help content resource: " + RESOURCE_PATH);
-            }
+        try (InputStream in = ResourceManager.openStream(ResourceManager.Asset.HELP_MARKDOWN)) {
             try (BufferedReader reader = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8))) {
                 StringBuilder builder = new StringBuilder();
                 String line;
