@@ -12,6 +12,22 @@ import java.util.Objects;
  */
 public final class GameSettings {
 
+    public enum ColorAssistMode {
+        CLASSIC("Classic"),
+        HIGH_CONTRAST("High Contrast");
+
+        private final String displayName;
+
+        ColorAssistMode(String displayName) {
+            this.displayName = displayName;
+        }
+
+        @Override
+        public String toString() {
+            return displayName;
+        }
+    }
+
     public enum Action {
         MOVE_LEFT,
         MOVE_RIGHT,
@@ -28,6 +44,8 @@ public final class GameSettings {
     private final EnumMap<Action, KeyCode> keyBindings;
     private final boolean bgmEnabled;
     private final double bgmVolume;
+    private final ColorAssistMode colorAssistMode;
+    private final boolean pieceOutlineEnabled;
 
     private GameSettings(Builder builder) {
         this.dasDelayMs = builder.dasDelayMs;
@@ -36,6 +54,8 @@ public final class GameSettings {
         this.keyBindings = new EnumMap<>(builder.keyBindings);
         this.bgmEnabled = builder.bgmEnabled;
         this.bgmVolume = builder.bgmVolume;
+        this.colorAssistMode = builder.colorAssistMode;
+        this.pieceOutlineEnabled = builder.pieceOutlineEnabled;
     }
 
     public static Builder builder() {
@@ -74,6 +94,14 @@ public final class GameSettings {
         return bgmVolume;
     }
 
+    public ColorAssistMode getColorAssistMode() {
+        return colorAssistMode;
+    }
+
+    public boolean isPieceOutlineEnabled() {
+        return pieceOutlineEnabled;
+    }
+
     public Builder toBuilder() {
         return builder().from(this);
     }
@@ -86,6 +114,8 @@ public final class GameSettings {
         private final EnumMap<Action, KeyCode> keyBindings = new EnumMap<>(Action.class);
         private boolean bgmEnabled = true;
         private double bgmVolume = 0.35;
+        private ColorAssistMode colorAssistMode = ColorAssistMode.CLASSIC;
+        private boolean pieceOutlineEnabled = false;
 
         private Builder() {
             keyBindings.put(Action.MOVE_LEFT, KeyCode.LEFT);
@@ -108,6 +138,8 @@ public final class GameSettings {
             keyBindings.putAll(settings.keyBindings);
             setBgmEnabled(settings.isBgmEnabled());
             setBgmVolume(settings.getBgmVolume());
+            setColorAssistMode(settings.getColorAssistMode());
+            setPieceOutlineEnabled(settings.isPieceOutlineEnabled());
             return this;
         }
 
@@ -138,6 +170,16 @@ public final class GameSettings {
 
         public Builder setBgmVolume(double volume) {
             this.bgmVolume = Math.max(0.0, Math.min(1.0, volume));
+            return this;
+        }
+
+        public Builder setColorAssistMode(ColorAssistMode mode) {
+            this.colorAssistMode = mode != null ? mode : ColorAssistMode.CLASSIC;
+            return this;
+        }
+
+        public Builder setPieceOutlineEnabled(boolean enabled) {
+            this.pieceOutlineEnabled = enabled;
             return this;
         }
 

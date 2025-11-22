@@ -2,6 +2,7 @@
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Slider?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.control.Tooltip?>
@@ -73,6 +74,33 @@
                 <Label text="BGM Volume" />
                 <Slider fx:id="bgmVolumeSlider" min="0" max="100" prefWidth="220"/>
             </HBox>
+
+            <Label text="Accessibility" styleClass="menu-title"/>
+            <GridPane hgap="10" vgap="10">
+                <columnConstraints>
+                    <ColumnConstraints percentWidth="45"/>
+                    <ColumnConstraints percentWidth="55"/>
+                </columnConstraints>
+                <HBox alignment="CENTER_LEFT" spacing="6">
+                    <Label text="Color Assist Mode">
+                        <tooltip>
+                            <Tooltip text="Choose between the original palette or the high-contrast, colorblind-friendly set."/>
+                        </tooltip>
+                    </Label>
+                    <Button text="?" focusTraversable="false" onAction="#showInfo" id="info-color-assist"/>
+                </HBox>
+                <ComboBox fx:id="colorAssistCombo" GridPane.columnIndex="1"/>
+                <HBox alignment="CENTER_LEFT" spacing="6" GridPane.rowIndex="1">
+                    <Label text="Piece Outlines">
+                        <tooltip>
+                            <Tooltip text="Enable to draw a dark border around tiles and Next previews for extra clarity."/>
+                        </tooltip>
+                    </Label>
+                    <Button text="?" focusTraversable="false" onAction="#showInfo" id="info-outline"/>
+                </HBox>
+                <CheckBox fx:id="outlineCheckBox" text="Draw outlines for active, locked, and preview pieces"
+                          GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+            </GridPane>
 
             <Label text="Key Bindings" styleClass="menu-title"/>
             <GridPane hgap="10" vgap="10">

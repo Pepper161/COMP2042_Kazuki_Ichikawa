@@ -8,8 +8,9 @@ import com.comp2042.config.ResourceManager;
 import com.comp2042.board.ClearRow;
 import com.comp2042.board.ViewData;
 import com.comp2042.config.GameSettings;
+import com.comp2042.config.GameSettings.ColorAssistMode;
 import com.comp2042.config.GameSettingsStore;
-import com.comp2042.game.GameConfig;
+import com.comp2042.config.ResourceManager;
 import com.comp2042.game.GameState;
 import com.comp2042.game.Score;
 import com.comp2042.game.events.DownData;
@@ -20,6 +21,7 @@ import com.comp2042.game.events.MoveEvent;
 import com.comp2042.game.stats.HighScoreEntry;
 import com.comp2042.game.stats.HighScoreService;
 import com.comp2042.help.HelpContentProvider;
+import com.comp2042.ui.BrickColorPalette.PaletteProfile;
 import com.comp2042.ui.input.AutoRepeatHandler;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
@@ -83,6 +85,7 @@ public class GuiController implements Initializable {
             145, 140, 135, 130, 125, 120, 115, 110, 105, 100,
             95, 90, 85, 80
     };
+    private static final Color OUTLINE_COLOR = Color.rgb(15, 15, 20, 0.7);
 
     @FXML
     private GridPane gamePanel;
@@ -121,6 +124,9 @@ public class GuiController implements Initializable {
 
     private Rectangle[][] rectangles;
     private Rectangle[][] ghostRectangles;
+    private int[][] lastBoardMatrix;
+    private ViewData lastViewData;
+    private boolean outlinesEnabled;
 
     private Timeline timeLine;
 
@@ -213,6 +219,7 @@ public class GuiController implements Initializable {
             for (int j = 0; j < boardMatrix[i].length; j++) {
                 Rectangle rectangle = new Rectangle(BRICK_SIZE, BRICK_SIZE);
                 rectangle.setFill(Color.TRANSPARENT);
+                applyOutline(rectangle);
                 displayMatrix[i][j] = rectangle;
                 gamePanel.add(rectangle, j, i - 2);
             }
@@ -223,6 +230,7 @@ public class GuiController implements Initializable {
             for (int j = 0; j < brick.getBrickData()[i].length; j++) {
                 Rectangle rectangle = new Rectangle(BRICK_SIZE, BRICK_SIZE);
                 rectangle.setFill(BrickColorPalette.resolve(brick.getBrickData()[i][j]));
+                applyOutline(rectangle);
                 rectangles[i][j] = rectangle;
                 brickPanel.add(rectangle, j, i);
             }
@@ -240,6 +248,7 @@ public class GuiController implements Initializable {
                 }
             }
         }
+        rememberBoardState(boardMatrix);
         applyBrickView(brick);
 
 
@@ -247,6 +256,7 @@ public class GuiController implements Initializable {
         timeLine.setCycleCount(Timeline.INDEFINITE);
         rebuildKeyBindings();
         resetLevelTracking();
+        applyVisualPreferences();
     }
 
 
@@ -260,6 +270,10 @@ public class GuiController implements Initializable {
     }
 
     public void refreshGameBackground(int[][] board) {
+        if (board == null || displayMatrix == null) {
+            return;
+        }
+        rememberBoardState(board);
         for (int i = 2; i < board.length; i++) {
             for (int j = 0; j < board[i].length; j++) {
                 setRectangleData(board[i][j], displayMatrix[i][j]);
@@ -299,12 +313,14 @@ public class GuiController implements Initializable {
             nextQueuePanel.setQueue(brick.getNextBricksData());
         }
         updateGameOverGuide(brick.getGameOverRow());
+        rememberViewData(brick);
     }
 
     private void setRectangleData(int color, Rectangle rectangle) {
         rectangle.setFill(BrickColorPalette.resolve(color));
         rectangle.setArcHeight(9);
         rectangle.setArcWidth(9);
+        applyOutline(rectangle);
     }
 
     private void setGhostRectangleData(int color, Rectangle rectangle) {
@@ -320,6 +336,20 @@ public class GuiController implements Initializable {
         }
         rectangle.setArcHeight(9);
         rectangle.setArcWidth(9);
+        applyOutline(rectangle);
+    }
+
+    private void applyOutline(Rectangle rectangle) {
+        if (rectangle == null) {
+            return;
+        }
+        if (outlinesEnabled) {
+            rectangle.setStroke(OUTLINE_COLOR);
+            rectangle.setStrokeWidth(0.9);
+        } else {
+            rectangle.setStrokeWidth(0);
+            rectangle.setStroke(null);
+        }
     }
 
     private void handleDropResult(DownData downData) {
@@ -419,6 +449,7 @@ public class GuiController implements Initializable {
         applyAudioPreferences();
         heldKeys.clear();
         rebuildKeyBindings();
+        applyVisualPreferences();
     }
 
     private void rebuildKeyBindings() {
@@ -865,6 +896,71 @@ public class GuiController implements Initializable {
             default -> {
             }
         }
+    }
+
+    private void applyVisualPreferences() {
+        BrickColorPalette.setProfile(resolvePalette(gameSettings.getColorAssistMode()));
+        outlinesEnabled = gameSettings.isPieceOutlineEnabled();
+        if (nextQueuePanel != null) {
+            nextQueuePanel.setOutlinesEnabled(outlinesEnabled);
+            nextQueuePanel.refreshColors();
+        }
+        refreshCachedLayers();
+    }
+
+    private PaletteProfile resolvePalette(ColorAssistMode mode) {
+        if (mode == ColorAssistMode.HIGH_CONTRAST) {
+            return PaletteProfile.HIGH_CONTRAST;
+        }
+        return PaletteProfile.CLASSIC;
+    }
+
+    private void refreshCachedLayers() {
+        if (lastBoardMatrix != null && displayMatrix != null) {
+            for (int i = 2; i < Math.min(lastBoardMatrix.length, displayMatrix.length); i++) {
+                int[] boardRow = lastBoardMatrix[i];
+                Rectangle[] rectanglesRow = displayMatrix[i];
+                if (boardRow == null || rectanglesRow == null) {
+                    continue;
+                }
+                for (int j = 0; j < Math.min(boardRow.length, rectanglesRow.length); j++) {
+                    setRectangleData(boardRow[j], rectanglesRow[j]);
+                }
+            }
+        }
+        if (lastViewData != null) {
+            applyBrickView(lastViewData);
+        }
+    }
+
+    private void rememberBoardState(int[][] matrix) {
+        lastBoardMatrix = copyMatrix(matrix);
+    }
+
+    private int[][] copyMatrix(int[][] source) {
+        if (source == null) {
+            return null;
+        }
+        int[][] copy = new int[source.length][];
+        for (int i = 0; i < source.length; i++) {
+            copy[i] = source[i] != null ? source[i].clone() : null;
+        }
+        return copy;
+    }
+
+    private void rememberViewData(ViewData data) {
+        if (data == null) {
+            lastViewData = null;
+            return;
+        }
+        lastViewData = new ViewData(
+                data.getBrickData(),
+                data.getxPosition(),
+                data.getyPosition(),
+                data.getGhostYPosition(),
+                data.getNextBricksData(),
+                data.getGameOverRow()
+        );
     }
 
     private void recordLeaderboardResult() {
