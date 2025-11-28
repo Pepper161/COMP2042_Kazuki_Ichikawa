@@ -603,6 +603,8 @@
 .settings-dialog {
     -fx-background-color: rgb(8, 12, 24);
     /* Solid background to block grid */
+    -fx-background-image: null;
+    /* Explicitly remove global background image */
     -fx-border-color: rgba(61, 214, 208, 0.3);
     -fx-border-width: 1;
     -fx-background-radius: 8;
@@ -755,7 +757,10 @@
 }
 
 .help-dialog {
-    -fx-background-color: rgba(15, 17, 34, 0.95);
+    -fx-background-color: rgb(8, 12, 24);
+    /* Solid dark background */
+    -fx-background-image: null;
+    /* Remove grid pattern */
     -fx-border-color: #00ffcc;
     -fx-border-radius: 12;
     -fx-background-radius: 12;
