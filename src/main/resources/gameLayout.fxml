@@ -37,9 +37,9 @@
                         </VBox>
                     </Group>
                 </StackPane>
+                <NextQueuePanel fx:id="nextQueuePanel"/>
                 <VBox spacing="18" styleClass="sidebar">
                     <HudPanel fx:id="hudPanel"/>
-                    <NextQueuePanel fx:id="nextQueuePanel"/>
                     <Button fx:id="helpHintButton"
                             text="?"
                             onAction="#onShowHelp"
