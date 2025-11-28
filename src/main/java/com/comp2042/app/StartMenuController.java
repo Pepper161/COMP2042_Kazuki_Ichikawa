@@ -37,10 +37,10 @@ import javafx.stage.Modality;
  */
 public class StartMenuController {
 
-    public static final double MENU_WINDOW_WIDTH = 420;
-    public static final double MENU_WINDOW_HEIGHT = 700;
-    public static final double GAME_WINDOW_WIDTH = 540;
-    public static final double GAME_WINDOW_HEIGHT = 720;
+    public static final double MENU_WINDOW_WIDTH = 1024;
+    public static final double MENU_WINDOW_HEIGHT = 720;
+    public static final double GAME_WINDOW_WIDTH = 1120;
+    public static final double GAME_WINDOW_HEIGHT = 760;
 
     private Stage primaryStage;
     private GameConfig gameConfig = GameConfig.defaultConfig();
@@ -66,11 +66,11 @@ public class StartMenuController {
 
     public void setPrimaryStage(Stage primaryStage) {
         this.primaryStage = primaryStage;
-        primaryStage.setResizable(true);
+        primaryStage.setResizable(false);
         primaryStage.setMinWidth(MENU_WINDOW_WIDTH);
         primaryStage.setMinHeight(MENU_WINDOW_HEIGHT);
-        primaryStage.setMaxWidth(Double.MAX_VALUE);
-        primaryStage.setMaxHeight(Double.MAX_VALUE);
+        primaryStage.setMaxWidth(MENU_WINDOW_WIDTH);
+        primaryStage.setMaxHeight(MENU_WINDOW_HEIGHT);
         musicManager.setEnabled(gameSettings.isBgmEnabled());
         musicManager.setMasterVolume(gameSettings.getBgmVolume());
         musicManager.playMenuTheme();
