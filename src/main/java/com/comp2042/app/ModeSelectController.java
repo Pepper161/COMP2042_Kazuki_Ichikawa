@@ -5,7 +5,6 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.input.KeyCode;
-import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
@@ -21,7 +20,7 @@ import java.util.Optional;
 public class ModeSelectController {
 
     @FXML
-    private FlowPane modeGrid;
+    private VBox modeList;
 
     @FXML
     private Label detailTitle;
@@ -48,13 +47,13 @@ public class ModeSelectController {
     }
 
     private void createModeCards() {
-        if (modeGrid == null) {
+        if (modeList == null) {
             return;
         }
         for (GameConfig.GameMode mode : GameConfig.GameMode.values()) {
             VBox card = buildCard(mode);
             modeCards.put(mode, card);
-            modeGrid.getChildren().add(card);
+            modeList.getChildren().add(card);
         }
     }
 

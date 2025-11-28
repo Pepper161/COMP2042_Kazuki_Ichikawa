@@ -329,9 +329,8 @@
     -fx-font-size: 16;
 }
 
-.mode-grid {
-    -fx-hgap: 20;
-    -fx-vgap: 20;
+.mode-list {
+    -fx-spacing: 16;
 }
 
 .mode-card {
@@ -341,8 +340,9 @@
     -fx-border-radius: 10;
     -fx-border-color: rgba(42, 46, 64, 0.9);
     -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.45), 20, 0.2, 0, 6);
-    -fx-pref-width: 260;
-    -fx-pref-height: 200;
+    -fx-pref-width: 760;
+    -fx-pref-height: 160;
+    -fx-max-width: Infinity;
     -fx-spacing: 10;
     -fx-cursor: hand;
 }
@@ -582,6 +582,10 @@
 }
 
 .settings-content {
+    -fx-padding: 24;
+}
+
+.settings-columns {
     -fx-padding: 24;
 }
 
