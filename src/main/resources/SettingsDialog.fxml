@@ -1,9 +1,7 @@
-<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
-<?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.Slider?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.control.Tooltip?>
@@ -11,192 +9,184 @@
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.Priority?>
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
-<?import java.net.URL?>
 
 <BorderPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
             fx:controller="com.comp2042.app.SettingsController"
-            styleClass="settings-root">
+            prefWidth="620"
+            styleClass="settings-dialog">
     <top>
-        <Label text="Settings" styleClass="settings-header"/>
+        <Label text="SETTINGS" styleClass="settings-header" BorderPane.alignment="CENTER"/>
     </top>
     <center>
-        <ScrollPane fitToWidth="true" hbarPolicy="NEVER" vbarPolicy="AS_NEEDED" styleClass="settings-scroll">
-            <content>
-                <HBox spacing="24" styleClass="settings-columns">
-                    <VBox spacing="18" HBox.hgrow="ALWAYS">
-                        <VBox spacing="12" styleClass="settings-section">
-                            <Label text="Gameplay" styleClass="settings-section-title"/>
-                            <GridPane hgap="10" vgap="12">
-                                <columnConstraints>
-                                    <ColumnConstraints percentWidth="50"/>
-                                    <ColumnConstraints percentWidth="50"/>
-                                </columnConstraints>
-                                <HBox alignment="CENTER_LEFT" spacing="6">
-                                    <Label text="DAS (ms)">
-                                        <tooltip>
-                                            <Tooltip text="Delayed Auto Shift: wait time before a held move key begins repeating."/>
-                                        </tooltip>
-                                    </Label>
-                                    <Button text="?" focusTraversable="false" onAction="#showInfo" id="info-das"/>
-                                </HBox>
-                                <TextField fx:id="dasField" GridPane.columnIndex="1"/>
-                                <HBox alignment="CENTER_LEFT" spacing="6" GridPane.rowIndex="1">
-                                    <Label text="ARR (ms)">
-                                        <tooltip>
-                                            <Tooltip text="Auto Repeat Rate: interval between repeated moves after DAS expires."/>
-                                        </tooltip>
-                                    </Label>
-                                    <Button text="?" focusTraversable="false" onAction="#showInfo" id="info-arr"/>
-                                </HBox>
-                                <TextField fx:id="arrField" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
-                                <HBox alignment="CENTER_LEFT" spacing="6" GridPane.rowIndex="2">
-                                    <Label text="Soft Drop Multiplier">
-                                        <tooltip>
-                                            <Tooltip text="Boost to manual drop speed when holding the soft-drop key."/>
-                                        </tooltip>
-                                    </Label>
-                                    <Button text="?" focusTraversable="false" onAction="#showInfo" id="info-sdf"/>
-                                </HBox>
-                                <TextField fx:id="sdfField" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
-                            </GridPane>
-                        </VBox>
+        <GridPane hgap="24" styleClass="settings-content">
+            <columnConstraints>
+                <ColumnConstraints percentWidth="50"/>
+                <ColumnConstraints percentWidth="50"/>
+            </columnConstraints>
 
-                        <VBox spacing="12" styleClass="settings-section">
-                            <Label text="Audio" styleClass="settings-section-title"/>
-                            <CheckBox fx:id="bgmCheckBox" text="Enable background music (menu &amp; gameplay)" />
-                            <HBox spacing="10" alignment="CENTER_LEFT">
-                                <Label text="BGM Volume" />
-                                <Slider fx:id="bgmVolumeSlider" min="0" max="100" prefWidth="220"/>
-                            </HBox>
-                        </VBox>
+            <VBox spacing="18" GridPane.columnIndex="0">
+                <VBox spacing="12" styleClass="settings-section">
+                    <Label text="GAMEPLAY" styleClass="settings-section-title"/>
+                    <VBox spacing="10">
+                        <HBox alignment="CENTER_LEFT" spacing="8">
+                            <Label text="DAS (ms)" styleClass="form-label">
+                                <tooltip>
+                                    <Tooltip text="Delayed Auto Shift: wait time before a held move key begins repeating."/>
+                                </tooltip>
+                            </Label>
+                            <Button text="?" focusTraversable="false" onAction="#showInfo" id="info-das"/>
+                        </HBox>
+                        <TextField fx:id="dasField"/>
 
-                        <VBox spacing="12" styleClass="settings-section">
-                            <Label text="Accessibility" styleClass="settings-section-title"/>
-                            <GridPane hgap="10" vgap="10">
-                                <columnConstraints>
-                                    <ColumnConstraints percentWidth="45"/>
-                                    <ColumnConstraints percentWidth="55"/>
-                                </columnConstraints>
-                                <HBox alignment="CENTER_LEFT" spacing="6">
-                                    <Label text="Color Assist Mode">
-                                        <tooltip>
-                                            <Tooltip text="Choose between the original palette or the high-contrast, colorblind-friendly set."/>
-                                        </tooltip>
-                                    </Label>
-                                    <Button text="?" focusTraversable="false" onAction="#showInfo" id="info-color-assist"/>
-                                </HBox>
-                                <ComboBox fx:id="colorAssistCombo" GridPane.columnIndex="1"/>
-                                <HBox alignment="CENTER_LEFT" spacing="6" GridPane.rowIndex="1">
-                                    <Label text="Piece Outlines">
-                                        <tooltip>
-                                            <Tooltip text="Enable to draw a dark border around tiles and Next previews for extra clarity."/>
-                                        </tooltip>
-                                    </Label>
-                                    <Button text="?" focusTraversable="false" onAction="#showInfo" id="info-outline"/>
-                                </HBox>
-                                <CheckBox fx:id="outlineCheckBox"
-                                          text="Draw outlines for active, locked, and preview pieces"
-                                          GridPane.rowIndex="1" GridPane.columnIndex="1"/>
-                            </GridPane>
-                        </VBox>
+                        <HBox alignment="CENTER_LEFT" spacing="8">
+                            <Label text="ARR (ms)" styleClass="form-label">
+                                <tooltip>
+                                    <Tooltip text="Auto Repeat Rate: interval between repeated moves after DAS expires."/>
+                                </tooltip>
+                            </Label>
+                            <Button text="?" focusTraversable="false" onAction="#showInfo" id="info-arr"/>
+                        </HBox>
+                        <TextField fx:id="arrField"/>
+
+                        <HBox alignment="CENTER_LEFT" spacing="8">
+                            <Label text="Soft Drop Multiplier" styleClass="form-label">
+                                <tooltip>
+                                    <Tooltip text="Boost to manual drop speed when holding the soft-drop key."/>
+                                </tooltip>
+                            </Label>
+                            <Button text="?" focusTraversable="false" onAction="#showInfo" id="info-sdf"/>
+                        </HBox>
+                        <TextField fx:id="sdfField"/>
                     </VBox>
+                </VBox>
 
-                    <VBox spacing="12" styleClass="settings-section" HBox.hgrow="ALWAYS">
-                        <Label text="Key Bindings" styleClass="settings-section-title"/>
-                        <GridPane hgap="10" vgap="12">
-                            <columnConstraints>
-                                <ColumnConstraints percentWidth="45"/>
-                                <ColumnConstraints percentWidth="55"/>
-                            </columnConstraints>
-                            <HBox alignment="CENTER_LEFT" spacing="6">
-                                <Label text="Move Left">
-                                    <tooltip>
-                                        <Tooltip text="Moves the active piece one column to the left."/>
-                                    </tooltip>
-                                </Label>
-                                <Button text="?" focusTraversable="false" onAction="#showInfo" id="info-move-left"/>
-                            </HBox>
-                            <TextField fx:id="leftKeyField" GridPane.columnIndex="1"/>
-                            <HBox alignment="CENTER_LEFT" spacing="6" GridPane.rowIndex="1">
-                                <Label text="Move Right">
-                                    <tooltip>
-                                        <Tooltip text="Moves the active piece one column to the right."/>
-                                    </tooltip>
-                                </Label>
-                                <Button text="?" focusTraversable="false" onAction="#showInfo" id="info-move-right"/>
-                            </HBox>
-                            <TextField fx:id="rightKeyField" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
-                            <HBox alignment="CENTER_LEFT" spacing="6" GridPane.rowIndex="2">
-                                <Label text="Soft Drop">
-                                    <tooltip>
-                                        <Tooltip text="Increases fall speed while held without forcing a lock."/>
-                                    </tooltip>
-                                </Label>
-                                <Button text="?" focusTraversable="false" onAction="#showInfo" id="info-soft-drop"/>
-                            </HBox>
-                            <TextField fx:id="downKeyField" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
-                            <HBox alignment="CENTER_LEFT" spacing="6" GridPane.rowIndex="3">
-                                <Label text="Hard Drop">
-                                    <tooltip>
-                                        <Tooltip text="Instantly drops the piece to the ghost position."/>
-                                    </tooltip>
-                                </Label>
-                                <Button text="?" focusTraversable="false" onAction="#showInfo" id="info-hard-drop"/>
-                            </HBox>
-                            <TextField fx:id="hardDropKeyField" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
-                            <HBox alignment="CENTER_LEFT" spacing="6" GridPane.rowIndex="4">
-                                <Label text="Rotate CW">
-                                    <tooltip>
-                                        <Tooltip text="Rotates the piece clockwise (right rotation)."/>
-                                    </tooltip>
-                                </Label>
-                                <Button text="?" focusTraversable="false" onAction="#showInfo" id="info-rotate-cw"/>
-                            </HBox>
-                            <TextField fx:id="rotateCwField" GridPane.rowIndex="4" GridPane.columnIndex="1"/>
-                            <HBox alignment="CENTER_LEFT" spacing="6" GridPane.rowIndex="5">
-                                <Label text="Rotate CCW">
-                                    <tooltip>
-                                        <Tooltip text="Rotates the piece counter-clockwise (left rotation)."/>
-                                    </tooltip>
-                                </Label>
-                                <Button text="?" focusTraversable="false" onAction="#showInfo" id="info-rotate-ccw"/>
-                            </HBox>
-                            <TextField fx:id="rotateCcwField" GridPane.rowIndex="5" GridPane.columnIndex="1"/>
-                            <HBox alignment="CENTER_LEFT" spacing="6" GridPane.rowIndex="6">
-                                <Label text="New Game">
-                                    <tooltip>
-                                        <Tooltip text="Resets the current run instantly when pressed."/>
-                                    </tooltip>
-                                </Label>
-                                <Button text="?" focusTraversable="false" onAction="#showInfo" id="info-new-game"/>
-                            </HBox>
-                            <TextField fx:id="newGameKeyField" GridPane.rowIndex="6" GridPane.columnIndex="1"/>
-                        </GridPane>
+                <VBox spacing="12" styleClass="settings-section">
+                    <Label text="AUDIO" styleClass="settings-section-title"/>
+                    <CheckBox fx:id="bgmCheckBox" text="Enable background music (menu &amp; gameplay)"/>
+                    <HBox spacing="10" alignment="CENTER_LEFT">
+                        <Label text="BGM Volume" styleClass="form-label"/>
+                        <Slider fx:id="bgmVolumeSlider" min="0" max="100" prefWidth="180"/>
+                    </HBox>
+                </VBox>
 
-                        <Label fx:id="infoLabel"
-                               wrapText="true"
-                               textFill="#cdd5e4"
-                               maxWidth="Infinity"
-                               styleClass="info-text"/>
-                    </VBox>
-                </HBox>
-            </content>
-        </ScrollPane>
+                <VBox spacing="12" styleClass="settings-section">
+                    <Label text="ACCESSIBILITY" styleClass="settings-section-title"/>
+                    <HBox alignment="CENTER_LEFT" spacing="8">
+                        <Label text="Color Assist Mode" styleClass="form-label">
+                            <tooltip>
+                                <Tooltip text="Choose between the original palette or the high-contrast, colorblind-friendly set."/>
+                            </tooltip>
+                        </Label>
+                        <Button text="?" focusTraversable="false" onAction="#showInfo" id="info-color-assist"/>
+                    </HBox>
+                    <ComboBox fx:id="colorAssistCombo"/>
+
+                    <HBox alignment="CENTER_LEFT" spacing="8">
+                        <Label text="Piece Outlines" styleClass="form-label">
+                            <tooltip>
+                                <Tooltip text="Enable to draw a dark border around tiles and Next previews for extra clarity."/>
+                            </tooltip>
+                        </Label>
+                        <Button text="?" focusTraversable="false" onAction="#showInfo" id="info-outline"/>
+                    </HBox>
+                    <CheckBox fx:id="outlineCheckBox"
+                              text="Draw outlines for active, locked, and preview pieces"/>
+
+                    <Label fx:id="infoLabel" wrapText="true" styleClass="info-text"/>
+                </VBox>
+            </VBox>
+
+            <VBox spacing="12" GridPane.columnIndex="1" styleClass="settings-section">
+                <Label text="CONTROLS" styleClass="settings-section-title"/>
+                <GridPane hgap="10" vgap="12">
+                    <columnConstraints>
+                        <ColumnConstraints percentWidth="45"/>
+                        <ColumnConstraints percentWidth="55"/>
+                    </columnConstraints>
+                    <HBox alignment="CENTER_LEFT" spacing="6">
+                        <Label text="Move Left" styleClass="form-label">
+                            <tooltip>
+                                <Tooltip text="Moves the active piece one column to the left."/>
+                            </tooltip>
+                        </Label>
+                        <Button text="?" focusTraversable="false" onAction="#showInfo" id="info-move-left"/>
+                    </HBox>
+                    <TextField fx:id="leftKeyField" GridPane.columnIndex="1"/>
+
+                    <HBox alignment="CENTER_LEFT" spacing="6" GridPane.rowIndex="1">
+                        <Label text="Move Right" styleClass="form-label">
+                            <tooltip>
+                                <Tooltip text="Moves the active piece one column to the right."/>
+                            </tooltip>
+                        </Label>
+                        <Button text="?" focusTraversable="false" onAction="#showInfo" id="info-move-right"/>
+                    </HBox>
+                    <TextField fx:id="rightKeyField" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+
+                    <HBox alignment="CENTER_LEFT" spacing="6" GridPane.rowIndex="2">
+                        <Label text="Soft Drop" styleClass="form-label">
+                            <tooltip>
+                                <Tooltip text="Increases fall speed while held without forcing a lock."/>
+                            </tooltip>
+                        </Label>
+                        <Button text="?" focusTraversable="false" onAction="#showInfo" id="info-soft-drop"/>
+                    </HBox>
+                    <TextField fx:id="downKeyField" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+
+                    <HBox alignment="CENTER_LEFT" spacing="6" GridPane.rowIndex="3">
+                        <Label text="Hard Drop" styleClass="form-label">
+                            <tooltip>
+                                <Tooltip text="Instantly drops the piece to the ghost position."/>
+                            </tooltip>
+                        </Label>
+                        <Button text="?" focusTraversable="false" onAction="#showInfo" id="info-hard-drop"/>
+                    </HBox>
+                    <TextField fx:id="hardDropKeyField" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
+
+                    <HBox alignment="CENTER_LEFT" spacing="6" GridPane.rowIndex="4">
+                        <Label text="Rotate CW" styleClass="form-label">
+                            <tooltip>
+                                <Tooltip text="Rotates the piece clockwise (right rotation)."/>
+                            </tooltip>
+                        </Label>
+                        <Button text="?" focusTraversable="false" onAction="#showInfo" id="info-rotate-cw"/>
+                    </HBox>
+                    <TextField fx:id="rotateCwField" GridPane.rowIndex="4" GridPane.columnIndex="1"/>
+
+                    <HBox alignment="CENTER_LEFT" spacing="6" GridPane.rowIndex="5">
+                        <Label text="Rotate CCW" styleClass="form-label">
+                            <tooltip>
+                                <Tooltip text="Rotates the piece counter-clockwise (left rotation)."/>
+                            </tooltip>
+                        </Label>
+                        <Button text="?" focusTraversable="false" onAction="#showInfo" id="info-rotate-ccw"/>
+                    </HBox>
+                    <TextField fx:id="rotateCcwField" GridPane.rowIndex="5" GridPane.columnIndex="1"/>
+
+                    <HBox alignment="CENTER_LEFT" spacing="6" GridPane.rowIndex="6">
+                        <Label text="New Game" styleClass="form-label">
+                            <tooltip>
+                                <Tooltip text="Resets the current run instantly when pressed."/>
+                            </tooltip>
+                        </Label>
+                        <Button text="?" focusTraversable="false" onAction="#showInfo" id="info-new-game"/>
+                    </HBox>
+                    <TextField fx:id="newGameKeyField" GridPane.rowIndex="6" GridPane.columnIndex="1"/>
+                </GridPane>
+
+                <Label fx:id="statusLabel" styleClass="status-label"/>
+            </VBox>
+        </GridPane>
     </center>
     <bottom>
-        <HBox spacing="12" alignment="CENTER_RIGHT" styleClass="settings-footer">
+        <HBox spacing="10" alignment="CENTER_RIGHT" styleClass="settings-footer">
             <Button text="Reset Defaults" onAction="#onResetDefaults" styleClass="btn-secondary"/>
-            <Label fx:id="statusLabel" textFill="#cc3333"/>
             <Region HBox.hgrow="ALWAYS"/>
             <Button text="Cancel" onAction="#onCancel" styleClass="btn-secondary"/>
-            <Button text="Save" onAction="#onSave" styleClass="btn-primary"/>
+            <Button text="Save Changes" onAction="#onSave" styleClass="btn-primary"/>
         </HBox>
     </bottom>
-    <stylesheets>
-        <URL value="@window_style.css"/>
-    </stylesheets>
 </BorderPane>

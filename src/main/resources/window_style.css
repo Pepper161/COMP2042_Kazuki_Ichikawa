@@ -23,10 +23,10 @@
 
 .ipad-dark-grey {
     -fx-background-color: linear-gradient(#686868 0%, #232723 25%, #373837 75%, #757575 100%),
-    linear-gradient(#020b02, #3a3a3a),
-    linear-gradient(#9d9e9d 0%, #6b6a6b 20%, #343534 80%, #242424 100%),
-    linear-gradient(#8a8a8a 0%, #6b6a6b 20%, #343534 80%, #262626 100%),
-    linear-gradient(#777777 0%, #606060 50%, #505250 51%, #2a2b2a 100%);
+        linear-gradient(#020b02, #3a3a3a),
+        linear-gradient(#9d9e9d 0%, #6b6a6b 20%, #343534 80%, #242424 100%),
+        linear-gradient(#8a8a8a 0%, #6b6a6b 20%, #343534 80%, #262626 100%),
+        linear-gradient(#777777 0%, #606060 50%, #505250 51%, #2a2b2a 100%);
     -fx-background-insets: 0, 1, 4, 5, 6;
     -fx-background-radius: 9, 8, 5, 4, 3;
     -fx-padding: 8;
@@ -64,7 +64,7 @@
     -fx-background-color: red;
 }
 
-.scoreClass{
+.scoreClass {
     -fx-font-family: "Let's go Digital";
     -fx-font-size: 38;
     -fx-fill: yellow;
@@ -419,27 +419,16 @@
     -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.6), 30, 0.35, 0, 14);
 }
 
-.board-wrapper {
-    -fx-background-color: rgba(6, 8, 20, 0.85);
-    -fx-padding: 20;
-    -fx-background-radius: 18;
-    -fx-border-radius: 18;
-    -fx-border-color: rgba(61, 214, 208, 0.15);
-}
 
 .board-stage {
-    -fx-border-color: rgba(255, 255, 255, 0.08);
-    -fx-border-width: 1.5;
-    -fx-background-color: linear-gradient(to bottom, #050912, #080c18);
-    -fx-background-radius: 14;
-    -fx-border-radius: 14;
+    /* Visual styles removed to eliminate double frame */
 }
 
 .gameBoard {
     -fx-border-color: rgba(61, 214, 208, 0.35);
     -fx-border-width: 2;
     -fx-border-radius: 14;
-    -fx-padding: 12;
+    -fx-padding: 4;
     -fx-background-color: rgba(5, 8, 18, 0.95);
     -fx-background-radius: 14;
 }
@@ -447,7 +436,7 @@
 .game-layer {
     -fx-background-color:
         linear-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+        linear-gradient(to right, rgba(255, 255, 255, 0.04) 1px, transparent 1px),
         rgba(4, 8, 18, 0.92);
     -fx-background-insets: 0, 0, 0;
     -fx-background-radius: 12, 12, 12;
@@ -456,7 +445,7 @@
     -fx-border-radius: 12;
     -fx-border-color: rgba(0, 255, 204, 0.15);
     -fx-border-width: 1.2;
-    -fx-padding: 20 16 16 16;
+    -fx-padding: 4;
     -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.5), 20, 0.3, 0, 6);
 }
 
@@ -600,29 +589,25 @@
     -fx-pref-width: 160;
 }
 
-.settings-root {
-    -fx-background-color: rgba(8, 10, 20, 0.95);
+.settings-dialog {
+    -fx-background-color: rgba(8, 10, 20, 0.98);
     -fx-border-color: rgba(0, 0, 0, 0.6);
     -fx-border-radius: 12;
     -fx-background-radius: 12;
+    -fx-padding: 0 0 24 0;
     -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.55), 25, 0.25, 0, 6);
 }
 
 .settings-header {
-    -fx-background-color: rgba(15, 17, 30, 0.95);
     -fx-text-fill: #ffffff;
-    -fx-font-size: 20;
+    -fx-font-size: 18;
     -fx-font-weight: bold;
-    -fx-padding: 18 24;
-    -fx-border-color: transparent transparent rgba(255, 255, 255, 0.05) transparent;
+    -fx-padding: 20;
+    -fx-border-color: transparent transparent rgba(255, 255, 255, 0.08) transparent;
     -fx-border-width: 0 0 1 0;
 }
 
 .settings-content {
-    -fx-padding: 24;
-}
-
-.settings-columns {
     -fx-padding: 24;
 }
 
@@ -634,19 +619,17 @@
 }
 
 .settings-section-title {
-    -fx-text-fill: #00ffcc;
-    -fx-font-size: 14;
+    -fx-text-fill: var(--accent-primary);
+    -fx-font-size: 13;
     -fx-font-weight: bold;
     -fx-border-color: transparent transparent rgba(255, 255, 255, 0.08) transparent;
     -fx-border-width: 0 0 1 0;
-    -fx-padding: 0 0 8 0;
+    -fx-padding: 0 0 6 0;
 }
 
-.settings-footer {
-    -fx-background-color: rgba(15, 17, 34, 0.95);
-    -fx-padding: 16 24;
-    -fx-border-color: rgba(255, 255, 255, 0.05) transparent transparent transparent;
-    -fx-border-width: 1 0 0 0;
+.form-label {
+    -fx-text-fill: #9fb2ce;
+    -fx-font-size: 12;
 }
 
 .info-text {
@@ -654,9 +637,12 @@
     -fx-font-size: 12;
 }
 
-.settings-scroll {
-    -fx-background-color: transparent;
-    -fx-border-color: transparent;
+.status-label {
+    -fx-text-fill: #cc3333;
+}
+
+.settings-footer {
+    -fx-padding: 15 24 0 24;
 }
 
 .help-dialog {
@@ -684,6 +670,7 @@
     -fx-font-size: 14;
     -fx-padding: 12;
 }
+
 .lb-scroll {
     -fx-background-color: transparent;
     -fx-border-color: transparent;
