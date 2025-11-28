@@ -21,7 +21,6 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
-import javafx.scene.control.ChoiceDialog;
 import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.TextAlignment;
@@ -62,9 +61,6 @@ public class StartMenuController {
 
     @FXML
     public void initialize() {
-        if (leaderboardContainer != null) {
-            leaderboardContainer.getStyleClass().add("leaderboard-container");
-        }
         refreshLeaderboard();
     }
 
@@ -220,14 +216,26 @@ public class StartMenuController {
     }
 
     private GameConfig.GameMode promptModeSelection() {
-        ChoiceDialog<GameConfig.GameMode> dialog = new ChoiceDialog<>(gameConfig.getMode(), GameConfig.GameMode.values());
-        dialog.setTitle("Select Game Mode");
-        dialog.setHeaderText("Choose a game mode");
-        dialog.setContentText("Mode:");
-        if (primaryStage != null) {
+        ensurePrimaryStageBound();
+        try {
+            URL modeSelectUrl = ResourceManager.getUrl(ResourceManager.Asset.MODE_SELECT_FXML);
+            FXMLLoader loader = new FXMLLoader(modeSelectUrl);
+            Parent root = loader.load();
+            ModeSelectController controller = loader.getController();
+            Stage dialog = new Stage();
+            dialog.setTitle("Select Game Mode");
             dialog.initOwner(primaryStage);
+            dialog.initModality(Modality.WINDOW_MODAL);
+            controller.setDialogStage(dialog);
+            controller.setInitialMode(gameConfig.getMode());
+            Scene scene = new Scene(root);
+            dialog.setScene(scene);
+            dialog.setResizable(false);
+            dialog.showAndWait();
+            Optional<GameConfig.GameMode> result = controller.getResult();
+            return result.orElse(null);
+        } catch (IOException ex) {
+            throw new IllegalStateException("Failed to load mode selection dialog.", ex);
         }
-        Optional<GameConfig.GameMode> result = dialog.showAndWait();
-        return result.orElse(null);
     }
 }
