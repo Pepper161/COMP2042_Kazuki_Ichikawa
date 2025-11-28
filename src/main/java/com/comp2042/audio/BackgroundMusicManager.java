@@ -7,7 +7,8 @@ import javafx.scene.media.AudioClip;
 import java.net.URL;
 
 /**
- * Singleton helper that loops menu / gameplay music and allows toggling BGM globally.
+ * Singleton helper that loops menu / gameplay music and allows toggling BGM
+ * globally.
  */
 public final class BackgroundMusicManager {
 
@@ -63,8 +64,12 @@ public final class BackgroundMusicManager {
             return;
         }
         runOnFxThread(() -> {
-            gameOverClip.stop();
-            gameOverClip.play();
+            try {
+                gameOverClip.stop();
+                gameOverClip.play();
+            } catch (Exception e) {
+                System.err.println("[Audio] Failed to play game over jingle: " + e.getMessage());
+            }
         });
     }
 
@@ -73,8 +78,12 @@ public final class BackgroundMusicManager {
             return;
         }
         runOnFxThread(() -> {
-            lineClearClip.stop();
-            lineClearClip.play();
+            try {
+                lineClearClip.stop();
+                lineClearClip.play();
+            } catch (Exception e) {
+                System.err.println("[Audio] Failed to play line clear sound: " + e.getMessage());
+            }
         });
     }
 
@@ -98,12 +107,18 @@ public final class BackgroundMusicManager {
             return;
         }
         runOnFxThread(() -> {
-            if (currentClip != null && currentClip != clip) {
-                currentClip.stop();
+            try {
+                if (currentClip != null && currentClip != clip) {
+                    currentClip.stop();
+                }
+                currentClip = clip;
+                if (currentClip != null) {
+                    currentClip.stop();
+                    currentClip.play();
+                }
+            } catch (Exception e) {
+                System.err.println("[Audio] Failed to switch BGM: " + e.getMessage());
             }
-            currentClip = clip;
-            currentClip.stop();
-            currentClip.play();
         });
     }
 
@@ -115,7 +130,15 @@ public final class BackgroundMusicManager {
         if (currentClip == null) {
             return;
         }
-        runOnFxThread(() -> currentClip.stop());
+        runOnFxThread(() -> {
+            try {
+                if (currentClip != null) {
+                    currentClip.stop();
+                }
+            } catch (Exception e) {
+                System.err.println("[Audio] Failed to stop BGM: " + e.getMessage());
+            }
+        });
         currentClip = null;
     }
 

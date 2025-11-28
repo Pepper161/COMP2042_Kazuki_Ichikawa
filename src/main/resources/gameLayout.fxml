@@ -18,11 +18,11 @@
     <children>
         <StackPane styleClass="gameplay-surface">
             <HBox spacing="28" alignment="TOP_CENTER" styleClass="gameplay-columns">
-                <StackPane styleClass="board-wrapper">
+                <StackPane>
                     <Pane prefWidth="360" prefHeight="660" styleClass="board-stage">
                         <BorderPane styleClass="gameBoard" fx:id="gameBoard">
                             <center>
-                                <StackPane fx:id="gameLayer" layoutX="30" layoutY="24" alignment="TOP_LEFT" styleClass="game-layer">
+                                <StackPane fx:id="gameLayer" alignment="TOP_LEFT" styleClass="game-layer">
                                     <GridPane fx:id="gamePanel" hgap="1" vgap="1"/>
                                     <Pane fx:id="guidePane" mouseTransparent="true" pickOnBounds="false"/>
                                 </StackPane>

@@ -33,6 +33,7 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.geometry.Point2D;
 import javafx.geometry.Pos;
 import javafx.scene.Group;
 import javafx.scene.Parent;
@@ -65,7 +66,8 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * JavaFX controller for the gameplay scene. It renders the board layers, handles input,
+ * JavaFX controller for the gameplay scene. It renders the board layers,
+ * handles input,
  * and delegates gameplay actions to {@link com.comp2042.game.GameController}.
  */
 public class GuiController implements Initializable {
@@ -251,14 +253,12 @@ public class GuiController implements Initializable {
         rememberBoardState(boardMatrix);
         applyBrickView(brick);
 
-
         timeLine = new Timeline();
         timeLine.setCycleCount(Timeline.INDEFINITE);
         rebuildKeyBindings();
         resetLevelTracking();
         applyVisualPreferences();
     }
-
 
     private void refreshBrick(ViewData brick) {
         if (brick == null) {
@@ -285,12 +285,30 @@ public class GuiController implements Initializable {
         if (brick == null || rectangles == null || brickPanel == null || gameLayer == null) {
             return;
         }
-        double originX = gameLayer.getLayoutX();
-        double originY = -42 + gameLayer.getLayoutY();
+
         double cellWidth = brickPanel.getVgap() + BRICK_SIZE;
         double cellHeight = brickPanel.getHgap() + BRICK_SIZE;
-        double activeX = originX + brick.getxPosition() * cellWidth;
-        double activeY = originY + brick.getyPosition() * cellHeight;
+
+        // Calculate the position of the top-left of the grid (0,0) in scene coordinates
+        // gamePanel contains the visible board (rows 2 to 21).
+        // Row 0 in the logical board corresponds to -2 * cellHeight relative to
+        // gamePanel's (0,0).
+        Point2D gridOriginScene = gamePanel.localToScene(0, 0);
+
+        // Convert that scene point to the coordinate space of brickPanel's parent
+        // This gives us the (0,0) of the gamePanel in the brickPanel's parent's
+        // coordinate system.
+        Point2D gridOriginLocal = brickPanel.getParent().sceneToLocal(gridOriginScene);
+
+        // The logical board starts at row 0, but gamePanel starts displaying at row 2.
+        // So logical (0,0) is at (gridOriginLocal.x, gridOriginLocal.y - 2 *
+        // cellHeight).
+        double boardOriginX = gridOriginLocal.getX();
+        double boardOriginY = gridOriginLocal.getY() - (HIDDEN_ROWS * cellHeight);
+
+        double activeX = boardOriginX + brick.getxPosition() * cellWidth;
+        double activeY = boardOriginY + brick.getyPosition() * cellHeight;
+
         brickPanel.setLayoutX(activeX);
         brickPanel.setLayoutY(activeY);
         int[][] brickData = brick.getBrickData();
@@ -301,7 +319,7 @@ public class GuiController implements Initializable {
         }
         if (ghostPanel != null && ghostRectangles != null) {
             ghostPanel.setLayoutX(activeX);
-            double ghostY = originY + brick.getGhostYPosition() * cellHeight;
+            double ghostY = boardOriginY + brick.getGhostYPosition() * cellHeight;
             ghostPanel.setLayoutY(ghostY);
             for (int i = 0; i < brickData.length; i++) {
                 for (int j = 0; j < brickData[i].length; j++) {
@@ -358,13 +376,13 @@ public class GuiController implements Initializable {
         }
         ClearRow clearRow = downData.getClearRow();
         if (clearRow != null && clearRow.getLinesRemoved() > 0) {
-                NotificationPanel notificationPanel = new NotificationPanel("+" + clearRow.getScoreBonus());
-                groupNotification.getChildren().add(notificationPanel);
-                notificationPanel.showScore(groupNotification.getChildren());
-                BackgroundMusicManager.getInstance().playLineClear();
-            }
-            updateLevelProgress(clearRow);
-            refreshBrick(downData.getViewData());
+            NotificationPanel notificationPanel = new NotificationPanel("+" + clearRow.getScoreBonus());
+            groupNotification.getChildren().add(notificationPanel);
+            notificationPanel.showScore(groupNotification.getChildren());
+            BackgroundMusicManager.getInstance().playLineClear();
+        }
+        updateLevelProgress(clearRow);
+        refreshBrick(downData.getViewData());
         gamePanel.requestFocus();
     }
 
@@ -411,7 +429,8 @@ public class GuiController implements Initializable {
         if (eventListener == null) {
             return;
         }
-        refreshBrick(eventListener.onRotateCounterClockwise(new MoveEvent(EventType.ROTATE_COUNTERCLOCKWISE, EventSource.USER)));
+        refreshBrick(eventListener
+                .onRotateCounterClockwise(new MoveEvent(EventType.ROTATE_COUNTERCLOCKWISE, EventSource.USER)));
     }
 
     private void performSoftDrop() {
@@ -785,8 +804,7 @@ public class GuiController implements Initializable {
         timeLine.stop();
         timeLine.getKeyFrames().setAll(new KeyFrame(
                 Duration.millis(currentGravityMs),
-                ae -> moveDown(new MoveEvent(EventType.DOWN, EventSource.THREAD))
-        ));
+                ae -> moveDown(new MoveEvent(EventType.DOWN, EventSource.THREAD))));
         updateTimelinePlayback();
     }
 
@@ -959,8 +977,7 @@ public class GuiController implements Initializable {
                 data.getyPosition(),
                 data.getGhostYPosition(),
                 data.getNextBricksData(),
-                data.getGameOverRow()
-        );
+                data.getGameOverRow());
     }
 
     private void recordLeaderboardResult() {
@@ -968,7 +985,8 @@ public class GuiController implements Initializable {
         HighScoreEntry highlight = null;
         if (boundScore != null) {
             java.time.Duration elapsed = computeSessionDuration();
-            HighScoreEntry newEntry = HighScoreEntry.create(boundScore.scoreProperty().get(), describeCurrentMode(), elapsed);
+            HighScoreEntry newEntry = HighScoreEntry.create(boundScore.scoreProperty().get(), describeCurrentMode(),
+                    elapsed);
             leaderboard = highScoreService.recordScore(newEntry);
             boolean onBoard = leaderboard.stream().anyMatch(newEntry::equals);
             highlight = onBoard ? newEntry : null;
@@ -1080,7 +1098,8 @@ public class GuiController implements Initializable {
         String status;
         switch (gameMode) {
             case TIMED -> status = String.format("Mode: Timed (%ds left)", Math.max(0, remainingModeSeconds));
-            case FIXED_LINES -> status = String.format("Mode: 40 lines (%d left)", Math.max(0, FIXED_LINES_TARGET - fixedLinesCleared));
+            case FIXED_LINES ->
+                status = String.format("Mode: 40 lines (%d left)", Math.max(0, FIXED_LINES_TARGET - fixedLinesCleared));
             default -> status = "Mode: Endless";
         }
         hudPanel.setModeStatus(status);
