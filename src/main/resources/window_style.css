@@ -420,28 +420,42 @@
 }
 
 .board-wrapper {
-    -fx-background-color: rgba(5, 5, 10, 0.8);
-    -fx-padding: 18;
-    -fx-background-radius: 16;
-    -fx-border-radius: 16;
-    -fx-border-color: rgba(255, 255, 255, 0.05);
+    -fx-background-color: rgba(6, 8, 20, 0.85);
+    -fx-padding: 20;
+    -fx-background-radius: 18;
+    -fx-border-radius: 18;
+    -fx-border-color: rgba(61, 214, 208, 0.15);
 }
 
 .board-stage {
-    -fx-border-color: rgba(255, 255, 255, 0.06);
-    -fx-border-width: 2;
-    -fx-background-color: #05050a;
-    -fx-background-radius: 10;
-    -fx-border-radius: 10;
+    -fx-border-color: rgba(255, 255, 255, 0.08);
+    -fx-border-width: 1.5;
+    -fx-background-color: linear-gradient(to bottom, #050912, #080c18);
+    -fx-background-radius: 14;
+    -fx-border-radius: 14;
 }
 
 .gameBoard {
-    -fx-border-color: rgba(61, 214, 208, 0.4);
-    -fx-border-width: 4;
-    -fx-border-radius: 12;
-    -fx-padding: 16;
-    -fx-background-color: rgba(10, 11, 20, 0.95);
+    -fx-border-color: rgba(61, 214, 208, 0.35);
+    -fx-border-width: 2;
+    -fx-border-radius: 14;
+    -fx-padding: 12;
+    -fx-background-color: rgba(5, 8, 18, 0.95);
+    -fx-background-radius: 14;
+}
+
+.game-layer {
+    -fx-background-color: rgba(4, 8, 18, 0.92);
     -fx-background-radius: 12;
+    -fx-border-radius: 12;
+    -fx-border-color: rgba(0, 255, 204, 0.15);
+    -fx-border-width: 1.2;
+    -fx-padding: 12;
+    -fx-background-image:
+        linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+    -fx-background-size: 20 20, 20 20;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.5), 20, 0.3, 0, 6);
 }
 
 .sidebar {
