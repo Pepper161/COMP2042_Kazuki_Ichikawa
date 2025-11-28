@@ -20,8 +20,6 @@
             <HBox spacing="28" alignment="TOP_CENTER" styleClass="gameplay-columns">
                 <StackPane styleClass="board-wrapper">
                     <Pane prefWidth="360" prefHeight="660" styleClass="board-stage">
-                        <GridPane fx:id="ghostPanel" vgap="1" hgap="1" mouseTransparent="true" pickOnBounds="false"/>
-                        <GridPane fx:id="brickPanel" vgap="1" hgap="1"/>
                         <BorderPane styleClass="gameBoard" fx:id="gameBoard">
                             <center>
                                 <StackPane fx:id="gameLayer" layoutX="30" layoutY="24" alignment="TOP_LEFT" styleClass="game-layer">
@@ -30,6 +28,8 @@
                                 </StackPane>
                             </center>
                         </BorderPane>
+                        <GridPane fx:id="ghostPanel" vgap="1" hgap="1" mouseTransparent="true" pickOnBounds="false"/>
+                        <GridPane fx:id="brickPanel" vgap="1" hgap="1"/>
                     </Pane>
                     <Group fx:id="groupNotification" pickOnBounds="false" StackPane.alignment="CENTER">
                         <VBox alignment="CENTER">
