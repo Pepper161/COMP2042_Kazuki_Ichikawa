@@ -26,9 +26,9 @@
                 <Label text="Press Start to select your mode." styleClass="menu-hint"/>
             </VBox>
 
-            <VBox spacing="12" prefWidth="320" styleClass="leaderboard-panel">
+            <VBox spacing="12" prefWidth="360" styleClass="leaderboard-panel">
                 <HBox alignment="CENTER_LEFT" spacing="12" styleClass="lb-header">
-                    <Label text="Leaderboard" styleClass="lb-title"/>
+                    <Label text="Leaderboard by Mode" styleClass="lb-title"/>
                     <Region HBox.hgrow="ALWAYS"/>
                     <Button fx:id="clearScoresButton"
                             text="Clear"
@@ -38,15 +38,11 @@
                             visible="false"
                             managed="false"/>
                 </HBox>
-                <VBox fx:id="leaderboardContainer"
-                      spacing="6"
-                      visible="false"
-                      managed="false"
-                      styleClass="lb-list"/>
-                <Label fx:id="leaderboardEmptyLabel"
-                       text="Play your first game to record a high score."
-                       wrapText="true"
-                       styleClass="leaderboard-placeholder"/>
+                <ScrollPane fitToWidth="true" hbarPolicy="NEVER" vbarPolicy="AS_NEEDED" styleClass="lb-scroll">
+                    <content>
+                        <VBox fx:id="leaderboardSections" spacing="16" styleClass="lb-sections"/>
+                    </content>
+                </ScrollPane>
             </VBox>
         </HBox>
     </children>

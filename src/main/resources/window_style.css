@@ -647,3 +647,25 @@
     -fx-font-size: 14;
     -fx-padding: 12;
 }
+.lb-scroll {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+}
+
+.lb-sections {
+    -fx-padding: 0 8 8 0;
+}
+
+.leaderboard-section {
+    -fx-background-color: rgba(255, 255, 255, 0.02);
+    -fx-background-radius: 10;
+    -fx-padding: 10 12 12 12;
+    -fx-spacing: 6;
+}
+
+.leaderboard-section-title {
+    -fx-text-fill: #8b9bb4;
+    -fx-font-size: 14;
+    -fx-font-weight: bold;
+    -fx-text-transform: uppercase;
+}

@@ -23,12 +23,14 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
-import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.EnumMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import javafx.stage.Modality;
 
@@ -51,16 +53,17 @@ public class StartMenuController {
     private final HelpContentProvider helpContentProvider = HelpContentProvider.getInstance();
 
     @FXML
-    private VBox leaderboardContainer;
-
-    @FXML
-    private Label leaderboardEmptyLabel;
+    private VBox leaderboardSections;
 
     @FXML
     private Button clearScoresButton;
 
+    private final Map<GameConfig.GameMode, VBox> leaderboardLists = new EnumMap<>(GameConfig.GameMode.class);
+    private final Map<GameConfig.GameMode, Label> leaderboardPlaceholders = new EnumMap<>(GameConfig.GameMode.class);
+
     @FXML
     public void initialize() {
+        buildLeaderboardSections();
         refreshLeaderboard();
     }
 
@@ -174,37 +177,83 @@ public class StartMenuController {
     }
 
     private void refreshLeaderboard() {
-        if (leaderboardContainer == null || leaderboardEmptyLabel == null || clearScoresButton == null) {
-            return;
-        }
         List<HighScoreEntry> entries = highScoreService.fetchLeaderboard();
-        leaderboardContainer.getChildren().clear();
-        if (entries.isEmpty()) {
-            leaderboardEmptyLabel.setManaged(true);
-            leaderboardEmptyLabel.setVisible(true);
-            leaderboardContainer.setManaged(false);
-            leaderboardContainer.setVisible(false);
-            clearScoresButton.setDisable(true);
-            clearScoresButton.setVisible(false);
-            clearScoresButton.setManaged(false);
+        Map<GameConfig.GameMode, List<HighScoreEntry>> grouped = new EnumMap<>(GameConfig.GameMode.class);
+        for (GameConfig.GameMode mode : GameConfig.GameMode.values()) {
+            grouped.put(mode, new ArrayList<>());
+        }
+        for (HighScoreEntry entry : entries) {
+            grouped.get(resolveMode(entry)).add(entry);
+        }
+        boolean hasAny = false;
+        for (GameConfig.GameMode mode : GameConfig.GameMode.values()) {
+            List<HighScoreEntry> modeEntries = grouped.getOrDefault(mode, List.of());
+            VBox listBox = leaderboardLists.get(mode);
+            Label placeholder = leaderboardPlaceholders.get(mode);
+            listBox.getChildren().clear();
+            if (modeEntries.isEmpty()) {
+                placeholder.setManaged(true);
+                placeholder.setVisible(true);
+                listBox.setManaged(false);
+                listBox.setVisible(false);
+            } else {
+                placeholder.setManaged(false);
+                placeholder.setVisible(false);
+                listBox.setManaged(true);
+                listBox.setVisible(true);
+                int rank = 1;
+                for (HighScoreEntry entry : modeEntries) {
+                    Label row = new Label(formatEntry(rank++, entry));
+                    row.getStyleClass().add("leaderboard-entry");
+                    row.setAlignment(Pos.CENTER_LEFT);
+                    row.setMaxWidth(Double.MAX_VALUE);
+                    listBox.getChildren().add(row);
+                }
+                hasAny = true;
+            }
+        }
+        if (clearScoresButton != null) {
+            clearScoresButton.setDisable(!hasAny);
+            clearScoresButton.setManaged(hasAny);
+            clearScoresButton.setVisible(hasAny);
+        }
+    }
+
+    private void buildLeaderboardSections() {
+        if (leaderboardSections == null) {
             return;
         }
-        int rank = 1;
-        for (HighScoreEntry entry : entries) {
-            Label row = new Label(formatEntry(rank++, entry));
-            row.getStyleClass().add("leaderboard-entry");
-            row.setAlignment(Pos.CENTER);
-            row.setTextAlignment(TextAlignment.CENTER);
-            row.setMaxWidth(Double.MAX_VALUE);
-            leaderboardContainer.getChildren().add(row);
+        leaderboardSections.getChildren().clear();
+        leaderboardLists.clear();
+        leaderboardPlaceholders.clear();
+        for (GameConfig.GameMode mode : GameConfig.GameMode.values()) {
+            VBox section = new VBox(8);
+            section.getStyleClass().add("leaderboard-section");
+            Label title = new Label(mode.toString());
+            title.getStyleClass().add("leaderboard-section-title");
+
+            VBox list = new VBox(4);
+            list.getStyleClass().add("lb-list");
+
+            Label placeholder = new Label("Play this mode to record a high score.");
+            placeholder.getStyleClass().add("leaderboard-placeholder");
+            placeholder.setWrapText(true);
+
+            section.getChildren().addAll(title, list, placeholder);
+            leaderboardSections.getChildren().add(section);
+            leaderboardLists.put(mode, list);
+            leaderboardPlaceholders.put(mode, placeholder);
         }
-        leaderboardContainer.setManaged(true);
-        leaderboardContainer.setVisible(true);
-        leaderboardEmptyLabel.setVisible(false);
-        leaderboardEmptyLabel.setManaged(false);
-        clearScoresButton.setDisable(false);
-        clearScoresButton.setManaged(true);
-        clearScoresButton.setVisible(true);
+    }
+
+    private GameConfig.GameMode resolveMode(HighScoreEntry entry) {
+        String modeLabel = entry != null ? entry.getMode() : "";
+        for (GameConfig.GameMode mode : GameConfig.GameMode.values()) {
+            if (mode.toString().equalsIgnoreCase(modeLabel)) {
+                return mode;
+            }
+        }
+        return GameConfig.GameMode.ENDLESS;
     }
 
     private String formatEntry(int rank, HighScoreEntry entry) {
