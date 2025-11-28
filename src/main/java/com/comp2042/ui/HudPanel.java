@@ -3,31 +3,31 @@ package com.comp2042.ui;
 import com.comp2042.game.Score;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.IntegerProperty;
+import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
-import javafx.geometry.Pos;
 
 /**
  * Simple HUD panel showing score, combo count, and back-to-back streak.
  */
 public class HudPanel extends VBox {
 
-    private final Label scoreLabel = new Label("Score: 0");
-    private final Label comboLabel = new Label("Combo: 0");
-    private final Label b2bLabel = new Label("B2B: --");
-    private final Label levelLabel = new Label("Level: 1");
-    private final Label modeLabel = new Label("Mode: Endless");
+    private final Label scoreValue;
+    private final Label comboValue;
+    private final Label b2bValue;
+    private final Label levelValue;
+    private final Label modeValue;
 
     public HudPanel() {
-        setSpacing(6);
+        setSpacing(12);
         setAlignment(Pos.TOP_LEFT);
         getStyleClass().add("hud-panel");
-        scoreLabel.getStyleClass().add("hud-label");
-        comboLabel.getStyleClass().add("hud-label");
-        b2bLabel.getStyleClass().add("hud-label");
-        levelLabel.getStyleClass().add("hud-label");
-        modeLabel.getStyleClass().add("hud-label");
-        getChildren().addAll(scoreLabel, comboLabel, b2bLabel, levelLabel, modeLabel);
+
+        scoreValue = addStat("Score", "0", true);
+        comboValue = addStat("Combo", "0", false);
+        b2bValue = addStat("Back-to-Back", "--", false);
+        levelValue = addStat("Level", "1", false);
+        modeValue = addStat("Mode", "Endless", false);
     }
 
     public void bindScore(Score score) {
@@ -40,26 +40,42 @@ public class HudPanel extends VBox {
     }
 
     private void bindScoreProperty(IntegerProperty scoreProperty) {
-        scoreLabel.textProperty().bind(scoreProperty.asString("Score: %,d"));
+        scoreValue.textProperty().bind(scoreProperty.asString("%,d"));
     }
 
     private void bindComboProperty(IntegerProperty comboProperty) {
-        comboLabel.textProperty().bind(comboProperty.asString("Combo: %d"));
+        comboValue.textProperty().bind(comboProperty.asString("%d"));
     }
 
     private void bindB2BProperty(IntegerProperty b2bProperty) {
-        b2bLabel.textProperty().bind(Bindings.createStringBinding(
+        b2bValue.textProperty().bind(Bindings.createStringBinding(
                 () -> b2bProperty.get() > 0
-                        ? String.format("B2B: %d", b2bProperty.get())
-                        : "B2B: --",
+                        ? String.format("%d", b2bProperty.get())
+                        : "--",
                 b2bProperty));
     }
 
     public void setLevel(int level) {
-        levelLabel.setText("Level: " + level);
+        levelValue.setText(String.valueOf(level));
     }
 
     public void setModeStatus(String status) {
-        modeLabel.setText(status != null ? status : "");
+        modeValue.setText(status != null ? status : "");
+    }
+
+    private Label addStat(String title, String initialValue, boolean emphasize) {
+        Label header = new Label(title.toUpperCase());
+        header.getStyleClass().add("hud-label");
+
+        Label value = new Label(initialValue);
+        value.getStyleClass().add("hud-value");
+        if (emphasize) {
+            value.getStyleClass().add("hud-value-lg");
+        }
+
+        VBox block = new VBox(4, header, value);
+        block.getStyleClass().add("hud-panel-row");
+        getChildren().add(block);
+        return value;
     }
 }

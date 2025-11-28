@@ -11,8 +11,6 @@ import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 import java.util.EnumMap;
@@ -91,7 +89,6 @@ public class SettingsController {
         if (infoLabel != null) {
             infoLabel.setWrapText(true);
             infoLabel.setMaxWidth(Double.MAX_VALUE);
-            VBox.setVgrow(infoLabel, Priority.NEVER);
             infoLabel.setText("Select a ? icon to learn what each setting means.");
         }
         if (bgmVolumeSlider != null) {
@@ -133,6 +130,13 @@ public class SettingsController {
         if (dialogStage != null) {
             dialogStage.close();
         }
+    }
+
+    @FXML
+    private void onResetDefaults(ActionEvent event) {
+        GameSettings defaults = GameSettings.defaultSettings();
+        setInitialSettings(defaults);
+        statusLabel.setText("Default values restored.");
     }
 
     private void populateFields() {

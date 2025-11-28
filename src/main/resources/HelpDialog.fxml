@@ -4,13 +4,14 @@
 <?import javafx.scene.control.TextArea?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.VBox?>
+<?import java.net.URL?>
 
 <BorderPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
-            fx:controller="com.comp2042.app.HelpDialogController">
+            fx:controller="com.comp2042.app.HelpDialogController"
+            styleClass="help-dialog">
     <top>
-        <Label text="Help &amp; Controls" BorderPane.alignment="CENTER" styleClass="menu-title"/>
+        <Label text="Help &amp; Controls" BorderPane.alignment="CENTER" styleClass="help-title"/>
     </top>
     <center>
         <TextArea fx:id="helpContentArea"
@@ -20,8 +21,11 @@
                   styleClass="help-text-area"/>
     </center>
     <bottom>
-        <HBox alignment="CENTER_RIGHT" spacing="10" padding="10">
-            <Button fx:id="closeButton" text="Close" onAction="#onClose" styleClass="ipad-dark-grey"/>
+        <HBox alignment="CENTER_RIGHT" spacing="10">
+            <padding>
+                <Insets top="10" right="10" bottom="10" left="10"/>
+            </padding>
+            <Button fx:id="closeButton" text="Close" onAction="#onClose" styleClass="btn-secondary"/>
         </HBox>
     </bottom>
     <padding>
