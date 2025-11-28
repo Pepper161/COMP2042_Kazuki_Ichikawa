@@ -653,6 +653,14 @@
     -fx-border-color: transparent;
 }
 
+.lb-scroll .viewport {
+    -fx-background-color: transparent;
+}
+
+.lb-scroll .content {
+    -fx-background-color: transparent;
+}
+
 .lb-sections {
     -fx-padding: 0 8 8 0;
 }
