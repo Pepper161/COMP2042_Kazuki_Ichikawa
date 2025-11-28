@@ -268,24 +268,25 @@
 }
 
 .leaderboard-panel {
-    -fx-background-color: rgba(30, 32, 48, 0.9);
-    -fx-background-radius: 12;
-    -fx-border-color: rgba(42, 46, 64, 0.9);
-    -fx-border-radius: 12;
-    -fx-padding: 24;
-    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.55), 30, 0.2, 0, 12);
+    -fx-background-color: rgba(10, 12, 24, 0.95);
+    -fx-background-radius: 14;
+    -fx-border-color: rgba(61, 214, 208, 0.2);
+    -fx-border-radius: 14;
+    -fx-padding: 26;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.65), 32, 0.25, 0, 14);
 }
 
 .lb-header {
-    -fx-padding: 0 0 10 0;
-    -fx-border-color: transparent transparent rgba(255, 255, 255, 0.08) transparent;
+    -fx-padding: 0 0 14 0;
+    -fx-border-color: transparent transparent rgba(255, 255, 255, 0.15) transparent;
     -fx-border-width: 0 0 1 0;
 }
 
 .lb-title {
-    -fx-text-fill: #00ffcc;
+    -fx-text-fill: #3dd6d0;
     -fx-font-size: 18;
     -fx-font-weight: bold;
+    -fx-letter-spacing: 1;
 }
 
 .lb-list {
@@ -293,13 +294,13 @@
 }
 
 .leaderboard-placeholder {
-    -fx-text-fill: #8b9bb4;
-    -fx-font-size: 14;
-    -fx-alignment: center;
+    -fx-text-fill: #9fb2ce;
+    -fx-font-size: 13;
+    -fx-alignment: center-left;
 }
 
 .leaderboard-entry {
-    -fx-text-fill: #e0e6ed;
+    -fx-text-fill: #f5f7ff;
     -fx-font-family: "Consolas", "Segoe UI", monospace;
     -fx-font-size: 14;
 }
@@ -657,15 +658,18 @@
 }
 
 .leaderboard-section {
-    -fx-background-color: rgba(255, 255, 255, 0.02);
-    -fx-background-radius: 10;
-    -fx-padding: 10 12 12 12;
-    -fx-spacing: 6;
+    -fx-background-color: rgba(20, 22, 40, 0.85);
+    -fx-background-radius: 12;
+    -fx-border-radius: 12;
+    -fx-border-color: rgba(255, 255, 255, 0.08);
+    -fx-padding: 12 14 14 14;
+    -fx-spacing: 8;
 }
 
 .leaderboard-section-title {
-    -fx-text-fill: #8b9bb4;
-    -fx-font-size: 14;
+    -fx-text-fill: #7fe9ff;
+    -fx-font-size: 13;
     -fx-font-weight: bold;
+    -fx-letter-spacing: 1;
     -fx-text-transform: uppercase;
 }
