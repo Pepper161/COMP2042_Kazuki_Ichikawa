@@ -614,10 +614,7 @@ public class GuiController implements Initializable {
         if (timeLine != null) {
             timeLine.stop();
         }
-        if (gameOverPanel != null) {
-            gameOverPanel.setVisible(false);
-            gameOverPanel.setManaged(false);
-        }
+        hideGameOverPanel();
         markSessionStart();
         resetModeObjectivesInternal();
         if (eventListener == null) {
@@ -682,20 +679,14 @@ public class GuiController implements Initializable {
                 isPause.setValue(Boolean.TRUE);
                 isGameOver.setValue(Boolean.FALSE);
                 stopModeTimer();
-                if (gameOverPanel != null) {
-                    gameOverPanel.setVisible(false);
-                    gameOverPanel.setManaged(false);
-                }
+                hideGameOverPanel();
                 setPauseOverlayVisible(false);
                 stopAllRepeats();
                 break;
             case PLAYING:
                 isPause.setValue(Boolean.FALSE);
                 isGameOver.setValue(Boolean.FALSE);
-                if (gameOverPanel != null) {
-                    gameOverPanel.setVisible(false);
-                    gameOverPanel.setManaged(false);
-                }
+                hideGameOverPanel();
                 setPauseOverlayVisible(false);
                 resumeModeTimerIfNeeded();
                 break;
@@ -983,18 +974,20 @@ public class GuiController implements Initializable {
     private void recordLeaderboardResult() {
         List<HighScoreEntry> leaderboard;
         HighScoreEntry highlight = null;
+        String modeLabel = describeCurrentMode();
         if (boundScore != null) {
             java.time.Duration elapsed = computeSessionDuration();
-            HighScoreEntry newEntry = HighScoreEntry.create(boundScore.scoreProperty().get(), describeCurrentMode(),
-                    elapsed);
-            leaderboard = highScoreService.recordScore(newEntry);
+            HighScoreEntry newEntry = HighScoreEntry.create(boundScore.scoreProperty().get(), modeLabel, elapsed);
+            highScoreService.recordScore(newEntry);
+            leaderboard = highScoreService.fetchLeaderboardForMode(modeLabel);
             boolean onBoard = leaderboard.stream().anyMatch(newEntry::equals);
             highlight = onBoard ? newEntry : null;
         } else {
-            leaderboard = highScoreService.fetchLeaderboard();
+            leaderboard = highScoreService.fetchLeaderboardForMode(modeLabel);
         }
         sessionStartInstant = null;
         if (gameOverPanel != null) {
+            gameOverPanel.setLeaderboardTitle(buildLeaderboardTitle(modeLabel));
             gameOverPanel.setLeaderboard(leaderboard, highlight);
         }
     }
@@ -1052,7 +1045,7 @@ public class GuiController implements Initializable {
             if (remainingModeSeconds <= 0) {
                 stopModeTimer();
                 showNotification("Time up!");
-                gameOver();
+                handleTimedModeExpiration();
             }
         }));
         modeTimer.setCycleCount(Timeline.INDEFINITE);
@@ -1085,6 +1078,7 @@ public class GuiController implements Initializable {
         fixedLinesCleared += linesRemoved;
         if (fixedLinesCleared >= FIXED_LINES_TARGET) {
             showNotification("Mission complete!");
+            setGameOverMessage("MISSION COMPLETE");
             gameOver();
         } else {
             updateModeStatus();
@@ -1112,5 +1106,33 @@ public class GuiController implements Initializable {
         NotificationPanel panel = new NotificationPanel(text);
         groupNotification.getChildren().add(panel);
         panel.showScore(groupNotification.getChildren());
+    }
+
+    private void hideGameOverPanel() {
+        if (gameOverPanel == null) {
+            return;
+        }
+        gameOverPanel.setVisible(false);
+        gameOverPanel.setManaged(false);
+        gameOverPanel.setOutcomeMessage(null);
+        gameOverPanel.setLeaderboardTitle(null);
+    }
+
+    private void setGameOverMessage(String message) {
+        if (gameOverPanel != null) {
+            gameOverPanel.setOutcomeMessage(message);
+        }
+    }
+
+    private void handleTimedModeExpiration() {
+        setGameOverMessage("TIME OUT");
+        gameOver();
+    }
+
+    private String buildLeaderboardTitle(String modeLabel) {
+        if (modeLabel == null || modeLabel.isBlank()) {
+            return null;
+        }
+        return String.format("Top %s Scores", modeLabel);
     }
 }

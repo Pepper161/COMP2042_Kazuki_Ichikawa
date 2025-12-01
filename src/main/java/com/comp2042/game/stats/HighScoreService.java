@@ -9,7 +9,9 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -17,7 +19,7 @@ import java.util.Objects;
  */
 public final class HighScoreService {
 
-    private static final int MAX_ENTRIES = 10;
+    private static final int MAX_ENTRIES_PER_MODE = 10;
     private static final Comparator<HighScoreEntry> SORT_BY_SCORE =
             Comparator.comparingInt(HighScoreEntry::getScore).reversed()
                     .thenComparingLong(HighScoreEntry::getDurationSeconds)
@@ -40,9 +42,7 @@ public final class HighScoreService {
         List<HighScoreEntry> entries = new ArrayList<>(readEntries());
         entries.add(newEntry);
         entries.sort(SORT_BY_SCORE);
-        if (entries.size() > MAX_ENTRIES) {
-            entries = new ArrayList<>(entries.subList(0, MAX_ENTRIES));
-        }
+        entries = pruneByMode(entries);
         writeEntries(entries);
         return Collections.unmodifiableList(entries);
     }
@@ -54,6 +54,21 @@ public final class HighScoreService {
 
     public synchronized List<HighScoreEntry> fetchLeaderboard() {
         return Collections.unmodifiableList(new ArrayList<>(readEntries()));
+    }
+
+    public synchronized List<HighScoreEntry> fetchLeaderboardForMode(String mode) {
+        String normalized = mode == null ? "" : mode.trim();
+        List<HighScoreEntry> entries = new ArrayList<>(readEntries());
+        if (normalized.isEmpty()) {
+            return Collections.unmodifiableList(entries);
+        }
+        List<HighScoreEntry> filtered = new ArrayList<>();
+        for (HighScoreEntry entry : entries) {
+            if (normalized.equals(entry.getMode())) {
+                filtered.add(entry);
+            }
+        }
+        return Collections.unmodifiableList(filtered);
     }
 
     public synchronized void clear() {
@@ -78,10 +93,7 @@ public final class HighScoreService {
                 }
             }
             entries.sort(SORT_BY_SCORE);
-            if (entries.size() > MAX_ENTRIES) {
-                return new ArrayList<>(entries.subList(0, MAX_ENTRIES));
-            }
-            return entries;
+            return pruneByMode(entries);
         } catch (IOException ex) {
             System.err.println("[HighScoreService] Failed to read leaderboard file: " + ex.getMessage());
             return List.of();
@@ -141,5 +153,19 @@ public final class HighScoreService {
         String home = System.getProperty("user.home", ".");
         Path directory = Path.of(home, ".comp2042");
         return directory.resolve("highscores.dat");
+    }
+
+    private List<HighScoreEntry> pruneByMode(List<HighScoreEntry> entries) {
+        Map<String, Integer> perMode = new HashMap<>();
+        List<HighScoreEntry> pruned = new ArrayList<>();
+        for (HighScoreEntry entry : entries) {
+            String modeKey = entry.getMode();
+            int count = perMode.getOrDefault(modeKey, 0);
+            if (count < MAX_ENTRIES_PER_MODE) {
+                pruned.add(entry);
+                perMode.put(modeKey, count + 1);
+            }
+        }
+        return pruned;
     }
 }
