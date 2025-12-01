@@ -1,0 +1,53 @@
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
+<?import java.net.URL?>
+
+<BorderPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.comp2042.app.ModeSelectController"
+            prefWidth="900"
+            prefHeight="620"
+            styleClass="mode-select-container">
+    <top>
+        <VBox spacing="6" styleClass="mode-header">
+            <Label text="Choose Your Mode" styleClass="mode-title"/>
+            <Label text="Pick a ruleset to tune pacing, objectives, and scoring focus."
+                   wrapText="true"
+                   styleClass="mode-subtitle"/>
+        </VBox>
+    </top>
+    <center>
+        <VBox spacing="20">
+            <VBox fx:id="modeList" spacing="16" styleClass="mode-list"/>
+            <VBox spacing="8" styleClass="mode-detail-card">
+                <Label fx:id="detailTitle" text="Select a mode to view details" styleClass="mode-detail-title"/>
+                <Label fx:id="detailDescription"
+                       wrapText="true"
+                       text="Each ruleset tweaks gravity, win conditions, and scoring bonuses." 
+                       styleClass="mode-detail-text"/>
+                <Label fx:id="detailMeta" wrapText="true" styleClass="mode-detail-meta"/>
+            </VBox>
+        </VBox>
+    </center>
+    <bottom>
+        <HBox alignment="CENTER_RIGHT" spacing="12">
+            <padding>
+                <Insets top="16" right="0" bottom="0" left="0"/>
+            </padding>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Button text="Back" onAction="#onCancel" styleClass="btn-secondary"/>
+            <Button fx:id="startModeButton" text="Start Mode" onAction="#onConfirm" styleClass="btn-primary"/>
+        </HBox>
+    </bottom>
+    <padding>
+        <Insets top="24" right="24" bottom="24" left="24"/>
+    </padding>
+    <stylesheets>
+        <URL value="@window_style.css"/>
+    </stylesheets>
+</BorderPane>

@@ -24,7 +24,7 @@ public class GameOverPanel extends BorderPane {
 
     public GameOverPanel() {
         final Label gameOverLabel = new Label("GAME OVER");
-        gameOverLabel.getStyleClass().add("gameOverStyle");
+        gameOverLabel.getStyleClass().addAll("overlay-title", "danger");
         seedLabel.getStyleClass().add("seedLabel");
         seedLabel.setVisible(false);
 
@@ -33,15 +33,15 @@ public class GameOverPanel extends BorderPane {
         leaderboardContainer.setAlignment(Pos.CENTER_LEFT);
 
         Button restartButton = new Button("Restart");
-        restartButton.getStyleClass().add("ipad-dark-grey");
+        restartButton.getStyleClass().add("btn-primary");
         restartButton.setOnAction(event -> onRestart.run());
 
         Button menuButton = new Button("Main Menu");
-        menuButton.getStyleClass().add("ipad-dark-grey");
+        menuButton.getStyleClass().add("btn-secondary");
         menuButton.setOnAction(event -> onMainMenu.run());
 
         Button exitButton = new Button("Exit");
-        exitButton.getStyleClass().add("ipad-dark-grey");
+        exitButton.getStyleClass().add("btn-danger");
         exitButton.setOnAction(event -> onExit.run());
 
         VBox leaderboardBox = new VBox(6, leaderboardTitle, emptyLeaderboardLabel, leaderboardContainer);

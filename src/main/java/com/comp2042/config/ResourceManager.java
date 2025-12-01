@@ -11,6 +11,7 @@ public final class ResourceManager {
 
     public enum Asset {
         START_MENU_FXML("StartMenu.fxml"),
+        MODE_SELECT_FXML("ModeSelect.fxml"),
         GAME_LAYOUT_FXML("gameLayout.fxml"),
         SETTINGS_DIALOG_FXML("SettingsDialog.fxml"),
         HELP_DIALOG_FXML("HelpDialog.fxml"),

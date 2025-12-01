@@ -64,26 +64,26 @@ public final class BrickColorPalette {
     private static Paint[] createClassicPalette() {
         return new Paint[]{
                 Color.TRANSPARENT,
-                Color.AQUA,
-                Color.BLUEVIOLET,
-                Color.DARKGREEN,
-                Color.YELLOW,
-                Color.RED,
-                Color.BEIGE,
-                Color.BURLYWOOD
+                Color.web("#00f3ff"),
+                Color.web("#8a64ff"),
+                Color.web("#45ff92"),
+                Color.web("#ffe066"),
+                Color.web("#ff4f81"),
+                Color.web("#ffb347"),
+                Color.web("#46b0ff")
         };
     }
 
     private static Paint[] createClassicGhostPalette() {
         return new Paint[]{
                 Color.TRANSPARENT,
-                withOpacity(Color.AQUA, 0.35),
-                withOpacity(Color.BLUEVIOLET, 0.35),
-                withOpacity(Color.DARKGREEN, 0.35),
-                withOpacity(Color.YELLOW, 0.35),
-                withOpacity(Color.RED, 0.35),
-                withOpacity(Color.BEIGE, 0.35),
-                withOpacity(Color.BURLYWOOD, 0.35)
+                withOpacity(Color.web("#00f3ff"), 0.55),
+                withOpacity(Color.web("#8a64ff"), 0.55),
+                withOpacity(Color.web("#45ff92"), 0.55),
+                withOpacity(Color.web("#ffe066"), 0.55),
+                withOpacity(Color.web("#ff4f81"), 0.55),
+                withOpacity(Color.web("#ffb347"), 0.55),
+                withOpacity(Color.web("#46b0ff"), 0.55)
         };
     }
 
