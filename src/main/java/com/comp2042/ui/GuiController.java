@@ -974,16 +974,17 @@ public class GuiController implements Initializable {
     private void recordLeaderboardResult() {
         List<HighScoreEntry> leaderboard;
         HighScoreEntry highlight = null;
+        GameConfig.GameMode currentMode = resolveCurrentMode();
         String modeLabel = describeCurrentMode();
         if (boundScore != null) {
             java.time.Duration elapsed = computeSessionDuration();
             HighScoreEntry newEntry = HighScoreEntry.create(boundScore.scoreProperty().get(), modeLabel, elapsed);
             highScoreService.recordScore(newEntry);
-            leaderboard = highScoreService.fetchLeaderboardForMode(modeLabel);
+            leaderboard = highScoreService.fetchLeaderboardForMode(currentMode);
             boolean onBoard = leaderboard.stream().anyMatch(newEntry::equals);
             highlight = onBoard ? newEntry : null;
         } else {
-            leaderboard = highScoreService.fetchLeaderboardForMode(modeLabel);
+            leaderboard = highScoreService.fetchLeaderboardForMode(currentMode);
         }
         sessionStartInstant = null;
         if (gameOverPanel != null) {
@@ -1134,5 +1135,9 @@ public class GuiController implements Initializable {
             return null;
         }
         return String.format("Top %s Scores", modeLabel);
+    }
+
+    private GameConfig.GameMode resolveCurrentMode() {
+        return gameMode != null ? gameMode : GameConfig.GameMode.ENDLESS;
     }
 }

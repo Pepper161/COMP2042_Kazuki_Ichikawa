@@ -749,10 +749,7 @@
     -fx-background-color: rgba(255, 255, 255, 0.2);
 }
 
-.status-label {
-    -fx-text-fill: #cc3333;
-    -fx-font-size: 12;
-    -fx-font-weight: bold;
+-fx-text-fill: #cc3333;
 }
 
 .settings-footer {

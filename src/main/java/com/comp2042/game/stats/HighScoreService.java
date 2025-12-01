@@ -1,5 +1,7 @@
 package com.comp2042.game.stats;
 
+import com.comp2042.game.GameConfig;
+
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -9,8 +11,9 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
+import java.util.EnumMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 
@@ -56,15 +59,16 @@ public final class HighScoreService {
         return Collections.unmodifiableList(new ArrayList<>(readEntries()));
     }
 
-    public synchronized List<HighScoreEntry> fetchLeaderboardForMode(String mode) {
-        String normalized = mode == null ? "" : mode.trim();
+    public synchronized List<HighScoreEntry> fetchLeaderboardForMode(String modeLabel) {
+        return fetchLeaderboardForMode(resolveModeKey(modeLabel));
+    }
+
+    public synchronized List<HighScoreEntry> fetchLeaderboardForMode(GameConfig.GameMode mode) {
+        GameConfig.GameMode target = mode != null ? mode : GameConfig.GameMode.ENDLESS;
         List<HighScoreEntry> entries = new ArrayList<>(readEntries());
-        if (normalized.isEmpty()) {
-            return Collections.unmodifiableList(entries);
-        }
         List<HighScoreEntry> filtered = new ArrayList<>();
         for (HighScoreEntry entry : entries) {
-            if (normalized.equals(entry.getMode())) {
+            if (resolveModeKey(entry.getMode()) == target) {
                 filtered.add(entry);
             }
         }
@@ -156,10 +160,10 @@ public final class HighScoreService {
     }
 
     private List<HighScoreEntry> pruneByMode(List<HighScoreEntry> entries) {
-        Map<String, Integer> perMode = new HashMap<>();
+        Map<GameConfig.GameMode, Integer> perMode = new EnumMap<>(GameConfig.GameMode.class);
         List<HighScoreEntry> pruned = new ArrayList<>();
         for (HighScoreEntry entry : entries) {
-            String modeKey = entry.getMode();
+            GameConfig.GameMode modeKey = resolveModeKey(entry.getMode());
             int count = perMode.getOrDefault(modeKey, 0);
             if (count < MAX_ENTRIES_PER_MODE) {
                 pruned.add(entry);
@@ -167,5 +171,28 @@ public final class HighScoreService {
             }
         }
         return pruned;
+    }
+
+    private GameConfig.GameMode resolveModeKey(String label) {
+        if (label == null || label.isBlank()) {
+            return GameConfig.GameMode.ENDLESS;
+        }
+        String trimmed = label.trim();
+        for (GameConfig.GameMode mode : GameConfig.GameMode.values()) {
+            if (mode.toString().equalsIgnoreCase(trimmed) || mode.name().equalsIgnoreCase(trimmed)) {
+                return mode;
+            }
+        }
+        String normalized = trimmed.toLowerCase(Locale.ROOT);
+        if ("classic".equals(normalized) || normalized.startsWith("endless")) {
+            return GameConfig.GameMode.ENDLESS;
+        }
+        if (normalized.startsWith("timed")) {
+            return GameConfig.GameMode.TIMED;
+        }
+        if (normalized.startsWith("fixed") || normalized.contains("40")) {
+            return GameConfig.GameMode.FIXED_LINES;
+        }
+        return GameConfig.GameMode.ENDLESS;
     }
 }
