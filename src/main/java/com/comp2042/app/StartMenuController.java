@@ -23,7 +23,12 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import javafx.stage.Stage;
+import javafx.animation.KeyFrame;
+import javafx.animation.KeyValue;
+import javafx.animation.Timeline;
+import javafx.util.Duration;
 
 import java.io.IOException;
 import java.net.URL;
@@ -58,6 +63,9 @@ public class StartMenuController {
     @FXML
     private Button clearScoresButton;
 
+    @FXML
+    private Label titleLabel;
+
     private final Map<GameConfig.GameMode, VBox> leaderboardLists = new EnumMap<>(GameConfig.GameMode.class);
     private final Map<GameConfig.GameMode, Label> leaderboardPlaceholders = new EnumMap<>(GameConfig.GameMode.class);
 
@@ -65,6 +73,7 @@ public class StartMenuController {
     public void initialize() {
         buildLeaderboardSections();
         refreshLeaderboard();
+        startTitleAnimation();
     }
 
     public void setPrimaryStage(Stage primaryStage) {
@@ -77,6 +86,31 @@ public class StartMenuController {
         musicManager.setEnabled(gameSettings.isBgmEnabled());
         musicManager.setMasterVolume(gameSettings.getBgmVolume());
         musicManager.playMenuTheme();
+    }
+
+    /**
+     * Start the color-shifting animation for the title label.
+     * Cycles between cyan (#00f3ff) and magenta (#ff0055) continuously.
+     */
+    private void startTitleAnimation() {
+        if (titleLabel == null) {
+            return; // Guard against null reference
+        }
+
+        // Define colors: Cyan and Magenta
+        Color cyan = Color.web("#00f3ff");
+        Color magenta = Color.web("#ff0055");
+
+        // Create a timeline that cycles colors
+        Timeline colorTimeline = new Timeline(
+            new KeyFrame(Duration.ZERO, new KeyValue(titleLabel.textFillProperty(), cyan)),
+            new KeyFrame(Duration.seconds(3), new KeyValue(titleLabel.textFillProperty(), magenta)),
+            new KeyFrame(Duration.seconds(6), new KeyValue(titleLabel.textFillProperty(), cyan))
+        );
+
+        // Loop infinitely
+        colorTimeline.setCycleCount(Timeline.INDEFINITE);
+        colorTimeline.play();
     }
 
     @FXML
