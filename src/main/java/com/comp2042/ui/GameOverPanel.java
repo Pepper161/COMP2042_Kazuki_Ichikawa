@@ -14,9 +14,12 @@ import java.util.List;
  */
 public class GameOverPanel extends BorderPane {
 
-    private Runnable onRestart = () -> {};
-    private Runnable onExit = () -> {};
-    private Runnable onMainMenu = () -> {};
+    private Runnable onRestart = () -> {
+    };
+    private Runnable onExit = () -> {
+    };
+    private Runnable onMainMenu = () -> {
+    };
     private static final String DEFAULT_OUTCOME_MESSAGE = "GAME OVER";
     private static final String DEFAULT_LEADERBOARD_TITLE = "Top Scores";
     private final Label seedLabel = new Label();
@@ -58,15 +61,18 @@ public class GameOverPanel extends BorderPane {
     }
 
     public void setOnRestart(Runnable onRestart) {
-        this.onRestart = onRestart != null ? onRestart : () -> {};
+        this.onRestart = onRestart != null ? onRestart : () -> {
+        };
     }
 
     public void setOnExit(Runnable onExit) {
-        this.onExit = onExit != null ? onExit : () -> {};
+        this.onExit = onExit != null ? onExit : () -> {
+        };
     }
 
     public void setOnMainMenu(Runnable onMainMenu) {
-        this.onMainMenu = onMainMenu != null ? onMainMenu : () -> {};
+        this.onMainMenu = onMainMenu != null ? onMainMenu : () -> {
+        };
     }
 
     public void setSeedInfo(long seed, boolean deterministic) {
@@ -84,6 +90,7 @@ public class GameOverPanel extends BorderPane {
         if (!hasEntries) {
             return;
         }
+
         int rank = 1;
         for (HighScoreEntry entry : entries) {
             Label label = new Label(formatEntry(rank++, entry));

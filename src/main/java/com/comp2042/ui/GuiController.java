@@ -981,8 +981,10 @@ public class GuiController implements Initializable {
             HighScoreEntry newEntry = HighScoreEntry.create(boundScore.scoreProperty().get(), modeLabel, elapsed);
             highScoreService.recordScore(newEntry);
             leaderboard = highScoreService.fetchLeaderboardForMode(currentMode);
-            boolean onBoard = leaderboard.stream().anyMatch(newEntry::equals);
-            highlight = onBoard ? newEntry : null;
+            highlight = leaderboard.stream()
+                    .filter(newEntry::equals)
+                    .findFirst()
+                    .orElse(null);
         } else {
             leaderboard = highScoreService.fetchLeaderboardForMode(currentMode);
         }
