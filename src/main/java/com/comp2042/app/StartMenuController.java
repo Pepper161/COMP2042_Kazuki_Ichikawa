@@ -77,6 +77,9 @@ public class StartMenuController {
     @FXML
     private Label titleLabel;
 
+    @FXML
+    private VBox menuLeftContainer;
+
     private final Map<GameConfig.GameMode, VBox> leaderboardLists = new EnumMap<>(GameConfig.GameMode.class);
     private final Map<GameConfig.GameMode, Label> leaderboardPlaceholders = new EnumMap<>(GameConfig.GameMode.class);
 
@@ -93,8 +96,8 @@ public class StartMenuController {
         primaryStage.setMinWidth(MENU_WINDOW_WIDTH);
         primaryStage.setMinHeight(MENU_WINDOW_HEIGHT);
         primaryStage.setMaxWidth(MENU_WINDOW_WIDTH);
-        primaryStage.setMaxHeight(MENU_WINDOW_HEIGHT);
-        musicManager.setEnabled(gameSettings.i
+        primaryStage.setMaxHeight(MENU_WI
+
                 cManager.setMasterVolume(gameSettings.getBgmVolume());
                 cManager.playMenuTheme();
                 
@@ -120,7 +123,9 @@ public class StartMenuController {
 
         // Loop infinitely
         colorTimeline.setCycleCount(Timeline.INDEFINITE);
-        colorTimeline.play();
+        colorTimeli
+
+    e.play();
                 
                 
                 ate void onStart(ActionEvent event) {

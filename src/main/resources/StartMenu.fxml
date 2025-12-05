@@ -14,7 +14,7 @@
            styleClass="start-menu-root">
     <children>
         <HBox spacing="36" alignment="CENTER" styleClass="start-menu-container">
-            <VBox spacing="18" alignment="CENTER_LEFT" styleClass="menu-left">
+
                 <Label fx:id="titleLabel" text="TETRIS FX" styleClass="game-title"/>
                 <Label text="SYSTEM READY // V.2.0" styleClass="menu-tagline"/>
                 <VBox spacing="12" prefWidth="280" styleClass="menu-buttons">
