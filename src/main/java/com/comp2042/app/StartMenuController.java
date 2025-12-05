@@ -11,6 +11,7 @@ import com.comp2042.game.stats.HighScoreEntry;
 import com.comp2042.game.stats.HighScoreService;
 import com.comp2042.help.HelpContentProvider;
 import com.comp2042.ui.GuiController;
+import com.comp2042.ui.anim.TetrisLogoView;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -22,8 +23,10 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 
 import java.io.IOException;
 import java.net.URL;
@@ -57,14 +60,18 @@ public class StartMenuController {
 
     @FXML
     private Button clearScoresButton;
+    @FXML
+    private StackPane logoContainer;
 
     private final Map<GameConfig.GameMode, VBox> leaderboardLists = new EnumMap<>(GameConfig.GameMode.class);
     private final Map<GameConfig.GameMode, Label> leaderboardPlaceholders = new EnumMap<>(GameConfig.GameMode.class);
+    private TetrisLogoView logoView;
 
     @FXML
     public void initialize() {
         buildLeaderboardSections();
         refreshLeaderboard();
+        setupAnimatedLogo();
     }
 
     public void setPrimaryStage(Stage primaryStage) {
@@ -79,6 +86,25 @@ public class StartMenuController {
         musicManager.playMenuTheme();
     }
 
+    private void setupAnimatedLogo() {
+        if (logoContainer == null) {
+            System.out.println("WARNING: logoContainer is null!");
+            return;
+        }
+        System.out.println("Setting up animated logo...");
+        logoView = new TetrisLogoView("TETRIS FX");
+        logoContainer.getChildren().setAll(logoView);
+        System.out.println("Logo view added to container, calling play()...");
+        logoView.play();
+        System.out.println("Animation started!");
+    }
+
+    private void stopLogoAnimation() {
+        if (logoView != null) {
+            logoView.stop();
+        }
+    }
+
     @FXML
     private void onStart(ActionEvent event) {
         GameConfig.GameMode selected = promptModeSelection();
@@ -87,6 +113,7 @@ public class StartMenuController {
         }
         gameConfig = gameConfig.withMode(selected);
         ensurePrimaryStageBound();
+        stopLogoAnimation();
         try {
             URL layoutUrl = ResourceManager.getUrl(ResourceManager.Asset.GAME_LAYOUT_FXML);
             FXMLLoader loader = new FXMLLoader(layoutUrl);

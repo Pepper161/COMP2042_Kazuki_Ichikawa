@@ -15,8 +15,7 @@
     <children>
         <HBox spacing="36" alignment="CENTER" styleClass="start-menu-container">
             <VBox spacing="18" alignment="CENTER_LEFT" styleClass="menu-left">
-                <Label text="TetrisJFX" styleClass="game-title"/>
-                <Label text="Neo arcade experience with modern assists." styleClass="menu-tagline"/>
+                <StackPane fx:id="logoContainer" styleClass="logo-stack"/>
                 <VBox spacing="12" prefWidth="280" styleClass="menu-buttons">
                     <Button fx:id="startButton" text="Start Game" onAction="#onStart" styleClass="btn-primary"/>
                     <Button fx:id="settingsButton" text="Settings" onAction="#onSettings" styleClass="btn-secondary"/>
