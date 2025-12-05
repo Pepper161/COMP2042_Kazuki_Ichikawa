@@ -1,5 +1,7 @@
 package com.comp2042.game.stats;
 
+import com.comp2042.game.GameConfig;
+
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -9,7 +11,10 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.EnumMap;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -17,7 +22,7 @@ import java.util.Objects;
  */
 public final class HighScoreService {
 
-    private static final int MAX_ENTRIES = 10;
+    private static final int MAX_ENTRIES_PER_MODE = 10;
     private static final Comparator<HighScoreEntry> SORT_BY_SCORE =
             Comparator.comparingInt(HighScoreEntry::getScore).reversed()
                     .thenComparingLong(HighScoreEntry::getDurationSeconds)
@@ -40,9 +45,7 @@ public final class HighScoreService {
         List<HighScoreEntry> entries = new ArrayList<>(readEntries());
         entries.add(newEntry);
         entries.sort(SORT_BY_SCORE);
-        if (entries.size() > MAX_ENTRIES) {
-            entries = new ArrayList<>(entries.subList(0, MAX_ENTRIES));
-        }
+        entries = pruneByMode(entries);
         writeEntries(entries);
         return Collections.unmodifiableList(entries);
     }
@@ -54,6 +57,22 @@ public final class HighScoreService {
 
     public synchronized List<HighScoreEntry> fetchLeaderboard() {
         return Collections.unmodifiableList(new ArrayList<>(readEntries()));
+    }
+
+    public synchronized List<HighScoreEntry> fetchLeaderboardForMode(String modeLabel) {
+        return fetchLeaderboardForMode(resolveModeKey(modeLabel));
+    }
+
+    public synchronized List<HighScoreEntry> fetchLeaderboardForMode(GameConfig.GameMode mode) {
+        GameConfig.GameMode target = mode != null ? mode : GameConfig.GameMode.ENDLESS;
+        List<HighScoreEntry> entries = new ArrayList<>(readEntries());
+        List<HighScoreEntry> filtered = new ArrayList<>();
+        for (HighScoreEntry entry : entries) {
+            if (resolveModeKey(entry.getMode()) == target) {
+                filtered.add(entry);
+            }
+        }
+        return Collections.unmodifiableList(filtered);
     }
 
     public synchronized void clear() {
@@ -78,10 +97,7 @@ public final class HighScoreService {
                 }
             }
             entries.sort(SORT_BY_SCORE);
-            if (entries.size() > MAX_ENTRIES) {
-                return new ArrayList<>(entries.subList(0, MAX_ENTRIES));
-            }
-            return entries;
+            return pruneByMode(entries);
         } catch (IOException ex) {
             System.err.println("[HighScoreService] Failed to read leaderboard file: " + ex.getMessage());
             return List.of();
@@ -141,5 +157,42 @@ public final class HighScoreService {
         String home = System.getProperty("user.home", ".");
         Path directory = Path.of(home, ".comp2042");
         return directory.resolve("highscores.dat");
+    }
+
+    private List<HighScoreEntry> pruneByMode(List<HighScoreEntry> entries) {
+        Map<GameConfig.GameMode, Integer> perMode = new EnumMap<>(GameConfig.GameMode.class);
+        List<HighScoreEntry> pruned = new ArrayList<>();
+        for (HighScoreEntry entry : entries) {
+            GameConfig.GameMode modeKey = resolveModeKey(entry.getMode());
+            int count = perMode.getOrDefault(modeKey, 0);
+            if (count < MAX_ENTRIES_PER_MODE) {
+                pruned.add(entry);
+                perMode.put(modeKey, count + 1);
+            }
+        }
+        return pruned;
+    }
+
+    private GameConfig.GameMode resolveModeKey(String label) {
+        if (label == null || label.isBlank()) {
+            return GameConfig.GameMode.ENDLESS;
+        }
+        String trimmed = label.trim();
+        for (GameConfig.GameMode mode : GameConfig.GameMode.values()) {
+            if (mode.toString().equalsIgnoreCase(trimmed) || mode.name().equalsIgnoreCase(trimmed)) {
+                return mode;
+            }
+        }
+        String normalized = trimmed.toLowerCase(Locale.ROOT);
+        if ("classic".equals(normalized) || normalized.startsWith("endless")) {
+            return GameConfig.GameMode.ENDLESS;
+        }
+        if (normalized.startsWith("timed")) {
+            return GameConfig.GameMode.TIMED;
+        }
+        if (normalized.startsWith("fixed") || normalized.contains("40")) {
+            return GameConfig.GameMode.FIXED_LINES;
+        }
+        return GameConfig.GameMode.ENDLESS;
     }
 }

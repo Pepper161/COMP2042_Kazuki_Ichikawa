@@ -96,9 +96,10 @@
     -fx-text-fill: #e5e5e5;
 }
 
-.leaderboard-highlight {
-    -fx-text-fill: yellow;
+.leaderboard-entry.leaderboard-highlight {
+    -fx-text-fill: #ffd700;
     -fx-font-weight: bold;
+    -fx-effect: dropshadow(gaussian, rgba(255, 215, 0, 0.6), 10, 0.5, 0, 0);
 }
 
 .leaderboard-container {
@@ -749,8 +750,7 @@
     -fx-background-color: rgba(255, 255, 255, 0.2);
 }
 
--fx-text-fill: #cc3333;
-}
+
 
 .settings-footer {
     -fx-padding: 15 24 0 24;

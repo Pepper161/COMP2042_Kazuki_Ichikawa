@@ -14,17 +14,22 @@ import java.util.List;
  */
 public class GameOverPanel extends BorderPane {
 
-    private Runnable onRestart = () -> {};
-    private Runnable onExit = () -> {};
-    private Runnable onMainMenu = () -> {};
+    private Runnable onRestart = () -> {
+    };
+    private Runnable onExit = () -> {
+    };
+    private Runnable onMainMenu = () -> {
+    };
+    private static final String DEFAULT_OUTCOME_MESSAGE = "GAME OVER";
+    private static final String DEFAULT_LEADERBOARD_TITLE = "Top Scores";
     private final Label seedLabel = new Label();
-    private final Label leaderboardTitle = new Label("Top Scores");
+    private final Label outcomeLabel = new Label(DEFAULT_OUTCOME_MESSAGE);
+    private final Label leaderboardTitle = new Label(DEFAULT_LEADERBOARD_TITLE);
     private final VBox leaderboardContainer = new VBox(4);
     private final Label emptyLeaderboardLabel = new Label("No runs recorded yet.");
 
     public GameOverPanel() {
-        final Label gameOverLabel = new Label("GAME OVER");
-        gameOverLabel.getStyleClass().addAll("overlay-title", "danger");
+        outcomeLabel.getStyleClass().addAll("overlay-title", "danger");
         seedLabel.getStyleClass().add("seedLabel");
         seedLabel.setVisible(false);
 
@@ -47,7 +52,7 @@ public class GameOverPanel extends BorderPane {
         VBox leaderboardBox = new VBox(6, leaderboardTitle, emptyLeaderboardLabel, leaderboardContainer);
         leaderboardBox.setAlignment(Pos.CENTER);
 
-        VBox container = new VBox(18, gameOverLabel, seedLabel, leaderboardBox, restartButton, menuButton, exitButton);
+        VBox container = new VBox(18, outcomeLabel, seedLabel, leaderboardBox, restartButton, menuButton, exitButton);
         container.setAlignment(Pos.CENTER);
         container.setFillWidth(false);
 
@@ -56,15 +61,18 @@ public class GameOverPanel extends BorderPane {
     }
 
     public void setOnRestart(Runnable onRestart) {
-        this.onRestart = onRestart != null ? onRestart : () -> {};
+        this.onRestart = onRestart != null ? onRestart : () -> {
+        };
     }
 
     public void setOnExit(Runnable onExit) {
-        this.onExit = onExit != null ? onExit : () -> {};
+        this.onExit = onExit != null ? onExit : () -> {
+        };
     }
 
     public void setOnMainMenu(Runnable onMainMenu) {
-        this.onMainMenu = onMainMenu != null ? onMainMenu : () -> {};
+        this.onMainMenu = onMainMenu != null ? onMainMenu : () -> {
+        };
     }
 
     public void setSeedInfo(long seed, boolean deterministic) {
@@ -82,6 +90,7 @@ public class GameOverPanel extends BorderPane {
         if (!hasEntries) {
             return;
         }
+
         int rank = 1;
         for (HighScoreEntry entry : entries) {
             Label label = new Label(formatEntry(rank++, entry));
@@ -99,5 +108,15 @@ public class GameOverPanel extends BorderPane {
                 entry.getScore(),
                 entry.getMode(),
                 entry.formattedDuration());
+    }
+
+    public void setOutcomeMessage(String message) {
+        String text = (message == null || message.isBlank()) ? DEFAULT_OUTCOME_MESSAGE : message;
+        outcomeLabel.setText(text);
+    }
+
+    public void setLeaderboardTitle(String title) {
+        String text = (title == null || title.isBlank()) ? DEFAULT_LEADERBOARD_TITLE : title;
+        leaderboardTitle.setText(text);
     }
 }
