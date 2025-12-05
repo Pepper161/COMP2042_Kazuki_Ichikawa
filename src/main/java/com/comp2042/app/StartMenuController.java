@@ -23,7 +23,17 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
+import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
+import javafx.scene.paint.LinearGradient;
+import javafx.scene.paint.Stop;
+import javafx.scene.paint.CycleMethod;
+import javafx.scene.shape.Rectangle;
+import javafx.scene.text.Text;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
+import javafx.scene.effect.BlendMode;
+import javafx.scene.effect.DropShadow;
 import javafx.stage.Stage;
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
@@ -37,6 +47,7 @@ import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Random;
 import javafx.stage.Modality;
 
 /**
@@ -83,20 +94,19 @@ public class StartMenuController {
         primaryStage.setMinHeight(MENU_WINDOW_HEIGHT);
         primaryStage.setMaxWidth(MENU_WINDOW_WIDTH);
         primaryStage.setMaxHeight(MENU_WINDOW_HEIGHT);
-        musicManager.setEnabled(gameSettings.isBgmEnabled());
-        musicManager.setMasterVolume(gameSettings.getBgmVolume());
-        musicManager.playMenuTheme();
-    }
-
+        musicManager.setEnabled(gameSettings.i
+                cManager.setMasterVolume(gameSettings.getBgmVolume());
+                cManager.playMenuTheme();
+                
     /**
      * Start the color-shifting animation for the title label.
      * Cycles between cyan (#00f3ff) and magenta (#ff0055) continuously.
      */
     private void startTitleAnimation() {
         if (titleLabel == null) {
-            return; // Guard against null reference
-        }
+            return; // Guard against null
 
+    
         // Define colors: Cyan and Magenta
         Color cyan = Color.web("#00f3ff");
         Color magenta = Color.web("#ff0055");
@@ -111,10 +121,9 @@ public class StartMenuController {
         // Loop infinitely
         colorTimeline.setCycleCount(Timeline.INDEFINITE);
         colorTimeline.play();
-    }
-
-    @FXML
-    private void onStart(ActionEvent event) {
+                
+                
+                ate void onStart(ActionEvent event) {
         GameConfig.GameMode selected = promptModeSelection();
         if (selected == null) {
             return;
