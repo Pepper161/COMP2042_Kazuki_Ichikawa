@@ -853,6 +853,12 @@
     -fx-alignment: center-left;
 }
 
+.logo-stack {
+    -fx-min-height: 90;
+    -fx-pref-height: 100;
+    -fx-alignment: center-left;
+}
+
 /* Bottom Hint Text */
 .menu-hint {
     -fx-text-fill: #5c7a8a;

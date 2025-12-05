@@ -11,6 +11,7 @@ import com.comp2042.game.stats.HighScoreEntry;
 import com.comp2042.game.stats.HighScoreService;
 import com.comp2042.help.HelpContentProvider;
 import com.comp2042.ui.GuiController;
+import com.comp2042.ui.anim.TetrisLogoView;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -22,22 +23,9 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
-import javafx.scene.layout.VBox;
 import javafx.scene.layout.StackPane;
-import javafx.scene.paint.Color;
-import javafx.scene.paint.LinearGradient;
-import javafx.scene.paint.Stop;
-import javafx.scene.paint.CycleMethod;
-import javafx.scene.shape.Rectangle;
-import javafx.scene.text.Text;
-import javafx.scene.text.Font;
-import javafx.scene.text.FontWeight;
-import javafx.scene.effect.BlendMode;
-import javafx.scene.effect.DropShadow;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-import javafx.animation.KeyFrame;
-import javafx.animation.KeyValue;
-import javafx.animation.Timeline;
 import javafx.util.Duration;
 
 import java.io.IOException;
@@ -47,7 +35,6 @@ import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Random;
 import javafx.stage.Modality;
 
 /**
@@ -73,21 +60,18 @@ public class StartMenuController {
 
     @FXML
     private Button clearScoresButton;
-
     @FXML
-    private Label titleLabel;
-
-    @FXML
-    private VBox menuLeftContainer;
+    private StackPane logoContainer;
 
     private final Map<GameConfig.GameMode, VBox> leaderboardLists = new EnumMap<>(GameConfig.GameMode.class);
     private final Map<GameConfig.GameMode, Label> leaderboardPlaceholders = new EnumMap<>(GameConfig.GameMode.class);
+    private TetrisLogoView logoView;
 
     @FXML
     public void initialize() {
         buildLeaderboardSections();
         refreshLeaderboard();
-        startTitleAnimation();
+        setupAnimatedLogo();
     }
 
     public void setPrimaryStage(Stage primaryStage) {
@@ -96,45 +80,40 @@ public class StartMenuController {
         primaryStage.setMinWidth(MENU_WINDOW_WIDTH);
         primaryStage.setMinHeight(MENU_WINDOW_HEIGHT);
         primaryStage.setMaxWidth(MENU_WINDOW_WIDTH);
-        primaryStage.setMaxHeight(MENU_WI
+        primaryStage.setMaxHeight(MENU_WINDOW_HEIGHT);
+        musicManager.setEnabled(gameSettings.isBgmEnabled());
+        musicManager.setMasterVolume(gameSettings.getBgmVolume());
+        musicManager.playMenuTheme();
+    }
 
-                cManager.setMasterVolume(gameSettings.getBgmVolume());
-                cManager.playMenuTheme();
-                
-    /**
-     * Start the color-shifting animation for the title label.
-     * Cycles between cyan (#00f3ff) and magenta (#ff0055) continuously.
-     */
-    private void startTitleAnimation() {
-        if (titleLabel == null) {
-            return; // Guard against null
+    private void setupAnimatedLogo() {
+        if (logoContainer == null) {
+            System.out.println("WARNING: logoContainer is null!");
+            return;
+        }
+        System.out.println("Setting up animated logo...");
+        logoView = new TetrisLogoView("TETRIS FX");
+        logoContainer.getChildren().setAll(logoView);
+        System.out.println("Logo view added to container, calling play()...");
+        logoView.play();
+        System.out.println("Animation started!");
+    }
 
-    
-        // Define colors: Cyan and Magenta
-        Color cyan = Color.web("#00f3ff");
-        Color magenta = Color.web("#ff0055");
+    private void stopLogoAnimation() {
+        if (logoView != null) {
+            logoView.stop();
+        }
+    }
 
-        // Create a timeline that cycles colors
-        Timeline colorTimeline = new Timeline(
-            new KeyFrame(Duration.ZERO, new KeyValue(titleLabel.textFillProperty(), cyan)),
-            new KeyFrame(Duration.seconds(3), new KeyValue(titleLabel.textFillProperty(), magenta)),
-            new KeyFrame(Duration.seconds(6), new KeyValue(titleLabel.textFillProperty(), cyan))
-        );
-
-        // Loop infinitely
-        colorTimeline.setCycleCount(Timeline.INDEFINITE);
-        colorTimeli
-
-    e.play();
-                
-                
-                ate void onStart(ActionEvent event) {
+    @FXML
+    private void onStart(ActionEvent event) {
         GameConfig.GameMode selected = promptModeSelection();
         if (selected == null) {
             return;
         }
         gameConfig = gameConfig.withMode(selected);
         ensurePrimaryStageBound();
+        stopLogoAnimation();
         try {
             URL layoutUrl = ResourceManager.getUrl(ResourceManager.Asset.GAME_LAYOUT_FXML);
             FXMLLoader loader = new FXMLLoader(layoutUrl);

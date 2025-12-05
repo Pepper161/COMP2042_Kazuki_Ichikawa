@@ -14,9 +14,8 @@
            styleClass="start-menu-root">
     <children>
         <HBox spacing="36" alignment="CENTER" styleClass="start-menu-container">
-
-                <Label fx:id="titleLabel" text="TETRIS FX" styleClass="game-title"/>
-                <Label text="SYSTEM READY // V.2.0" styleClass="menu-tagline"/>
+            <VBox spacing="18" alignment="CENTER_LEFT" styleClass="menu-left">
+                <StackPane fx:id="logoContainer" styleClass="logo-stack"/>
                 <VBox spacing="12" prefWidth="280" styleClass="menu-buttons">
                     <Button fx:id="startButton" text="Start Game" onAction="#onStart" styleClass="btn-primary"/>
                     <Button fx:id="settingsButton" text="Settings" onAction="#onSettings" styleClass="btn-secondary"/>
