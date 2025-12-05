@@ -32,12 +32,16 @@ public class TetrisLogoView extends StackPane {
     private final Text glitchCyan;
     private final Timeline glitchTimeline;
 
+    private final Text mainText;
+    private final Timeline colorTimeline;
+    private double hueOffset = 0;
+
     public TetrisLogoView(String text) {
         setPickOnBounds(false);
         setMouseTransparent(true);
 
         Font font = loadLogoFont();
-        Text mainText = buildMainText(text, font);
+        mainText = buildMainText(text, font);
         glitchMagenta = buildGlitchLayer(text, font, COLOR_MAGENTA);
         glitchCyan = buildGlitchLayer(text, font, COLOR_CYAN);
 
@@ -46,11 +50,16 @@ public class TetrisLogoView extends StackPane {
         glitchTimeline = new Timeline(new KeyFrame(Duration.millis(GLITCH_INTERVAL_MS), e -> runGlitchCycle()));
         glitchTimeline.setCycleCount(Animation.INDEFINITE);
 
+        colorTimeline = new Timeline(new KeyFrame(Duration.millis(50), e -> runColorCycle()));
+        colorTimeline.setCycleCount(Animation.INDEFINITE);
+
         sceneProperty().addListener((obs, oldScene, newScene) -> {
             if (newScene == null) {
                 glitchTimeline.stop();
+                colorTimeline.stop();
             } else if (glitchTimeline.getStatus() != Animation.Status.RUNNING) {
                 glitchTimeline.play();
+                colorTimeline.play();
             }
         });
     }
@@ -58,28 +67,34 @@ public class TetrisLogoView extends StackPane {
     public void play() {
         if (glitchTimeline.getStatus() != Animation.Status.RUNNING) {
             glitchTimeline.play();
+            colorTimeline.play();
         }
     }
 
     public void stop() {
         glitchTimeline.stop();
+        colorTimeline.stop();
     }
 
     private Text buildMainText(String text, Font font) {
         Text mainText = new Text(text);
         mainText.setFont(font);
-        mainText.setFill(new LinearGradient(
+        updateMainTextColor(mainText, COLOR_CYAN);
+        return mainText;
+    }
+
+    private void updateMainTextColor(Text text, Color baseColor) {
+        text.setFill(new LinearGradient(
                 0, 0, 0, 1, true, CycleMethod.NO_CYCLE,
                 new Stop(0.0, Color.WHITE),
                 new Stop(0.65, Color.WHITE),
-                new Stop(1.0, COLOR_CYAN)));
+                new Stop(1.0, baseColor)));
 
         DropShadow glow = new DropShadow();
-        glow.setColor(COLOR_CYAN.deriveColor(0, 1, 1, 0.65));
+        glow.setColor(baseColor.deriveColor(0, 1, 1, 0.65));
         glow.setRadius(30);
         glow.setSpread(0.25);
-        mainText.setEffect(glow);
-        return mainText;
+        text.setEffect(glow);
     }
 
     private Text buildGlitchLayer(String text, Font font, Color color) {
@@ -94,6 +109,15 @@ public class TetrisLogoView extends StackPane {
     private void runGlitchCycle() {
         applyGlitch(glitchMagenta, -3.0, -0.5);
         applyGlitch(glitchCyan, 0.5, 3.0);
+    }
+
+    private void runColorCycle() {
+        hueOffset += 2; // Shift hue by 2 degrees each frame
+        if (hueOffset > 360)
+            hueOffset -= 360;
+
+        Color dynamicColor = COLOR_CYAN.deriveColor(hueOffset, 1.0, 1.0, 1.0);
+        updateMainTextColor(mainText, dynamicColor);
     }
 
     private void applyGlitch(Text textNode, double minOffset, double maxOffset) {
