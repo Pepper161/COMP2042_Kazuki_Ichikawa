@@ -4,10 +4,12 @@ import javafx.scene.input.KeyCode;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
+import java.nio.file.Files;
 import java.nio.file.Path;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class GameSettingsStoreTest {
 
@@ -46,5 +48,27 @@ class GameSettingsStoreTest {
         assertEquals(custom.getKey(GameSettings.Action.MOVE_LEFT), reloaded.getKey(GameSettings.Action.MOVE_LEFT));
         assertEquals(custom.getKey(GameSettings.Action.NEW_GAME), reloaded.getKey(GameSettings.Action.NEW_GAME));
         assertEquals(custom.isBgmEnabled(), reloaded.isBgmEnabled());
+    }
+
+    @Test
+    void usesSystemPropertyOverrideForFileLocation() {
+        Path explicitFile = tempDir.resolve("custom").resolve("my-settings.properties");
+        String previous = System.getProperty(GameSettingsStore.SETTINGS_FILE_PROPERTY);
+        try {
+            System.setProperty(GameSettingsStore.SETTINGS_FILE_PROPERTY, explicitFile.toString());
+            GameSettingsStore store = new GameSettingsStore();
+            GameSettings custom = GameSettings.builder().setDasDelayMs(50).build();
+            store.save(custom);
+            assertTrue(Files.exists(explicitFile));
+            GameSettings reloaded = store.load();
+            assertEquals(50, reloaded.getDasDelayMs());
+            assertEquals(explicitFile.toAbsolutePath().normalize(), store.getSettingsFile());
+        } finally {
+            if (previous == null) {
+                System.clearProperty(GameSettingsStore.SETTINGS_FILE_PROPERTY);
+            } else {
+                System.setProperty(GameSettingsStore.SETTINGS_FILE_PROPERTY, previous);
+            }
+        }
     }
 }
