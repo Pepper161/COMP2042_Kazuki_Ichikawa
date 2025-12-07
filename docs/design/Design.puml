@@ -1,0 +1,146 @@
+@startuml
+skinparam classAttributeIconSize 0
+skinparam linetype ortho
+skinparam handwritten false
+skinparam packageStyle rectangle
+
+package com.comp2042.app {
+    class Main
+    class StartMenuController
+    class SettingsController
+    class ModeSelectController
+    class HelpDialogController
+    class HelpDialogService
+}
+
+package com.comp2042.game {
+    class GameController
+    class GameLogic
+    class GameConfig
+    enum GameState
+    class LevelProgression
+    class Score
+    class LineClearStats
+    enum LineClearType
+}
+
+package com.comp2042.board {
+    interface Board
+    class SimpleBoard
+    class BrickRotator
+    class MatrixOperations
+    class ViewData
+    class ClearRow
+    class NextShapeInfo
+}
+
+package com.comp2042.logic.bricks {
+    interface Brick
+    interface BrickGenerator
+    class PieceGenerator
+    enum TetrominoType
+    class IBrick
+    class JBrick
+    class LBrick
+    class OBrick
+    class SBrick
+    class TBrick
+    class ZBrick
+}
+
+package com.comp2042.ui {
+    class GuiController
+    class HudPanel
+    class NextQueuePanel
+    class NotificationPanel
+    class GameOverPanel
+    class BrickColorPalette
+}
+
+package com.comp2042.ui.anim {
+    class TetrisLogoView
+}
+
+package com.comp2042.ui.input {
+    class AutoRepeatHandler
+}
+
+package com.comp2042.config {
+    class GameSettings
+    class GameSettingsStore
+    class ResourceManager
+}
+
+package com.comp2042.audio {
+    class BackgroundMusicManager
+}
+
+package com.comp2042.game.stats {
+    class HighScoreEntry
+    class HighScoreService
+}
+
+package com.comp2042.help {
+    class HelpContentProvider
+}
+
+' Relationships with Multiplicity
+
+Main ..> StartMenuController : creates >
+StartMenuController "1" o-- "1" GameConfig
+StartMenuController "1" o-- "1" GameSettingsStore
+StartMenuController ..> BackgroundMusicManager : uses >
+StartMenuController ..> HighScoreService : uses >
+StartMenuController ..> HelpContentProvider : uses >
+StartMenuController ..> TetrisLogoView : uses >
+StartMenuController ..> SettingsController : opens >
+StartMenuController ..> ModeSelectController : opens >
+StartMenuController ..> HelpDialogService : uses >
+StartMenuController ..> GameController : creates >
+
+GameController "1" *-- "1" GameLogic
+GameController "1" o-- "1" GameConfig
+GameController "1" o-- "1" GameSettings
+GameController "1" o-- "1" GuiController
+
+GameLogic "1" *-- "1" Board
+GameLogic "1" *-- "1" LevelProgression
+GameLogic "1" *-- "1" Score
+GameLogic "1" *-- "1" LineClearStats
+
+SimpleBoard ..|> Board
+SimpleBoard "1" *-- "1" BrickRotator
+SimpleBoard "1" *-- "1" BrickGenerator
+SimpleBoard "1" o-- "1" Score
+
+BrickRotator "1" o-- "1" Brick
+BrickRotator ..> MatrixOperations : uses >
+
+PieceGenerator ..|> BrickGenerator
+PieceGenerator ..> Brick : produces >
+
+IBrick ..|> Brick
+JBrick ..|> Brick
+LBrick ..|> Brick
+OBrick ..|> Brick
+SBrick ..|> Brick
+TBrick ..|> Brick
+ZBrick ..|> Brick
+
+Brick "1" *-- "1" TetrominoType
+
+GuiController "1" *-- "1" HudPanel
+GuiController "1" *-- "1" NextQueuePanel
+GuiController "1" *-- "1" NotificationPanel
+GuiController "1" *-- "1" GameOverPanel
+GuiController "1" *-- "1" AutoRepeatHandler
+GuiController ..> Board : reads >
+GuiController ..> ViewData : reads >
+
+HudPanel ..> BrickColorPalette : uses >
+NextQueuePanel ..> BrickColorPalette : uses >
+
+SettingsController ..> GameSettings : modifies >
+SettingsController ..> GameSettingsStore : uses >
+
+@enduml

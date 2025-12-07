@@ -1,0 +1,332 @@
+@startuml
+skinparam classAttributeIconSize 0
+skinparam linetype ortho
+
+package com.comp2042.app {
+    class Main {
+        +start(primaryStage: Stage): void
+        +main(args: String[]): void
+    }
+
+    class StartMenuController {
+        +initialize(): void
+        +setPrimaryStage(primaryStage: Stage): void
+        +setGameConfig(gameConfig: GameConfig): void
+    }
+
+    class SettingsController {
+        +initialize(): void
+        +setDialogStage(dialogStage: Stage): void
+        +setInitialSettings(settings: GameSettings): void
+        +getResult(): Optional<GameSettings>
+    }
+
+    class ModeSelectController {
+        +initialize(): void
+        +setDialogStage(dialogStage: Stage): void
+        +setInitialMode(mode: GameMode): void
+        +getResult(): Optional<GameMode>
+    }
+
+    class HelpDialogController {
+        +setContent(markdown: String): void
+    }
+
+    class HelpDialogService {
+        +{static} showHelp(owner: Stage, markdown: String): void
+    }
+}
+
+package com.comp2042.game {
+    class GameController {
+        +startGame(): void
+        +pauseGame(): void
+        +resumeGame(): void
+        +stopGame(): void
+    }
+
+    class GameLogic {
+        +update(): void
+        +moveLeft(): void
+        +moveRight(): void
+        +moveDown(): boolean
+        +rotateClockwise(): void
+        +rotateCounterClockwise(): void
+        +hardDrop(): void
+        +getLevelProgression(): LevelProgression
+    }
+
+    class GameConfig {
+        +{static} defaultConfig(): GameConfig
+        +withMode(mode: GameMode): GameConfig
+    }
+
+    enum GameState {
+        PLAYING
+        PAUSED
+        GAME_OVER
+    }
+
+    class LevelProgression {
+        +reset(): LevelState
+        +handleLinesCleared(linesCleared: int): LevelState
+        +getState(): LevelState
+    }
+
+    class Score {
+        +reset(): void
+        +add(points: int): void
+        +scoreProperty(): IntegerProperty
+    }
+
+    class LineClearStats {
+        +getLinesCleared(): int
+        +getLevel(): int
+    }
+
+    enum LineClearType {
+        SINGLE
+        DOUBLE
+        TRIPLE
+        TETRIS
+        T_SPIN
+        T_SPIN_SINGLE
+        T_SPIN_DOUBLE
+        T_SPIN_TRIPLE
+    }
+}
+
+package com.comp2042.board {
+    interface Board {
+        +moveBrickDown(): boolean
+        +moveBrickLeft(): boolean
+        +moveBrickRight(): boolean
+        +rotateClockwise(): boolean
+        +rotateCounterClockwise(): boolean
+        +createNewBrick(): boolean
+        +getBoardMatrix(): int[][]
+        +getViewData(): ViewData
+        +mergeBrickToBackground(): void
+        +clearRows(): ClearRow
+        +getScore(): Score
+        +newGame(): void
+        +getActiveTetrominoType(): TetrominoType
+        +calculateDropDistance(): int
+    }
+
+    class SimpleBoard {
+        +SimpleBoard(width: int, height: int)
+    }
+
+    class BrickRotator {
+        +getNextShapeClockwise(): NextShapeInfo
+        +getNextShapeCounterClockwise(): NextShapeInfo
+        +getCurrentShape(): int[][]
+        +setCurrentShape(currentShape: int): void
+        +setBrick(brick: Brick): void
+    }
+
+    class MatrixOperations {
+        +{static} intersect(matrix: int[][], brick: int[][], x: int, y: int): boolean
+        +{static} merge(filledFields: int[][], brick: int[][], x: int, y: int): int[][]
+        +{static} checkRemoving(matrix: int[][]): ClearRow
+    }
+
+    class ViewData {
+        +getBrickData(): int[][]
+        +getxPosition(): int
+        +getyPosition(): int
+        +getGhostYPosition(): int
+        +getNextBricksData(): List<int[][]>
+    }
+
+    class ClearRow {
+        +getLinesRemoved(): int
+        +getNewMatrix(): int[][]
+        +getScoreBonus(): int
+    }
+}
+
+package com.comp2042.logic.bricks {
+    interface Brick {
+        +getShapeMatrix(): List<int[][]>
+        +getType(): TetrominoType
+    }
+
+    interface BrickGenerator {
+        +getBrick(): Brick
+        +peekUpcoming(count: int): List<Brick>
+        +reset(): void
+    }
+
+    class PieceGenerator {
+        +getBrick(): Brick
+        +peekUpcoming(count: int): List<Brick>
+        +reset(): void
+    }
+
+    enum TetrominoType {
+        I
+        J
+        L
+        O
+        S
+        T
+        Z
+    }
+
+    class IBrick
+    class JBrick
+    class LBrick
+    class OBrick
+    class SBrick
+    class TBrick
+    class ZBrick
+}
+
+package com.comp2042.ui {
+    class GuiController {
+        +initialize(): void
+        +setPrimaryStage(primaryStage: Stage): void
+        +setGameState(state: GameState): void
+        +updateLoop(): void
+    }
+
+    class HudPanel {
+        +updateScore(score: int): void
+        +updateLevel(level: int): void
+        +updateLines(lines: int): void
+    }
+
+    class NextQueuePanel {
+        +update(nextShapes: List<int[][]>): void
+    }
+
+    class NotificationPanel {
+        +show(text: String): void
+    }
+
+    class GameOverPanel {
+        +show(score: int, highScore: boolean): void
+    }
+
+    class BrickColorPalette {
+        +{static} resolve(tileId: int): Paint
+    }
+}
+
+package com.comp2042.ui.anim {
+    class TetrisLogoView {
+        +play(): void
+        +stop(): void
+    }
+}
+
+package com.comp2042.ui.input {
+    class AutoRepeatHandler {
+        +configure(das: Duration, arr: Duration): void
+        +start(): void
+        +stop(): void
+    }
+}
+
+package com.comp2042.config {
+    class GameSettings {
+        +{static} defaultSettings(): GameSettings
+        +getDasDelayMs(): long
+        +getArrIntervalMs(): long
+    }
+
+    class GameSettingsStore {
+        +load(): GameSettings
+        +save(settings: GameSettings): void
+    }
+
+    class ResourceManager {
+        +{static} getUrl(asset: Asset): URL
+    }
+}
+
+package com.comp2042.audio {
+    class BackgroundMusicManager {
+        +{static} getInstance(): BackgroundMusicManager
+        +setEnabled(enabled: boolean): void
+        +playMenuTheme(): void
+        +playGameTheme(): void
+    }
+}
+
+package com.comp2042.game.stats {
+    class HighScoreEntry
+    class HighScoreService {
+        +fetchLeaderboard(): List<HighScoreEntry>
+        +recordScore(entry: HighScoreEntry): void
+    }
+}
+
+package com.comp2042.help {
+    class HelpContentProvider {
+        +{static} getInstance(): HelpContentProvider
+        +getMarkdown(): String
+    }
+}
+
+Main ..> StartMenuController : creates
+StartMenuController ..> GameConfig : uses
+StartMenuController ..> GameSettingsStore : uses
+StartMenuController ..> BackgroundMusicManager : uses
+StartMenuController ..> HighScoreService : uses
+StartMenuController ..> HelpContentProvider : uses
+StartMenuController ..> TetrisLogoView : uses
+StartMenuController ..> SettingsController : opens
+StartMenuController ..> ModeSelectController : opens
+StartMenuController ..> HelpDialogService : uses
+StartMenuController ..> GameController : creates
+StartMenuController ..> GuiController : loads
+
+GameController o-- GameLogic
+GameController o-- GameConfig
+GameController o-- GameSettings
+GameController o-- GuiController
+
+GameLogic o-- Board
+GameLogic o-- LevelProgression
+GameLogic o-- Score
+GameLogic o-- LineClearStats
+
+SimpleBoard ..|> Board
+SimpleBoard o-- BrickRotator
+SimpleBoard o-- BrickGenerator
+SimpleBoard o-- Score
+
+BrickRotator o-- Brick
+BrickRotator ..> MatrixOperations : uses
+
+PieceGenerator ..|> BrickGenerator
+PieceGenerator ..> Brick : produces
+
+IBrick ..|> Brick
+JBrick ..|> Brick
+LBrick ..|> Brick
+OBrick ..|> Brick
+SBrick ..|> Brick
+TBrick ..|> Brick
+ZBrick ..|> Brick
+
+Brick ..> TetrominoType : has
+
+GuiController o-- HudPanel
+GuiController o-- NextQueuePanel
+GuiController o-- NotificationPanel
+GuiController o-- GameOverPanel
+GuiController o-- AutoRepeatHandler
+GuiController ..> Board : reads
+GuiController ..> ViewData : reads
+
+HudPanel ..> BrickColorPalette : uses
+NextQueuePanel ..> BrickColorPalette : uses
+
+SettingsController ..> GameSettings : modifies
+SettingsController ..> GameSettingsStore : uses
+
+@enduml
