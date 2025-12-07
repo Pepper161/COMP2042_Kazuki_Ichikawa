@@ -125,7 +125,7 @@ In accordance with the coursework specification, this submission includes:
 
 ### Start Menu & Leaderboard
 ![Start Menu with Leaderboard](docs/screenshots/start-menu-with-leaderboard.png)
-The main entry point featuring the animated logo, mode selection, and a persistent leaderboard showing top scores for each mode.
+The main entry point featuring the animated "TETRIS FX" logo (letters pulse and slide over time), mode selection, and a persistent leaderboard showing top scores for each mode.
 
 ### Mode Selection
 ![Mode Selection Console](docs/screenshots/mode-select-console.png)
