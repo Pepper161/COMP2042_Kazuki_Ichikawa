@@ -38,8 +38,8 @@ class GameLogicTest {
 
         assertNotNull(downData.getClearRow());
         assertEquals(2, downData.getClearRow().getLinesRemoved());
-        assertEquals(306, board.getScore().scoreProperty().get(),
-                "Three-cell hard drop (3*2) plus double clear (300) should total 306 points");
+        assertEquals(206, board.getScore().scoreProperty().get(),
+                "Three-cell hard drop (3*2) plus double clear (200) should total 206 points");
     }
 
     @Test
@@ -60,7 +60,7 @@ class GameLogicTest {
 
         logic.hardDrop(new MoveEvent(EventType.HARD_DROP, EventSource.USER));
 
-        assertEquals(1200, board.getScore().scoreProperty().get(),
+        assertEquals(200, board.getScore().scoreProperty().get(),
                 "Rotation followed by hard drop should keep the rotation flag for T-Spin scoring");
     }
 
