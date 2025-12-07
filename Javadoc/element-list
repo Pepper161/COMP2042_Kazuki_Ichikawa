@@ -1,0 +1,12 @@
+com.comp2042.app
+com.comp2042.audio
+com.comp2042.board
+com.comp2042.config
+com.comp2042.game
+com.comp2042.game.events
+com.comp2042.game.stats
+com.comp2042.help
+com.comp2042.logic.bricks
+com.comp2042.ui
+com.comp2042.ui.anim
+com.comp2042.ui.input

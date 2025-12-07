@@ -32,9 +32,9 @@ public final class LevelProgression {
     }
 
     public LevelProgression(int linesPerLevel,
-                            double baseGravityMs,
-                            double minGravityMs,
-                            double[] gravityTable) {
+            double baseGravityMs,
+            double minGravityMs,
+            double[] gravityTable) {
         if (linesPerLevel <= 0) {
             throw new IllegalArgumentException("linesPerLevel must be positive");
         }
@@ -57,7 +57,8 @@ public final class LevelProgression {
     }
 
     /**
-     * Applies the specified number of cleared lines and returns the resulting state.
+     * Applies the specified number of cleared lines and returns the resulting
+     * state.
      */
     public LevelState handleLinesCleared(int linesCleared) {
         if (linesCleared <= 0) {
@@ -93,6 +94,11 @@ public final class LevelProgression {
 
     /**
      * Immutable view of the current level progression state.
+     *
+     * @param level               the current difficulty level (1-based)
+     * @param linesUntilNextLevel number of lines needed to reach the next level
+     * @param gravityIntervalMs   the current gravity delay in milliseconds
+     * @param leveledUp           true if the last operation caused a level up
      */
     public record LevelState(int level, int linesUntilNextLevel, double gravityIntervalMs, boolean leveledUp) {
     }

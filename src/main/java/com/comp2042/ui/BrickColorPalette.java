@@ -7,13 +7,23 @@ import javafx.scene.paint.Paint;
 import javafx.scene.paint.Stop;
 
 /**
- * Centralises the mapping between tile IDs and their display colours so multiple UI
+ * Centralises the mapping between tile IDs and their display colours so
+ * multiple UI
  * components can stay in sync. Supports multiple palettes to aid accessibility.
  */
 public final class BrickColorPalette {
 
+    /**
+     * Defines the available color themes for bricks and ghosts.
+     */
     public enum PaletteProfile {
+        /**
+         * Standard vivid colors.
+         */
         CLASSIC(createClassicPalette(), createClassicGhostPalette()),
+        /**
+         * High contrast patterns for accessibility.
+         */
         HIGH_CONTRAST(createHighContrastPalette(), createHighContrastGhostPalette());
 
         private final Paint[] brickColors;
@@ -62,7 +72,7 @@ public final class BrickColorPalette {
     }
 
     private static Paint[] createClassicPalette() {
-        return new Paint[]{
+        return new Paint[] {
                 Color.TRANSPARENT,
                 Color.web("#00f3ff"),
                 Color.web("#8a64ff"),
@@ -75,7 +85,7 @@ public final class BrickColorPalette {
     }
 
     private static Paint[] createClassicGhostPalette() {
-        return new Paint[]{
+        return new Paint[] {
                 Color.TRANSPARENT,
                 withOpacity(Color.web("#00f3ff"), 0.55),
                 withOpacity(Color.web("#8a64ff"), 0.55),
@@ -88,7 +98,7 @@ public final class BrickColorPalette {
     }
 
     private static Paint[] createHighContrastPalette() {
-        return new Paint[]{
+        return new Paint[] {
                 Color.TRANSPARENT,
                 stripedPaint(Color.rgb(0, 45, 95), Color.rgb(0, 168, 255)),
                 stripedPaint(Color.rgb(55, 0, 90), Color.rgb(220, 230, 80)),
@@ -101,7 +111,7 @@ public final class BrickColorPalette {
     }
 
     private static Paint[] createHighContrastGhostPalette() {
-        return new Paint[]{
+        return new Paint[] {
                 Color.TRANSPARENT,
                 withOpacity(Color.rgb(0, 168, 255), 0.5),
                 withOpacity(Color.rgb(220, 230, 80), 0.5),
@@ -125,7 +135,6 @@ public final class BrickColorPalette {
                 new Stop(0.36, background),
                 new Stop(0.65, background),
                 new Stop(0.66, accent),
-                new Stop(1.0, accent)
-        );
+                new Stop(1.0, accent));
     }
 }
