@@ -3,6 +3,7 @@ skinparam classAttributeIconSize 0
 skinparam linetype ortho
 skinparam handwritten false
 skinparam packageStyle rectangle
+top to bottom direction
 
 package com.comp2042.app {
     class Main
@@ -11,6 +12,36 @@ package com.comp2042.app {
     class ModeSelectController
     class HelpDialogController
     class HelpDialogService
+    
+    Main -[hidden]down-> StartMenuController
+    StartMenuController -[hidden]down-> SettingsController
+    SettingsController -[hidden]down-> ModeSelectController
+    ModeSelectController -[hidden]down-> HelpDialogController
+    HelpDialogController -[hidden]down-> HelpDialogService
+}
+
+package com.comp2042.ui {
+    class GuiController
+    class HudPanel
+    class NextQueuePanel
+    class NotificationPanel
+    class GameOverPanel
+    class BrickColorPalette
+    package anim {
+        class TetrisLogoView
+    }
+    package input {
+        class AutoRepeatHandler
+    }
+
+    ' Force vertical stacking in UI package
+    GuiController -[hidden]down-> HudPanel
+    HudPanel -[hidden]down-> NextQueuePanel
+    NextQueuePanel -[hidden]down-> NotificationPanel
+    NotificationPanel -[hidden]down-> GameOverPanel
+    GameOverPanel -[hidden]down-> BrickColorPalette
+    BrickColorPalette -[hidden]down-> anim
+    anim -[hidden]down-> input
 }
 
 package com.comp2042.game {
@@ -22,6 +53,20 @@ package com.comp2042.game {
     class Score
     class LineClearStats
     enum LineClearType
+    package stats {
+        class HighScoreEntry
+        class HighScoreService
+    }
+
+    ' Force vertical stacking in Game package
+    GameController -[hidden]down-> GameLogic
+    GameLogic -[hidden]down-> GameConfig
+    GameConfig -[hidden]down-> GameState
+    GameState -[hidden]down-> LevelProgression
+    LevelProgression -[hidden]down-> Score
+    Score -[hidden]down-> LineClearStats
+    LineClearStats -[hidden]down-> LineClearType
+    LineClearType -[hidden]down-> stats
 }
 
 package com.comp2042.board {
@@ -32,6 +77,14 @@ package com.comp2042.board {
     class ViewData
     class ClearRow
     class NextShapeInfo
+
+    ' Force vertical stacking in Board package
+    Board -[hidden]down-> SimpleBoard
+    SimpleBoard -[hidden]down-> BrickRotator
+    BrickRotator -[hidden]down-> MatrixOperations
+    MatrixOperations -[hidden]down-> ViewData
+    ViewData -[hidden]down-> ClearRow
+    ClearRow -[hidden]down-> NextShapeInfo
 }
 
 package com.comp2042.logic.bricks {
@@ -48,23 +101,6 @@ package com.comp2042.logic.bricks {
     class ZBrick
 }
 
-package com.comp2042.ui {
-    class GuiController
-    class HudPanel
-    class NextQueuePanel
-    class NotificationPanel
-    class GameOverPanel
-    class BrickColorPalette
-}
-
-package com.comp2042.ui.anim {
-    class TetrisLogoView
-}
-
-package com.comp2042.ui.input {
-    class AutoRepeatHandler
-}
-
 package com.comp2042.config {
     class GameSettings
     class GameSettingsStore
@@ -75,14 +111,18 @@ package com.comp2042.audio {
     class BackgroundMusicManager
 }
 
-package com.comp2042.game.stats {
-    class HighScoreEntry
-    class HighScoreService
-}
-
 package com.comp2042.help {
     class HelpContentProvider
 }
+
+' Global Layout Hints (Force Vertical Stack of Packages)
+com.comp2042.app -[hidden]down-> com.comp2042.ui
+com.comp2042.ui -[hidden]down-> com.comp2042.game
+com.comp2042.game -[hidden]down-> com.comp2042.board
+com.comp2042.board -[hidden]down-> com.comp2042.logic.bricks
+com.comp2042.logic.bricks -[hidden]down-> com.comp2042.config
+com.comp2042.config -[hidden]down-> com.comp2042.audio
+com.comp2042.audio -[hidden]down-> com.comp2042.help
 
 ' Relationships with Multiplicity
 
