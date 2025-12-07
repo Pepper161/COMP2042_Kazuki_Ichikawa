@@ -5,10 +5,13 @@ import javafx.beans.binding.Bindings;
 import javafx.beans.property.IntegerProperty;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 
 /**
- * Simple HUD panel showing score, combo count, and back-to-back streak.
+ * Stylised HUD panel that mirrors the "run telemetry" card in the HTML reference.
+ * Handles scoreboard bindings while exposing extra slots for level/mode badges.
  */
 public class HudPanel extends VBox {
 
@@ -17,17 +20,37 @@ public class HudPanel extends VBox {
     private final Label b2bValue;
     private final Label levelValue;
     private final Label modeValue;
+    private final VBox statsContainer = new VBox(12);
 
     public HudPanel() {
-        setSpacing(12);
+        setSpacing(16);
         setAlignment(Pos.TOP_LEFT);
         getStyleClass().add("hud-panel");
+
+        Label kicker = new Label("RUN TELEMETRY");
+        kicker.getStyleClass().add("hud-panel-kicker");
+
+        Label title = new Label("Live Stack Data");
+        title.getStyleClass().add("hud-panel-title");
+
+        statsContainer.getStyleClass().add("hud-stats");
 
         scoreValue = addStat("Score", "0", true);
         comboValue = addStat("Combo", "0", false);
         b2bValue = addStat("Back-to-Back", "--", false);
         levelValue = addStat("Level", "1", false);
-        modeValue = addStat("Mode", "Endless", false);
+
+        Region spacer = new Region();
+        VBox.setVgrow(spacer, Priority.ALWAYS);
+
+        modeValue = new Label("Mode: Endless");
+        modeValue.getStyleClass().add("hud-mode-status");
+        modeValue.setWrapText(true);
+
+        Label hint = new Label("ESC pauses · F1 opens help");
+        hint.getStyleClass().add("hud-footer-hint");
+
+        getChildren().addAll(kicker, title, statsContainer, spacer, modeValue, hint);
     }
 
     public void bindScore(Score score) {
@@ -74,8 +97,8 @@ public class HudPanel extends VBox {
         }
 
         VBox block = new VBox(4, header, value);
-        block.getStyleClass().add("hud-panel-row");
-        getChildren().add(block);
+        block.getStyleClass().addAll("hud-panel-row", "hud-stat-block");
+        statsContainer.getChildren().add(block);
         return value;
     }
 }

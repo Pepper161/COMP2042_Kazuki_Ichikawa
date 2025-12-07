@@ -2,10 +2,12 @@
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.Region?>
-<?import javafx.scene.layout.VBox?>
 <?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
 <?import java.net.URL?>
 
 <StackPane xmlns="http://javafx.com/javafx"
@@ -13,42 +15,93 @@
            fx:controller="com.comp2042.app.StartMenuController"
            styleClass="start-menu-root">
     <children>
-        <HBox spacing="36" alignment="CENTER" styleClass="start-menu-container">
-            <VBox spacing="18" alignment="CENTER_LEFT" styleClass="menu-left">
-                <StackPane fx:id="logoContainer" styleClass="logo-stack"/>
-                <VBox spacing="12" prefWidth="280" styleClass="menu-buttons">
-                    <Button fx:id="startButton" text="Start Game" onAction="#onStart" styleClass="btn-primary"/>
-                    <Button fx:id="settingsButton" text="Settings" onAction="#onSettings" styleClass="btn-secondary"/>
-                    <Button fx:id="helpButton" text="Help &amp; Controls" onAction="#onHelp" styleClass="btn-secondary"/>
-                    <Button fx:id="exitButton" text="Exit" onAction="#onExit" styleClass="btn-danger"/>
-                </VBox>
-                <Region VBox.vgrow="ALWAYS"/>
-                <Label text="Press Start to select your mode." styleClass="menu-hint"/>
-            </VBox>
+        <Pane styleClass="grid-overlay"/>
+        <Pane styleClass="scanline-overlay"/>
+        <BorderPane styleClass="start-menu-shell">
+            <center>
+                <HBox spacing="36" alignment="CENTER" styleClass="start-menu-container">
+                    <VBox spacing="18" alignment="TOP_LEFT" styleClass="menu-left">
+                        <Label text="NEOTETRIS OPS DECK" styleClass="menu-kicker"/>
+                        <StackPane fx:id="logoContainer" styleClass="logo-stack"/>
+                        <Label text="Neo-retro drop simulation suite" styleClass="menu-subtitle"/>
 
-            <VBox spacing="12" prefWidth="360" styleClass="leaderboard-panel">
-                <HBox alignment="CENTER_LEFT" spacing="12" styleClass="lb-header">
-                    <Label text="Leaderboard by Mode" styleClass="lb-title"/>
-                    <Region HBox.hgrow="ALWAYS"/>
-                    <Button fx:id="clearScoresButton"
-                            text="Clear"
-                            onAction="#onClearScores"
-                            styleClass="btn-secondary compact"
-                            disable="true"
-                            visible="false"
-                            managed="false"/>
+                        <VBox spacing="12" styleClass="menu-hero">
+                            <HBox spacing="18" styleClass="hero-metric-row">
+                                <VBox spacing="4" styleClass="hero-metric">
+                                    <Label text="CURRENT STATUS" styleClass="hero-metric-title"/>
+                                    <Label text="STANDBY" styleClass="hero-metric-value"/>
+                                </VBox>
+                                <VBox spacing="4" styleClass="hero-metric">
+                                    <Label text="CARTRIDGE" styleClass="hero-metric-title"/>
+                                    <Label text="REV X3" styleClass="hero-metric-value"/>
+                                </VBox>
+                            </HBox>
+                            <HBox spacing="6" styleClass="accent-bar">
+                                <Region/>
+                            </HBox>
+                            <Label text="Select a mode, tune your telemetry, then deploy."
+                                   wrapText="true"
+                                   styleClass="hero-description"/>
+                        </VBox>
+
+                        <VBox spacing="12" prefWidth="320" styleClass="menu-buttons">
+                            <Button fx:id="startButton" text="Start Game" onAction="#onStart" styleClass="btn-primary"/>
+                            <Button fx:id="settingsButton" text="Settings" onAction="#onSettings" styleClass="btn-secondary"/>
+                            <Button fx:id="helpButton" text="Help &amp; Controls" onAction="#onHelp" styleClass="btn-secondary"/>
+                            <Button fx:id="exitButton" text="Exit" onAction="#onExit" styleClass="btn-danger"/>
+                        </VBox>
+
+                        <VBox spacing="6" styleClass="menu-quick-hints">
+                            <Label text="↵  confirm · ESC  quit" styleClass="hint-chip"/>
+                            <Button text="F1 opens help anywhere" styleClass="hint-chip" onAction="#onHelp"/>
+                        </VBox>
+
+                        <Region VBox.vgrow="ALWAYS"/>
+                        <Label text="Press Start to choose between Endless, Sprint, or 40 Lines."
+                               wrapText="true"
+                               styleClass="menu-hint"/>
+                    </VBox>
+
+                    <BorderPane prefWidth="360" styleClass="leaderboard-panel">
+                        <top>
+                            <VBox spacing="6">
+                                <HBox alignment="CENTER_LEFT" spacing="12" styleClass="lb-header">
+                                    <Label text="Leaderboard by Mode" styleClass="lb-title"/>
+                                    <Region HBox.hgrow="ALWAYS"/>
+                                    <Button fx:id="clearScoresButton"
+                                            text="Clear"
+                                            onAction="#onClearScores"
+                                            styleClass="btn-ghost compact"
+                                            disable="true"
+                                            visible="false"
+                                            managed="false"/>
+                                </HBox>
+                                <Label text="Latest uploads per ruleset" styleClass="lb-subtitle"/>
+                            </VBox>
+                        </top>
+                        <center>
+                            <ScrollPane fitToWidth="true"
+                                        hbarPolicy="NEVER"
+                                        vbarPolicy="AS_NEEDED"
+                                        styleClass="lb-scroll">
+                                <content>
+                                    <VBox fx:id="leaderboardSections" spacing="16" styleClass="lb-sections"/>
+                                </content>
+                            </ScrollPane>
+                        </center>
+                        <bottom>
+                            <Label text="Scores update after each completed run."
+                                   wrapText="true"
+                                   styleClass="lb-footer"/>
+                        </bottom>
+                    </BorderPane>
                 </HBox>
-                <ScrollPane fitToWidth="true" hbarPolicy="NEVER" vbarPolicy="AS_NEEDED" styleClass="lb-scroll">
-                    <content>
-                        <VBox fx:id="leaderboardSections" spacing="16" styleClass="lb-sections"/>
-                    </content>
-                </ScrollPane>
-            </VBox>
-        </HBox>
+            </center>
+            <padding>
+                <Insets top="32" right="32" bottom="32" left="32"/>
+            </padding>
+        </BorderPane>
     </children>
-    <padding>
-        <Insets top="32" right="32" bottom="32" left="32"/>
-    </padding>
     <stylesheets>
         <URL value="@window_style.css"/>
     </stylesheets>

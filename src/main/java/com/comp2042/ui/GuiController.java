@@ -12,6 +12,7 @@ import com.comp2042.config.GameSettingsStore;
 import com.comp2042.config.ResourceManager;
 import com.comp2042.game.GameConfig;
 import com.comp2042.game.GameState;
+import com.comp2042.game.LevelProgression;
 import com.comp2042.game.Score;
 import com.comp2042.game.events.DownData;
 import com.comp2042.game.events.EventSource;
@@ -75,18 +76,8 @@ public class GuiController implements Initializable {
     private static final int BRICK_SIZE = 20;
     private static final int HIDDEN_ROWS = 2;
     private static final double GAME_OVER_GUIDE_OFFSET_ROWS = 0.5;
-    private static final double BASE_GRAVITY_INTERVAL_MS = 400;
-    private static final double MIN_GRAVITY_INTERVAL_MS = 80;
     private static final int TIMED_MODE_SECONDS = 180;
     private static final int FIXED_LINES_TARGET = 40;
-    private static final int LINES_PER_LEVEL = 1;
-    private static final double[] LEVEL_GRAVITY_MS = {
-            400, 390, 380, 370, 360, 350, 340, 330, 320, 310,
-            300, 290, 280, 270, 260, 250, 240, 230, 220, 210,
-            200, 190, 185, 180, 175, 170, 165, 160, 155, 150,
-            145, 140, 135, 130, 125, 120, 115, 110, 105, 100,
-            95, 90, 85, 80
-    };
     private static final Color OUTLINE_COLOR = Color.rgb(15, 15, 20, 0.7);
 
     @FXML
@@ -149,15 +140,15 @@ public class GuiController implements Initializable {
     private AutoRepeatHandler moveLeftRepeat;
     private AutoRepeatHandler moveRightRepeat;
     private AutoRepeatHandler softDropRepeat;
-    private int currentLevel = 1;
-    private int linesUntilNextLevel = LINES_PER_LEVEL;
-    private double currentGravityMs = BASE_GRAVITY_INTERVAL_MS;
+    private final LevelProgression levelProgression = new LevelProgression();
+    private double currentGravityMs = LevelProgression.DEFAULT_BASE_GRAVITY_MS;
     private final HighScoreService highScoreService = new HighScoreService();
     private final HelpContentProvider helpContentProvider = HelpContentProvider.getInstance();
     private Score boundScore;
     private Instant sessionStartInstant;
     private long lastSeed;
     private boolean lastSeedDeterministic;
+    private GameConfig activeGameConfig = GameConfig.defaultConfig();
     private GameConfig.GameMode gameMode = GameConfig.GameMode.ENDLESS;
     private Timeline modeTimer;
     private long remainingModeSeconds;
@@ -170,12 +161,21 @@ public class GuiController implements Initializable {
         gamePanel.requestFocus();
         StackPane.setAlignment(gamePanel, Pos.TOP_LEFT);
         StackPane.setAlignment(guidePane, Pos.TOP_LEFT);
+        StackPane.setAlignment(brickPanel, Pos.TOP_LEFT);
+        if (ghostPanel != null) {
+            StackPane.setAlignment(ghostPanel, Pos.TOP_LEFT);
+        }
         gamePanel.setOnKeyPressed(new EventHandler<KeyEvent>() {
             @Override
             public void handle(KeyEvent keyEvent) {
                 KeyCode code = keyEvent.getCode();
                 if (code == KeyCode.ESCAPE) {
                     handleEscapeKey();
+                    keyEvent.consume();
+                    return;
+                }
+                if (code == KeyCode.F1) {
+                    onShowHelp(null);
                     keyEvent.consume();
                     return;
                 }
@@ -286,8 +286,8 @@ public class GuiController implements Initializable {
             return;
         }
 
-        double cellWidth = brickPanel.getVgap() + BRICK_SIZE;
-        double cellHeight = brickPanel.getHgap() + BRICK_SIZE;
+        double cellWidth = brickPanel.getHgap() + BRICK_SIZE;
+        double cellHeight = brickPanel.getVgap() + BRICK_SIZE;
 
         // Calculate the position of the top-left of the grid (0,0) in scene coordinates
         // gamePanel contains the visible board (rows 2 to 21).
@@ -461,6 +461,10 @@ public class GuiController implements Initializable {
     public void setGameMode(GameConfig.GameMode mode) {
         this.gameMode = mode != null ? mode : GameConfig.GameMode.ENDLESS;
         updateModeStatus();
+    }
+
+    public void setActiveGameConfig(GameConfig config) {
+        this.activeGameConfig = config != null ? config : GameConfig.defaultConfig();
     }
 
     public void setGameSettings(GameSettings settings) {
@@ -645,6 +649,7 @@ public class GuiController implements Initializable {
             Parent menuRoot = loader.load();
             StartMenuController menuController = loader.getController();
             menuController.setPrimaryStage(primaryStage);
+            menuController.setGameConfig(activeGameConfig);
             Scene currentScene = primaryStage.getScene();
             double width = currentScene != null ? currentScene.getWidth() : StartMenuController.MENU_WINDOW_WIDTH;
             double height = currentScene != null ? currentScene.getHeight() : StartMenuController.MENU_WINDOW_HEIGHT;
@@ -780,12 +785,20 @@ public class GuiController implements Initializable {
     }
 
     private void resetLevelTracking() {
-        currentLevel = 1;
-        linesUntilNextLevel = LINES_PER_LEVEL;
-        currentGravityMs = resolveGravityInterval(currentLevel);
-        setLevel(currentLevel);
-        applyGravityInterval();
-        updateSoftDropRepeatInterval();
+        LevelProgression.LevelState state = levelProgression.reset();
+        applyLevelState(state, true);
+    }
+
+    private void applyLevelState(LevelProgression.LevelState state, boolean updateTiming) {
+        if (state == null) {
+            return;
+        }
+        currentGravityMs = state.gravityIntervalMs();
+        setLevel(state.level());
+        if (updateTiming) {
+            applyGravityInterval();
+            updateSoftDropRepeatInterval();
+        }
     }
 
     private void applyGravityInterval() {
@@ -815,30 +828,11 @@ public class GuiController implements Initializable {
         if (removed <= 0) {
             return;
         }
-        linesUntilNextLevel -= removed;
-        boolean leveledUp = false;
-        while (linesUntilNextLevel <= 0) {
-            currentLevel++;
-            linesUntilNextLevel += LINES_PER_LEVEL;
-            leveledUp = true;
-        }
-        if (leveledUp) {
-            setLevel(currentLevel);
-            currentGravityMs = resolveGravityInterval(currentLevel);
-            applyGravityInterval();
-            updateSoftDropRepeatInterval();
+        LevelProgression.LevelState state = levelProgression.handleLinesCleared(removed);
+        if (state.leveledUp()) {
+            applyLevelState(state, true);
         }
         handleModeLineProgress(removed);
-    }
-
-    private double resolveGravityInterval(int level) {
-        if (level <= 0) {
-            return BASE_GRAVITY_INTERVAL_MS;
-        }
-        if (level > LEVEL_GRAVITY_MS.length) {
-            return MIN_GRAVITY_INTERVAL_MS;
-        }
-        return Math.max(MIN_GRAVITY_INTERVAL_MS, LEVEL_GRAVITY_MS[level - 1]);
     }
 
     @FXML
@@ -1142,4 +1136,5 @@ public class GuiController implements Initializable {
     private GameConfig.GameMode resolveCurrentMode() {
         return gameMode != null ? gameMode : GameConfig.GameMode.ENDLESS;
     }
+
 }

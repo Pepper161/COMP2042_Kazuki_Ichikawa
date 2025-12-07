@@ -11,13 +11,17 @@ import javafx.stage.Stage;
 import java.net.URL;
 import java.util.Map;
 
+import javafx.scene.paint.Color;
+
 /**
- * JavaFX entry point that loads the start menu and wires it to the primary stage.
+ * JavaFX entry point that loads the start menu and wires it to the primary
+ * stage.
  */
 public class Main extends Application {
 
     /**
-     * Bootstraps the start menu scene and hands the primary stage to the controller.
+     * Bootstraps the start menu scene and hands the primary stage to the
+     * controller.
      *
      * @param primaryStage the stage created by the JavaFX runtime
      */
@@ -33,6 +37,7 @@ public class Main extends Application {
 
         primaryStage.setTitle("TetrisJFX");
         Scene scene = new Scene(root, StartMenuController.MENU_WINDOW_WIDTH, StartMenuController.MENU_WINDOW_HEIGHT);
+        scene.setFill(Color.web("#04060b"));
         primaryStage.setScene(scene);
         primaryStage.show();
     }

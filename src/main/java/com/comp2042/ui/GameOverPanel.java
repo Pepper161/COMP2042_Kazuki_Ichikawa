@@ -5,6 +5,7 @@ import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
 import java.util.List;
@@ -24,6 +25,7 @@ public class GameOverPanel extends BorderPane {
     private static final String DEFAULT_LEADERBOARD_TITLE = "Top Scores";
     private final Label seedLabel = new Label();
     private final Label outcomeLabel = new Label(DEFAULT_OUTCOME_MESSAGE);
+    private final Label summaryLabel = new Label("Drop back in when you're ready.");
     private final Label leaderboardTitle = new Label(DEFAULT_LEADERBOARD_TITLE);
     private final VBox leaderboardContainer = new VBox(4);
     private final Label emptyLeaderboardLabel = new Label("No runs recorded yet.");
@@ -32,6 +34,9 @@ public class GameOverPanel extends BorderPane {
         outcomeLabel.getStyleClass().addAll("overlay-title", "danger");
         seedLabel.getStyleClass().add("seedLabel");
         seedLabel.setVisible(false);
+
+        summaryLabel.getStyleClass().add("sidebar-hint");
+        summaryLabel.setWrapText(true);
 
         leaderboardTitle.getStyleClass().add("menu-subtitle");
         emptyLeaderboardLabel.getStyleClass().add("leaderboard-placeholder");
@@ -49,12 +54,18 @@ public class GameOverPanel extends BorderPane {
         exitButton.getStyleClass().add("btn-danger");
         exitButton.setOnAction(event -> onExit.run());
 
-        VBox leaderboardBox = new VBox(6, leaderboardTitle, emptyLeaderboardLabel, leaderboardContainer);
-        leaderboardBox.setAlignment(Pos.CENTER);
+        VBox headerBox = new VBox(6, outcomeLabel, summaryLabel, seedLabel);
+        headerBox.setAlignment(Pos.CENTER);
 
-        VBox container = new VBox(18, outcomeLabel, seedLabel, leaderboardBox, restartButton, menuButton, exitButton);
+        VBox leaderboardBox = new VBox(6, leaderboardTitle, emptyLeaderboardLabel, leaderboardContainer);
+        leaderboardBox.setAlignment(Pos.CENTER_LEFT);
+
+        HBox buttonRow = new HBox(12, restartButton, menuButton, exitButton);
+        buttonRow.setAlignment(Pos.CENTER);
+
+        VBox container = new VBox(18, headerBox, leaderboardBox, buttonRow);
         container.setAlignment(Pos.CENTER);
-        container.setFillWidth(false);
+        container.setFillWidth(true);
 
         setCenter(container);
         getStyleClass().add("game-over-panel");

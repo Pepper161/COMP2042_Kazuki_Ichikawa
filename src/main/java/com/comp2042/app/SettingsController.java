@@ -14,6 +14,7 @@ import javafx.scene.input.KeyCode;
 import javafx.stage.Stage;
 
 import java.util.EnumMap;
+import java.util.EnumSet;
 import java.util.Map;
 import java.util.Optional;
 
@@ -182,8 +183,13 @@ public class SettingsController {
                 : GameSettings.ColorAssistMode.CLASSIC;
         builder.setColorAssistMode(assistMode);
         builder.setPieceOutlineEnabled(outlineCheckBox != null && outlineCheckBox.isSelected());
+        EnumSet<KeyCode> usedKeys = EnumSet.noneOf(KeyCode.class);
         for (Map.Entry<GameSettings.Action, TextField> entry : keyFields.entrySet()) {
-            builder.setKey(entry.getKey(), parseKey(entry.getValue(), entry.getKey().name()));
+            KeyCode keyCode = parseKey(entry.getValue(), entry.getKey().name());
+            if (!usedKeys.add(keyCode)) {
+                throw new IllegalArgumentException("キー設定が重複しています: " + keyCode.name());
+            }
+            builder.setKey(entry.getKey(), keyCode);
         }
         return builder.build();
     }

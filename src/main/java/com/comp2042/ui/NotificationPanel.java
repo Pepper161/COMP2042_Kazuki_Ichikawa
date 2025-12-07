@@ -15,13 +15,18 @@ import javafx.scene.paint.Color;
 import javafx.util.Duration;
 
 /**
- * Disposable overlay used to show combo/bonus notifications above the playfield.
+ * Disposable overlay used to show combo/bonus notifications above the
+ * playfield.
  */
 public class NotificationPanel extends BorderPane {
 
     public NotificationPanel(String text) {
         setMinHeight(200);
         setMinWidth(220);
+        setMouseTransparent(true);
+        setPickOnBounds(false);
+        setBackground(javafx.scene.layout.Background.EMPTY);
+        getStyleClass().add("notification-panel");
         final Label score = new Label(text);
         score.getStyleClass().add("bonusStyle");
         final Effect glow = new Glow(0.6);

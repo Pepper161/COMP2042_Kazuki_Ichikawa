@@ -8,7 +8,11 @@ import java.time.format.DateTimeFormatter;
 import java.util.Objects;
 
 /**
- * Immutable value object describing a single leaderboard row.
+ * Immutable value object describing a single leaderboard row (score, mode, clear time, timestamp).
+ * <p>
+ * Instances are normally created by {@link HighScoreService} when a game completes but the class also exposes
+ * {@link #recreate(int, String, long, long)} for reconstructing entries from disk.
+ * </p>
  */
 public final class HighScoreEntry {
 
@@ -27,12 +31,29 @@ public final class HighScoreEntry {
         this.recordedAtMillis = recordedAtMillis;
     }
 
+    /**
+     * Creates a fresh entry at the current timestamp from runtime results.
+     *
+     * @param score            achieved score
+     * @param mode             display label describing the active {@code GameMode}
+     * @param duration         elapsed gameplay duration; may be {@code null}
+     * @return immutable leaderboard entry
+     */
     public static HighScoreEntry create(int score, String mode, Duration duration) {
         long recordedAt = System.currentTimeMillis();
         long seconds = duration != null ? Math.max(0L, duration.toSeconds()) : 0L;
         return new HighScoreEntry(score, normalizeMode(mode), seconds, recordedAt);
     }
 
+    /**
+     * Rebuilds an entry from persisted fields.
+     *
+     * @param score            stored score
+     * @param mode             stored mode label
+     * @param durationSeconds  stored duration in seconds
+     * @param recordedAtMillis stored timestamp in millis since epoch
+     * @return immutable leaderboard entry
+     */
     public static HighScoreEntry recreate(int score, String mode, long durationSeconds, long recordedAtMillis) {
         return new HighScoreEntry(score, normalizeMode(mode), durationSeconds, recordedAtMillis);
     }
@@ -57,6 +78,11 @@ public final class HighScoreEntry {
         return Instant.ofEpochMilli(recordedAtMillis);
     }
 
+    /**
+     * Formats the duration as either {@code HH:mm:ss} or {@code mm:ss} depending on the length.
+     *
+     * @return human readable elapsed time
+     */
     public String formattedDuration() {
         long totalSeconds = Math.max(0L, durationSeconds);
         long hours = totalSeconds / 3600;
@@ -68,6 +94,11 @@ public final class HighScoreEntry {
         return String.format("%02d:%02d", minutes, seconds);
     }
 
+    /**
+     * Formats the timestamp using the JVM's default time zone for display in the leaderboard.
+     *
+     * @return formatted timestamp string
+     */
     public String formattedTimestamp() {
         LocalDateTime dateTime = LocalDateTime.ofInstant(getRecordedAtInstant(), ZoneId.systemDefault());
         return TIMESTAMP_FORMAT.format(dateTime);

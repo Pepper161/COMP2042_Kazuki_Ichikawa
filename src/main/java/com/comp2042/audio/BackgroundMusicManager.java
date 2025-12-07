@@ -5,10 +5,12 @@ import javafx.application.Platform;
 import javafx.scene.media.AudioClip;
 
 import java.net.URL;
+import java.util.Optional;
 
 /**
- * Singleton helper that loops menu / gameplay music and allows toggling BGM
- * globally.
+ * Singleton helper that loops menu / gameplay music, exposes quick FX triggers, and gracefully handles missing assets.
+ * All audio retrieval happens lazily, so missing WAV files or codec issues simply disable the respective sound instead
+ * of crashing the UI. Calls are marshalled to the JavaFX thread to keep Media APIs happy.
  */
 public final class BackgroundMusicManager {
 
@@ -18,27 +20,35 @@ public final class BackgroundMusicManager {
     }
 
     private static final BackgroundMusicManager INSTANCE = new BackgroundMusicManager();
+    private static final double DEFAULT_MASTER_VOLUME = 0.35;
+    private static final double GAME_OVER_VOLUME_MULTIPLIER = 1.2;
+    private static final double LINE_CLEAR_VOLUME_MULTIPLIER = 0.8;
 
     private final AudioClip menuClip;
     private final AudioClip gameClip;
     private final AudioClip gameOverClip;
     private final AudioClip lineClearClip;
-    private AudioClip currentClip;
+    private volatile AudioClip currentClip;
     private Mode currentMode = Mode.MENU;
-    private boolean backgroundEnabled = true;
-    private double masterVolume = 0.35;
+    private volatile boolean backgroundEnabled = true;
+    private volatile double masterVolume = DEFAULT_MASTER_VOLUME;
 
     private BackgroundMusicManager() {
         menuClip = createLoopingClip(ResourceManager.Asset.AUDIO_MENU_THEME);
         gameClip = createLoopingClip(ResourceManager.Asset.AUDIO_GAME_THEME);
-        gameOverClip = createSingleShotClip(ResourceManager.Asset.AUDIO_GAME_OVER, 1.2);
-        lineClearClip = createSingleShotClip(ResourceManager.Asset.AUDIO_LINE_CLEAR, 0.8);
+        gameOverClip = createEffectClip(ResourceManager.Asset.AUDIO_GAME_OVER, GAME_OVER_VOLUME_MULTIPLIER);
+        lineClearClip = createEffectClip(ResourceManager.Asset.AUDIO_LINE_CLEAR, LINE_CLEAR_VOLUME_MULTIPLIER);
     }
 
     public static BackgroundMusicManager getInstance() {
         return INSTANCE;
     }
 
+    /**
+     * Enables or disables looping BGM. Disabling will stop the active clip immediately.
+     *
+     * @param enabled whether BGM should be audible
+     */
     public void setEnabled(boolean enabled) {
         boolean wasEnabled = this.backgroundEnabled;
         this.backgroundEnabled = enabled;
@@ -49,48 +59,54 @@ public final class BackgroundMusicManager {
         }
     }
 
+    /**
+     * Switches to the menu theme (looping).
+     */
     public void playMenuTheme() {
         currentMode = Mode.MENU;
         playClip(menuClip);
     }
 
+    /**
+     * Switches to the gameplay loop.
+     */
     public void playGameTheme() {
         currentMode = Mode.GAME;
         playClip(gameClip);
     }
 
+    /**
+     * Plays the one-shot game over jingle if available.
+     */
     public void playGameOverJingle() {
-        if (gameOverClip == null) {
-            return;
-        }
-        runOnFxThread(() -> {
-            try {
-                gameOverClip.stop();
-                gameOverClip.play();
-            } catch (Exception e) {
-                System.err.println("[Audio] Failed to play game over jingle: " + e.getMessage());
-            }
-        });
+        playOneShot(gameOverClip, "game over jingle");
     }
 
+    /**
+     * Plays the one-shot line clear sound if available.
+     */
     public void playLineClear() {
-        if (lineClearClip == null) {
-            return;
-        }
-        runOnFxThread(() -> {
-            try {
-                lineClearClip.stop();
-                lineClearClip.play();
-            } catch (Exception e) {
-                System.err.println("[Audio] Failed to play line clear sound: " + e.getMessage());
-            }
-        });
+        playOneShot(lineClearClip, "line clear sound");
     }
 
+    /**
+     * Updates the global master volume (0.0 - 1.0) and reapplies it to the cached clips.
+     *
+     * @param volume normalized volume
+     */
     public void setMasterVolume(double volume) {
         masterVolume = Math.max(0.0, Math.min(1.0, volume));
         applyVolume(menuClip);
         applyVolume(gameClip);
+        applyVolume(gameOverClip, GAME_OVER_VOLUME_MULTIPLIER);
+        applyVolume(lineClearClip, LINE_CLEAR_VOLUME_MULTIPLIER);
+    }
+
+    /**
+     * Stops the currently playing background loop, if any.
+     */
+    public void stopBackgroundMusic() {
+        stopCurrent();
     }
 
     private void resumeCurrentMode() {
@@ -108,13 +124,13 @@ public final class BackgroundMusicManager {
         }
         runOnFxThread(() -> {
             try {
-                if (currentClip != null && currentClip != clip) {
-                    currentClip.stop();
+                AudioClip activeClip = currentClip;
+                if (activeClip != null && activeClip != clip) {
+                    activeClip.stop();
                 }
                 currentClip = clip;
-                if (currentClip != null) {
-                    currentClip.stop();
-                    currentClip.play();
+                if (!clip.isPlaying()) {
+                    clip.play();
                 }
             } catch (Exception e) {
                 System.err.println("[Audio] Failed to switch BGM: " + e.getMessage());
@@ -122,49 +138,83 @@ public final class BackgroundMusicManager {
         });
     }
 
-    public void stopBackgroundMusic() {
-        stopCurrent();
-    }
-
-    private void stopCurrent() {
-        if (currentClip == null) {
+    private void playOneShot(AudioClip clip, String clipLabel) {
+        if (clip == null) {
             return;
         }
         runOnFxThread(() -> {
             try {
-                if (currentClip != null) {
-                    currentClip.stop();
-                }
+                clip.stop();
+                clip.play();
             } catch (Exception e) {
-                System.err.println("[Audio] Failed to stop BGM: " + e.getMessage());
+                System.err.println("[Audio] Failed to play " + clipLabel + ": " + e.getMessage());
             }
         });
-        currentClip = null;
+    }
+
+    private void stopCurrent() {
+        AudioClip clip = currentClip;
+        if (clip == null) {
+            return;
+        }
+        runOnFxThread(() -> {
+            try {
+                clip.stop();
+            } catch (Exception e) {
+                System.err.println("[Audio] Failed to stop BGM: " + e.getMessage());
+            } finally {
+                if (currentClip == clip) {
+                    currentClip = null;
+                }
+            }
+        });
     }
 
     private AudioClip createLoopingClip(ResourceManager.Asset asset) {
-        URL resource = ResourceManager.getUrl(asset);
-        AudioClip clip = new AudioClip(resource.toExternalForm());
-        clip.setCycleCount(AudioClip.INDEFINITE);
-        applyVolume(clip);
-        return clip;
+        return createClip(asset, AudioClip.INDEFINITE, 1.0);
     }
 
-    private AudioClip createSingleShotClip(ResourceManager.Asset asset, double volumeMultiplier) {
-        URL resource = ResourceManager.getUrl(asset);
-        AudioClip clip = new AudioClip(resource.toExternalForm());
-        clip.setCycleCount(1);
-        clip.setVolume(Math.max(0.0, Math.min(1.0, masterVolume * volumeMultiplier)));
-        return clip;
+    private AudioClip createEffectClip(ResourceManager.Asset asset, double volumeMultiplier) {
+        return createClip(asset, 1, volumeMultiplier);
+    }
+
+    private AudioClip createClip(ResourceManager.Asset asset, int cycles, double multiplier) {
+        Optional<URL> resource = ResourceManager.findUrl(asset);
+        if (resource.isEmpty()) {
+            System.err.println("[Audio] Missing resource: " + asset.path());
+            return null;
+        }
+        try {
+            AudioClip clip = new AudioClip(resource.get().toExternalForm());
+            clip.setCycleCount(cycles);
+            applyVolume(clip, multiplier);
+            return clip;
+        } catch (RuntimeException ex) {
+            System.err.println("[Audio] Failed to load clip " + asset.path() + ": " + ex.getMessage());
+            return null;
+        }
     }
 
     private void applyVolume(AudioClip clip) {
-        if (clip != null) {
-            clip.setVolume(masterVolume);
+        applyVolume(clip, 1.0);
+    }
+
+    private void applyVolume(AudioClip clip, double multiplier) {
+        if (clip == null) {
+            return;
+        }
+        double clamped = Math.max(0.0, Math.min(1.0, masterVolume * multiplier));
+        try {
+            clip.setVolume(clamped);
+        } catch (Exception ex) {
+            System.err.println("[Audio] Failed to apply volume: " + ex.getMessage());
         }
     }
 
     private void runOnFxThread(Runnable action) {
+        if (action == null) {
+            return;
+        }
         if (Platform.isFxApplicationThread()) {
             action.run();
         } else {

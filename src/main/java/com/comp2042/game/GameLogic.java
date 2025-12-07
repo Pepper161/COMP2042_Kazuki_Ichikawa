@@ -92,7 +92,6 @@ public class GameLogic {
         if (dropDistance > 0) {
             board.getScore().add(dropDistance * HARD_DROP_POINTS_PER_CELL);
         }
-        lastAction = LastAction.MOVE;
         ClearRow clearRow = lockCurrentPiece();
         return new DownData(clearRow, board.getViewData());
     }

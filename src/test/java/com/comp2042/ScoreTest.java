@@ -15,7 +15,7 @@ class ScoreTest {
         score.handleLineClear(new LineClearStats(LineClearType.SINGLE, 1));
         score.handleLineClear(new LineClearStats(LineClearType.SINGLE, 1));
         assertEquals(2, score.comboProperty().get());
-        assertEquals(250, score.scoreProperty().get());
+        assertEquals(100, score.scoreProperty().get());
     }
 
     @Test
@@ -41,19 +41,20 @@ class ScoreTest {
     void tSpinScoresCorrectBaseValue() {
         Score score = new Score();
         score.handleLineClear(new LineClearStats(LineClearType.T_SPIN_DOUBLE, 2));
-        assertEquals(1200, score.scoreProperty().get());
+        assertEquals(200, score.scoreProperty().get());
     }
 
     @Test
-    void backToBackAwardsFiftyPercentBonus() {
+    void backToBackNoLongerAffectsScoreButStillTracksStreak() {
         Score score = new Score();
         score.handleLineClear(new LineClearStats(LineClearType.TETRIS, 4));
         assertEquals(800, score.scoreProperty().get());
+        assertEquals(1, score.backToBackProperty().get());
 
         score.handleLineClear(new LineClearStats(LineClearType.TETRIS, 4));
 
-        assertEquals(2050, score.scoreProperty().get(),
-                "Second Tetris should include B2B bonus (+400) and combo bonus (+50)");
+        assertEquals(1600, score.scoreProperty().get());
+        assertEquals(2, score.backToBackProperty().get());
     }
 
     @Test
