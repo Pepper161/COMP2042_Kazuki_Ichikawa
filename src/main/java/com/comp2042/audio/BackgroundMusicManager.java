@@ -8,14 +8,26 @@ import java.net.URL;
 import java.util.Optional;
 
 /**
- * Singleton helper that loops menu / gameplay music, exposes quick FX triggers, and gracefully handles missing assets.
- * All audio retrieval happens lazily, so missing WAV files or codec issues simply disable the respective sound instead
- * of crashing the UI. Calls are marshalled to the JavaFX thread to keep Media APIs happy.
+ * Singleton helper that loops menu / gameplay music, exposes quick FX triggers,
+ * and gracefully handles missing assets.
+ * All audio retrieval happens lazily, so missing WAV files or codec issues
+ * simply disable the respective sound instead
+ * of crashing the UI. Calls are marshalled to the JavaFX thread to keep Media
+ * APIs happy.
  */
 public final class BackgroundMusicManager {
 
+    /**
+     * Represents the current audio context (Menu or Game).
+     */
     public enum Mode {
+        /**
+         * Background music for the main menu and settings.
+         */
         MENU,
+        /**
+         * Background music for active gameplay.
+         */
         GAME
     }
 
@@ -40,12 +52,18 @@ public final class BackgroundMusicManager {
         lineClearClip = createEffectClip(ResourceManager.Asset.AUDIO_LINE_CLEAR, LINE_CLEAR_VOLUME_MULTIPLIER);
     }
 
+    /**
+     * Returns the singleton instance of the music manager.
+     *
+     * @return the singleton instance
+     */
     public static BackgroundMusicManager getInstance() {
         return INSTANCE;
     }
 
     /**
-     * Enables or disables looping BGM. Disabling will stop the active clip immediately.
+     * Enables or disables looping BGM. Disabling will stop the active clip
+     * immediately.
      *
      * @param enabled whether BGM should be audible
      */
@@ -90,7 +108,8 @@ public final class BackgroundMusicManager {
     }
 
     /**
-     * Updates the global master volume (0.0 - 1.0) and reapplies it to the cached clips.
+     * Updates the global master volume (0.0 - 1.0) and reapplies it to the cached
+     * clips.
      *
      * @param volume normalized volume
      */

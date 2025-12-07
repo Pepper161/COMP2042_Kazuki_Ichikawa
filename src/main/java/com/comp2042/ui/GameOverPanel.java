@@ -126,6 +126,11 @@ public class GameOverPanel extends BorderPane {
         outcomeLabel.setText(text);
     }
 
+    /**
+     * Updates the title text displayed above the leaderboard section.
+     *
+     * @param title the new title text
+     */
     public void setLeaderboardTitle(String title) {
         String text = (title == null || title.isBlank()) ? DEFAULT_LEADERBOARD_TITLE : title;
         leaderboardTitle.setText(text);

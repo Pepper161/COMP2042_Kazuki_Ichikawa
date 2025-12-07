@@ -17,11 +17,24 @@ public class AutoRepeatHandler {
     private Duration arrDuration = Duration.millis(30);
     private Duration dasDuration = Duration.millis(150);
 
+    /**
+     * Creates a new handler with the specified action and timing configuration.
+     *
+     * @param action      the runnable to execute on repeat
+     * @param dasDuration the initial delay before repeating starts
+     * @param arrDuration the interval between repeats
+     */
     public AutoRepeatHandler(Runnable action, Duration dasDuration, Duration arrDuration) {
         this.action = action;
         configure(dasDuration, arrDuration);
     }
 
+    /**
+     * Updates the timing configuration.
+     *
+     * @param dasDuration the new initial delay
+     * @param arrDuration the new repeat interval
+     */
     public void configure(Duration dasDuration, Duration arrDuration) {
         stop();
         this.dasDuration = dasDuration != null ? dasDuration : Duration.ZERO;
@@ -41,6 +54,9 @@ public class AutoRepeatHandler {
         });
     }
 
+    /**
+     * Triggers the action immediately and starts the DAS/ARR cycle.
+     */
     public void start() {
         stop();
         action.run();
@@ -54,6 +70,9 @@ public class AutoRepeatHandler {
         }
     }
 
+    /**
+     * Stops any active repeat cycles.
+     */
     public void stop() {
         delayTransition.stop();
         if (repeatTimeline != null) {
