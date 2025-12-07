@@ -59,9 +59,12 @@ public class SettingsController {
     private final Map<GameSettings.Action, TextField> keyFields = new EnumMap<>(GameSettings.Action.class);
     private final GameSettingsStore store = new GameSettingsStore();
     private final Map<String, String> infoMessages = Map.ofEntries(
-            Map.entry("info-das", "Delayed Auto Shift (DAS): delay before a held move key begins repeating. Larger values feel heavier."),
-            Map.entry("info-arr", "Auto Repeat Rate (ARR): interval between repeated moves after DAS. Smaller values slide pieces faster."),
-            Map.entry("info-sdf", "Soft Drop multiplier: scales how quickly the piece falls while holding the soft drop key."),
+            Map.entry("info-das",
+                    "Delayed Auto Shift (DAS): delay before a held move key begins repeating. Larger values feel heavier."),
+            Map.entry("info-arr",
+                    "Auto Repeat Rate (ARR): interval between repeated moves after DAS. Smaller values slide pieces faster."),
+            Map.entry("info-sdf",
+                    "Soft Drop multiplier: scales how quickly the piece falls while holding the soft drop key."),
             Map.entry("info-move-left", "Move Left: shifts the active piece one column to the left."),
             Map.entry("info-move-right", "Move Right: shifts the active piece one column to the right."),
             Map.entry("info-soft-drop", "Soft Drop: manually speeds up the descent without forcing a lock."),
@@ -69,9 +72,10 @@ public class SettingsController {
             Map.entry("info-rotate-cw", "Rotate CW: clockwise rotation (90° to the right)."),
             Map.entry("info-rotate-ccw", "Rotate CCW: counter-clockwise rotation (90° to the left)."),
             Map.entry("info-new-game", "New Game: resets the playfield immediately and starts a new run."),
-            Map.entry("info-color-assist", "Use High Contrast to apply bold palettes and stripe patterns tailored for common color vision deficiencies."),
-            Map.entry("info-outline", "Adds a dark outline around pieces and previews so shapes remain readable regardless of fill colour.")
-    );
+            Map.entry("info-color-assist",
+                    "Use High Contrast to apply bold palettes and stripe patterns tailored for common color vision deficiencies."),
+            Map.entry("info-outline",
+                    "Adds a dark outline around pieces and previews so shapes remain readable regardless of fill colour."));
 
     private GameSettings initialSettings = GameSettings.defaultSettings();
     private GameSettings resultSettings;
@@ -95,11 +99,18 @@ public class SettingsController {
         if (bgmVolumeSlider != null) {
             bgmVolumeSlider.setMin(0);
             bgmVolumeSlider.setMax(100);
+            bgmVolumeSlider.valueProperty().addListener((obs, oldVal, newVal) -> {
+                com.comp2042.audio.BackgroundMusicManager.getInstance().setMasterVolume(newVal.doubleValue() / 100.0);
+            });
         }
     }
 
     public void setDialogStage(Stage dialogStage) {
         this.dialogStage = dialogStage;
+        // Revert volume if closed via X button
+        this.dialogStage.setOnCloseRequest(e -> {
+            com.comp2042.audio.BackgroundMusicManager.getInstance().setMasterVolume(initialSettings.getBgmVolume());
+        });
     }
 
     public void setInitialSettings(GameSettings settings) {
@@ -127,6 +138,8 @@ public class SettingsController {
 
     @FXML
     private void onCancel(ActionEvent event) {
+        // Revert volume to initial state
+        com.comp2042.audio.BackgroundMusicManager.getInstance().setMasterVolume(initialSettings.getBgmVolume());
         resultSettings = null;
         if (dialogStage != null) {
             dialogStage.close();
@@ -137,6 +150,10 @@ public class SettingsController {
     private void onResetDefaults(ActionEvent event) {
         GameSettings defaults = GameSettings.defaultSettings();
         setInitialSettings(defaults);
+        // Also apply default volume immediately for preview
+        if (bgmVolumeSlider != null) {
+            bgmVolumeSlider.setValue(defaults.getBgmVolume() * 100.0);
+        }
         statusLabel.setText("Default values restored.");
     }
 
