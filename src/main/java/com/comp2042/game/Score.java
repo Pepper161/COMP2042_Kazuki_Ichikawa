@@ -8,7 +8,7 @@ import javafx.beans.property.SimpleIntegerProperty;
  */
 public final class Score {
 
-    private static final int COMBO_STEP = 50;
+    private static final int BASE_LINE_SCORE = 50;
 
     private final IntegerProperty score = new SimpleIntegerProperty(0);
     private final IntegerProperty combo = new SimpleIntegerProperty(0);
@@ -34,14 +34,13 @@ public final class Score {
     public void handleLineClear(LineClearStats stats) {
         if (stats == null || stats.getLinesCleared() <= 0 || stats.getClearType() == LineClearType.NONE) {
             combo.set(0);
+            resetBackToBack();
             return;
         }
 
         combo.set(combo.get() + 1);
-        int base = stats.getClearType().getBaseScore();
-        int scoreWithB2B = applyBackToBack(base, stats.getClearType().isBackToBackEligible());
-        int comboBonus = combo.get() > 1 ? (combo.get() - 1) * COMBO_STEP : 0;
-        add(scoreWithB2B + comboBonus);
+        updateBackToBack(stats.getClearType());
+        add(calculateFlatScore(stats.getLinesCleared()));
     }
 
     public void reset() {
@@ -51,20 +50,25 @@ public final class Score {
         backToBackActive = false;
     }
 
-    private int applyBackToBack(int base, boolean eligible) {
-        if (!eligible) {
-            backToBackActive = false;
-            backToBack.set(0);
-            return base;
+    private void resetBackToBack() {
+        backToBackActive = false;
+        backToBack.set(0);
+    }
+
+    private void updateBackToBack(LineClearType clearType) {
+        if (clearType == null || !clearType.isBackToBackEligible()) {
+            resetBackToBack();
+            return;
         }
         if (backToBackActive) {
             backToBack.set(backToBack.get() + 1);
-            int bonus = Math.round(base * 0.5f);
-            return base + bonus;
         } else {
             backToBackActive = true;
             backToBack.set(1);
-            return base;
         }
+    }
+
+    private int calculateFlatScore(int lines) {
+        return BASE_LINE_SCORE * lines * lines;
     }
 }
