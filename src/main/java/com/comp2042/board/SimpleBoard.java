@@ -11,7 +11,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * Default {@link Board} implementation that holds the matrix state, active tetromino,
+ * Default {@link Board} implementation that holds the matrix state, active
+ * tetromino,
  * and helper objects (rotator/generator) needed for Guideline playfields.
  */
 public class SimpleBoard implements Board {
@@ -36,7 +37,7 @@ public class SimpleBoard implements Board {
         this.width = width;
         this.height = height;
         this.brickGenerator = brickGenerator != null ? brickGenerator : new PieceGenerator();
-        this.currentGameMatrix = new int[width][height];
+        this.currentGameMatrix = new int[height][width];
         this.brickRotator = new BrickRotator();
         this.score = new Score();
     }
@@ -46,7 +47,8 @@ public class SimpleBoard implements Board {
         int[][] currentMatrix = MatrixOperations.copy(currentGameMatrix);
         Point p = new Point(currentOffset);
         p.translate(0, 1);
-        boolean conflict = MatrixOperations.intersect(currentMatrix, brickRotator.getCurrentShape(), (int) p.getX(), (int) p.getY());
+        boolean conflict = MatrixOperations.intersect(currentMatrix, brickRotator.getCurrentShape(), (int) p.getX(),
+                (int) p.getY());
         if (conflict) {
             return false;
         } else {
@@ -55,13 +57,13 @@ public class SimpleBoard implements Board {
         }
     }
 
-
     @Override
     public boolean moveBrickLeft() {
         int[][] currentMatrix = MatrixOperations.copy(currentGameMatrix);
         Point p = new Point(currentOffset);
         p.translate(-1, 0);
-        boolean conflict = MatrixOperations.intersect(currentMatrix, brickRotator.getCurrentShape(), (int) p.getX(), (int) p.getY());
+        boolean conflict = MatrixOperations.intersect(currentMatrix, brickRotator.getCurrentShape(), (int) p.getX(),
+                (int) p.getY());
         if (conflict) {
             return false;
         } else {
@@ -75,7 +77,8 @@ public class SimpleBoard implements Board {
         int[][] currentMatrix = MatrixOperations.copy(currentGameMatrix);
         Point p = new Point(currentOffset);
         p.translate(1, 0);
-        boolean conflict = MatrixOperations.intersect(currentMatrix, brickRotator.getCurrentShape(), (int) p.getX(), (int) p.getY());
+        boolean conflict = MatrixOperations.intersect(currentMatrix, brickRotator.getCurrentShape(), (int) p.getX(),
+                (int) p.getY());
         if (conflict) {
             return false;
         } else {
@@ -100,7 +103,8 @@ public class SimpleBoard implements Board {
         brickRotator.setBrick(currentBrick);
         int spawnColumn = Math.max(0, (currentGameMatrix[0].length / 2) - 1);
         currentOffset = new Point(spawnColumn, SPAWN_ROW);
-        return MatrixOperations.intersect(currentGameMatrix, brickRotator.getCurrentShape(), (int) currentOffset.getX(), (int) currentOffset.getY());
+        return MatrixOperations.intersect(currentGameMatrix, brickRotator.getCurrentShape(), (int) currentOffset.getX(),
+                (int) currentOffset.getY());
     }
 
     @Override
@@ -122,7 +126,8 @@ public class SimpleBoard implements Board {
 
     @Override
     public void mergeBrickToBackground() {
-        currentGameMatrix = MatrixOperations.merge(currentGameMatrix, brickRotator.getCurrentShape(), (int) currentOffset.getX(), (int) currentOffset.getY());
+        currentGameMatrix = MatrixOperations.merge(currentGameMatrix, brickRotator.getCurrentShape(),
+                (int) currentOffset.getX(), (int) currentOffset.getY());
     }
 
     @Override
@@ -138,10 +143,9 @@ public class SimpleBoard implements Board {
         return score;
     }
 
-
     @Override
     public void newGame() {
-        currentGameMatrix = new int[width][height];
+        currentGameMatrix = new int[height][width];
         score.reset();
         brickGenerator.reset();
         createNewBrick();

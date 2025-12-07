@@ -11,7 +11,8 @@ import com.comp2042.logic.bricks.PieceGenerator;
 import com.comp2042.ui.GuiController;
 
 /**
- * Wires {@link GuiController} input callbacks to {@link GameLogic} and keeps the board/score in sync.
+ * Wires {@link GuiController} input callbacks to {@link GameLogic} and keeps
+ * the board/score in sync.
  */
 public class GameController implements InputEventListener {
 
@@ -28,11 +29,12 @@ public class GameController implements InputEventListener {
         generator = this.config.seedOverride().isPresent()
                 ? new PieceGenerator(this.config.seedOverride().getAsLong())
                 : new PieceGenerator();
-        board = new SimpleBoard(25, 10, generator);
+        board = new SimpleBoard(10, 22, generator);
         logic = new GameLogic(board);
         board.createNewBrick();
         viewGuiController.setEventListener(this);
         viewGuiController.setGameSettings(safeSettings);
+        viewGuiController.setActiveGameConfig(this.config);
         viewGuiController.setGameMode(this.config.getMode());
         viewGuiController.initGameView(board.getBoardMatrix(), board.getViewData());
         viewGuiController.bindScore(logic.getScore());
@@ -89,7 +91,6 @@ public class GameController implements InputEventListener {
         syncBoardState();
         return data;
     }
-
 
     @Override
     public DownData onHardDrop(MoveEvent event) {

@@ -1,9 +1,7 @@
 package com.comp2042.board;
 
 import java.awt.Point;
-import java.util.ArrayDeque;
 import java.util.Arrays;
-import java.util.Deque;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -16,17 +14,26 @@ public class MatrixOperations {
     }
 
     public static boolean intersect(final int[][] matrix, final int[][] brick, int x, int y) {
-        for (int i = 0; i < brick.length; i++) {
-            for (int j = 0; j < brick[i].length; j++) {
-                int targetX = x + i;
-                int targetY = y + j;
-                if (brick[j][i] != 0) {
-                    if (targetY < 0) {
-                        continue;
-                    }
-                    if (checkOutOfBound(matrix, targetX, targetY) || matrix[targetY][targetX] != 0) {
-                        return true;
-                    }
+        if (brick == null) {
+            return false;
+        }
+        for (int row = 0; row < brick.length; row++) {
+            int[] brickRow = brick[row];
+            if (brickRow == null) {
+                continue;
+            }
+            for (int col = 0; col < brickRow.length; col++) {
+                int cell = brickRow[col];
+                if (cell == 0) {
+                    continue;
+                }
+                int targetX = x + col;
+                int targetY = y + row;
+                if (targetY < 0) {
+                    continue;
+                }
+                if (checkOutOfBound(matrix, targetX, targetY) || matrix[targetY][targetX] != 0) {
+                    return true;
                 }
             }
         }
@@ -58,16 +65,25 @@ public class MatrixOperations {
 
     public static int[][] merge(int[][] filledFields, int[][] brick, int x, int y) {
         int[][] copy = copy(filledFields);
-        for (int i = 0; i < brick.length; i++) {
-            for (int j = 0; j < brick[i].length; j++) {
-                int targetX = x + i;
-                int targetY = y + j;
-                if (brick[j][i] != 0) {
-                    if (targetY < 0) {
-                        continue;
-                    }
-                    copy[targetY][targetX] = brick[j][i];
+        if (brick == null) {
+            return copy;
+        }
+        for (int row = 0; row < brick.length; row++) {
+            int[] brickRow = brick[row];
+            if (brickRow == null) {
+                continue;
+            }
+            for (int col = 0; col < brickRow.length; col++) {
+                int cell = brickRow[col];
+                if (cell == 0) {
+                    continue;
                 }
+                int targetX = x + col;
+                int targetY = y + row;
+                if (targetY < 0) {
+                    continue;
+                }
+                copy[targetY][targetX] = cell;
             }
         }
         return copy;
