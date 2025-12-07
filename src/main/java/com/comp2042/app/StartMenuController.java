@@ -24,7 +24,9 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox;import javafx.stage.Stage;
+import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
+import javafx.scene.paint.Color;
 
 import java.io.IOException;
 import java.net.URL;
@@ -153,7 +155,8 @@ public class StartMenuController {
             dialog.initModality(Modality.WINDOW_MODAL);
             controller.setDialogStage(dialog);
             controller.setInitialSettings(gameSettings);
-            Scene scene = new Scene(root, 520, 620);
+            Scene scene = new Scene(root, 960, 640);
+            scene.setFill(Color.web("#04060b"));
             dialog.setScene(scene);
             dialog.showAndWait();
             controller.getResult().ifPresent(result -> {

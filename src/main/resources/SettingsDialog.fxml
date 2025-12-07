@@ -24,7 +24,7 @@
     <children>
         <Pane styleClass="grid-overlay"/>
         <Pane styleClass="scanline-overlay"/>
-        <BorderPane styleClass="settings-dialog" prefWidth="760">
+        <BorderPane styleClass="settings-dialog" prefWidth="960" prefHeight="640" maxWidth="1200">
             <top>
                 <VBox spacing="6" styleClass="settings-header">
                     <Label text="Systems Console" styleClass="settings-kicker"/>

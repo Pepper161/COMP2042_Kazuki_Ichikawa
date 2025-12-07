@@ -121,6 +121,36 @@ In accordance with the coursework specification, this submission includes:
 | Maintenance | `GameController`, `GameLogic`, `Score`, `NotificationPanel` | Refactors the gameplay loop for deterministic seeds plus combos/back-to-back/T-Spin detection. |
 | Maintenance | `HighScoreService`, `StartMenuController`, `GameOverPanel` | Adds durable per-mode leaderboards shared between the start menu and game-over overlay. |
 
+## Screenshots
+
+### Start Menu & Leaderboard
+![Start Menu with Leaderboard](docs/screenshots/start-menu-with-leaderboard.png)
+The main entry point featuring the animated "TETRIS FX" logo (letters pulse and slide over time), mode selection, and a persistent leaderboard showing top scores for each mode.
+
+### Mode Selection
+![Mode Selection Console](docs/screenshots/mode-select-console.png)
+A dedicated console for choosing between Endless, Timed (180s), and Fixed Lines (40 Lines) modes.
+
+### Gameplay Interface
+![Gameplay Interface](docs/screenshots/gameplay.png)
+The core gameplay view showing the board, ghost piece, next queue (right), and HUD stats (left) including score, combo, and level.
+
+### Settings Menu
+![Settings Menu](docs/screenshots/setting.png)
+Comprehensive configuration for gameplay tuning (DAS, ARR, Soft Drop), audio controls, and accessibility options (Color Assist, Outlines).
+
+### Help & Controls
+![Help & Controls](docs/screenshots/help-and-control.png)
+In-game reference guide explaining controls, scoring rules, and special mechanics like T-Spins and Wall Kicks.
+
+### Pause Overlay
+![Pause Overlay](docs/screenshots/pause-overlay.png)
+The pause menu overlay that halts the game loop, allowing players to resume, restart, or return to the main menu.
+
+### Game Over & Results
+![Game Over Screen](docs/screenshots/game-over-endless-leaderboard.png)
+The summary screen displaying the final score, run statistics, and updated leaderboard rankings.
+
 ## Unexpected Problems
 *   **Background Grid Visibility**: The default background grid pattern made the text in the Settings and Help dialogs difficult to read.
     *   **Resolution**: I modified the CSS (`window_style.css`) to explicitly remove the background image (`-fx-background-image: null`) and apply a solid dark background color (`rgb(8, 12, 24)`) for these specific dialogs, ensuring high contrast and readability.
