@@ -8,6 +8,7 @@
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 <?import java.net.URL?>
@@ -16,51 +17,85 @@
            xmlns:fx="http://javafx.com/fxml"
            styleClass="gameplay-root">
     <children>
-        <StackPane styleClass="gameplay-surface">
-            <HBox spacing="28" alignment="TOP_CENTER" styleClass="gameplay-columns">
-                <StackPane>
-                    <Pane prefWidth="360" prefHeight="660" styleClass="board-stage">
-                        <BorderPane styleClass="gameBoard" fx:id="gameBoard">
-                            <center>
-                                <StackPane fx:id="gameLayer" alignment="TOP_LEFT" styleClass="game-layer">
-                                    <GridPane fx:id="gamePanel" hgap="1" vgap="1"/>
-                                    <Pane fx:id="guidePane" mouseTransparent="true" pickOnBounds="false"/>
-                                </StackPane>
-                            </center>
-                        </BorderPane>
-                        <GridPane fx:id="ghostPanel" vgap="1" hgap="1" mouseTransparent="true" pickOnBounds="false"/>
-                        <GridPane fx:id="brickPanel" vgap="1" hgap="1"/>
-                    </Pane>
-                    <Group fx:id="groupNotification" pickOnBounds="false" StackPane.alignment="CENTER">
-                        <VBox alignment="CENTER">
-                            <GameOverPanel fx:id="gameOverPanel"/>
-                        </VBox>
-                    </Group>
-                </StackPane>
-                <NextQueuePanel fx:id="nextQueuePanel"/>
-                <VBox spacing="18" styleClass="sidebar">
-                    <HudPanel fx:id="hudPanel"/>
+        <Pane styleClass="grid-overlay"/>
+        <Pane styleClass="scanline-overlay"/>
+        <BorderPane styleClass="gameplay-shell">
+            <top>
+                <HBox alignment="CENTER_LEFT" spacing="12" styleClass="gameplay-header">
+                    <VBox spacing="4">
+                        <Label text="NEOTETRIS OPS" styleClass="hud-panel-kicker"/>
+                        <Label text="Live Run · Press ESC to pause" styleClass="gameplay-subtitle"/>
+                    </VBox>
+                    <Region HBox.hgrow="ALWAYS"/>
                     <Button fx:id="helpHintButton"
-                            text="?"
+                            text="Help Overlay"
                             onAction="#onShowHelp"
                             styleClass="help-icon-button"/>
-                </VBox>
-            </HBox>
-            <VBox fx:id="pauseOverlay"
-                  alignment="CENTER"
-                  spacing="14"
-                  visible="false"
-                  managed="false"
-                  StackPane.alignment="CENTER"
-                  styleClass="pause-overlay">
-                <Label text="Paused" styleClass="overlay-title"/>
-                <HBox spacing="10" alignment="CENTER">
-                    <Button text="Resume" onAction="#onPauseResume" styleClass="btn-primary"/>
-                    <Button text="Settings" onAction="#onPauseSettings" styleClass="btn-secondary"/>
-                    <Button text="Main Menu" onAction="#onPauseMainMenu" styleClass="btn-secondary"/>
                 </HBox>
-            </VBox>
-        </StackPane>
+            </top>
+            <center>
+                <HBox spacing="28" alignment="TOP_CENTER" styleClass="gameplay-columns">
+                    <StackPane styleClass="board-stack">
+                        <Pane prefWidth="210"
+                              prefHeight="420"
+                              minWidth="210"
+                              minHeight="420"
+                              maxWidth="210"
+                              maxHeight="420"
+                              styleClass="board-stage">
+                            <BorderPane styleClass="gameBoard" fx:id="gameBoard">
+                                <center>
+                                    <StackPane fx:id="gameLayer" alignment="TOP_LEFT" styleClass="game-layer">
+                                        <GridPane fx:id="gamePanel" hgap="1" vgap="1"/>
+                                        <Pane fx:id="guidePane" mouseTransparent="true" pickOnBounds="false"/>
+                                    </StackPane>
+                                </center>
+                            </BorderPane>
+                            <GridPane fx:id="ghostPanel"
+                                      vgap="1"
+                                      hgap="1"
+                                      mouseTransparent="true"
+                                      pickOnBounds="false"/>
+                            <GridPane fx:id="brickPanel"
+                                      vgap="1"
+                                      hgap="1"/>
+                        </Pane>
+                        <Group fx:id="groupNotification" pickOnBounds="false" StackPane.alignment="CENTER">
+                            <VBox alignment="CENTER">
+                                <GameOverPanel fx:id="gameOverPanel"/>
+                            </VBox>
+                        </Group>
+                    </StackPane>
+                    <NextQueuePanel fx:id="nextQueuePanel"/>
+                    <VBox spacing="18" styleClass="sidebar">
+                        <HudPanel fx:id="hudPanel"/>
+                        <VBox spacing="6" styleClass="sidebar-legends">
+                            <Label text="Quick Legends" styleClass="sidebar-title"/>
+                            <Label text="Shift hold: charge DAS" styleClass="sidebar-hint"/>
+                            <Label text="Space: instant drop + lock" styleClass="sidebar-hint"/>
+                            <Label text="N: start a new seed" styleClass="sidebar-hint"/>
+                        </VBox>
+                    </VBox>
+                </HBox>
+            </center>
+        </BorderPane>
+        <VBox fx:id="pauseOverlay"
+              alignment="CENTER"
+              spacing="12"
+              visible="false"
+              managed="false"
+              StackPane.alignment="CENTER"
+              styleClass="pause-overlay">
+            <Label text="Paused" styleClass="overlay-title"/>
+            <Label text="Anything you change here applies instantly."
+                   styleClass="overlay-subtitle"
+                   wrapText="true"/>
+            <HBox spacing="10" alignment="CENTER">
+                <Button text="Resume" onAction="#onPauseResume" styleClass="btn-primary"/>
+                <Button text="Settings" onAction="#onPauseSettings" styleClass="btn-secondary"/>
+                <Button text="Main Menu" onAction="#onPauseMainMenu" styleClass="btn-secondary"/>
+            </HBox>
+        </VBox>
     </children>
     <stylesheets>
         <URL value="@window_style.css"/>

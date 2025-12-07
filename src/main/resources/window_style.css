@@ -1,55 +1,260 @@
-﻿/* ================================================
-   COMP2042 Tetris - Neo Arcade Theme Styles
-   ================================================ */
+﻿/* ===========================================================
+   COMP2042 Neo-Retro Theme
+   Shared JavaFX stylesheet for menus, dialogs, and gameplay.
+   =========================================================== */
 
-/* === Global Root === */
+/* ---------- Core Palette & Utilities ---------- */
 .root {
+    -fx-font-family: "Segoe UI", "Rajdhani", "Arial", sans-serif;
+    -fx-font-smoothing-type: lcd;
+    -fx-background-color: #04060b;
     -fx-background-image: url("background_image.png");
+    -fx-background-size: cover;
+    -fx-background-position: center;
 }
 
-/* === Leaderboard Panel === */
-.leaderboard-panel {
-    -fx-background-color: rgba(10, 12, 24, 0.95);
+.grid-overlay {
+    -fx-background-color:
+        rgba(6, 10, 24, 0.92),
+        linear-gradient(from 0px 0px to 0px 40px, repeat, rgba(0, 243, 255, 0.06) 0%, rgba(0, 243, 255, 0.06) 1px, transparent 1px, transparent 100%),
+        linear-gradient(from 0px 0px to 40px 0px, repeat, rgba(0, 243, 255, 0.04) 0%, rgba(0, 243, 255, 0.04) 1px, transparent 1px, transparent 100%);
+}
+
+.scanline-overlay {
+    -fx-background-color: linear-gradient(from 0px 0px to 0px 3px, repeat, rgba(255, 255, 255, 0.04) 0%, rgba(255, 255, 255, 0.04) 0.5px, transparent 0.5px, transparent 100%);
+    -fx-opacity: 0.35;
+}
+
+.start-menu-shell,
+.mode-select-shell,
+.settings-dialog,
+.help-dialog,
+.gameplay-shell {
+    -fx-background-color: rgba(8, 12, 28, 0.95);
+    -fx-background-radius: 24;
+    -fx-border-color: rgba(0, 243, 255, 0.35);
+    -fx-border-radius: 24;
+    -fx-padding: 32;
+    -fx-effect: dropshadow(gaussian, rgba(0, 10, 30, 0.8), 30, 0.45, 0, 12);
+}
+
+.hint-chip {
+    -fx-background-color: rgba(0, 243, 255, 0.12);
+    -fx-text-fill: #9adcf3;
+    -fx-font-size: 12px;
+    -fx-padding: 4 12;
+    -fx-background-radius: 999;
+    -fx-effect: dropshadow(gaussian, rgba(0, 243, 255, 0.2), 10, 0.2, 0, 0);
+}
+
+/* ---------- Button System ---------- */
+.btn-primary,
+.btn-secondary,
+.btn-danger,
+.btn-ghost {
+    -fx-font-family: "Rajdhani", "Segoe UI", sans-serif;
+    -fx-font-size: 15px;
+    -fx-font-weight: 700;
+    -fx-cursor: hand;
     -fx-background-radius: 14;
-    -fx-border-color: rgba(61, 214, 208, 0.2);
     -fx-border-radius: 14;
-    -fx-padding: 26;
-    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.65), 32, 0.25, 0, 14);
+    -fx-padding: 12 28;
+    -fx-min-width: 200;
+    -fx-transition: all 200ms ease;
 }
 
-.lb-header {
-    -fx-padding: 0 0 14 0;
-    -fx-border-color: transparent transparent rgba(255, 255, 255, 0.15) transparent;
-    -fx-border-width: 0 0 1 0;
+.btn-primary {
+    -fx-background-color: linear-gradient(to right, #00f3ff, #14b7ff);
+    -fx-text-fill: #04050b;
+    -fx-effect: dropshadow(gaussian, rgba(0, 243, 255, 0.55), 20, 0.3, 0, 4);
 }
 
-.lb-title {
-    -fx-text-fill: #3dd6d0;
-    -fx-font-size: 18;
+.btn-primary:hover {
+    -fx-translate-y: -1;
+    -fx-background-color: linear-gradient(to right, #32fbff, #35c8ff);
+}
+
+.btn-secondary {
+    -fx-background-color: rgba(255, 255, 255, 0.08);
+    -fx-border-color: rgba(255, 255, 255, 0.25);
+    -fx-border-width: 1.5;
+    -fx-text-fill: #c2d2f2;
+}
+
+.btn-secondary:hover {
+    -fx-background-color: rgba(255, 255, 255, 0.16);
+}
+
+.btn-ghost {
+    -fx-background-color: transparent;
+    -fx-border-color: rgba(0, 243, 255, 0.35);
+    -fx-border-width: 1.5;
+    -fx-text-fill: #84f2ff;
+}
+
+.btn-ghost:hover {
+    -fx-background-color: rgba(0, 243, 255, 0.1);
+}
+
+.btn-danger {
+    -fx-background-color: rgba(255, 0, 85, 0.15);
+    -fx-border-color: rgba(255, 0, 85, 0.7);
+    -fx-text-fill: #ff7ba6;
+}
+
+.btn-danger:hover {
+    -fx-background-color: #ff0055;
+    -fx-text-fill: #04050b;
+}
+
+.btn-secondary.compact,
+.btn-ghost.compact {
+    -fx-min-width: 90;
+    -fx-padding: 6 16;
+    -fx-font-size: 13px;
+}
+
+.btn-info {
+    -fx-background-color: rgba(0, 243, 255, 0.12);
+    -fx-border-color: rgba(0, 243, 255, 0.7);
+    -fx-border-width: 1;
+    -fx-background-radius: 12;
+    -fx-border-radius: 12;
+    -fx-text-fill: #00f3ff;
+    -fx-font-size: 11;
     -fx-font-weight: bold;
-    -fx-letter-spacing: 1;
+    -fx-pref-width: 24;
+    -fx-pref-height: 24;
+    -fx-padding: 0;
 }
 
-.lb-list {
-    -fx-padding: 6 0 0 0;
+.btn-info:hover {
+    -fx-background-color: rgba(0, 243, 255, 0.35);
+    -fx-text-fill: #050508;
 }
 
-.leaderboard-placeholder {
-    -fx-text-fill: #9fb2ce;
-    -fx-font-size: 13;
+/* ---------- Start Menu ---------- */
+.start-menu-root {
+    -fx-padding: 24;
+}
+
+.start-menu-container {
+    -fx-background-color: rgba(4, 6, 12, 0.85);
+    -fx-border-color: rgba(0, 243, 255, 0.25);
+    -fx-border-width: 1;
+    -fx-border-radius: 20;
+    -fx-background-radius: 20;
+    -fx-padding: 32 38;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.7), 35, 0.3, 0, 10);
+}
+
+.menu-left {
+    -fx-max-width: 420;
+}
+
+.menu-kicker {
+    -fx-text-fill: #ff0055;
+    -fx-font-size: 12px;
+    -fx-letter-spacing: 4px;
+}
+
+.logo-stack {
+    -fx-min-height: 140;
     -fx-alignment: center-left;
 }
 
-.leaderboard-entry {
-    -fx-text-fill: #f5f7ff;
-    -fx-font-family: "Consolas", "Segoe UI", monospace;
-    -fx-font-size: 14;
+.menu-subtitle {
+    -fx-text-fill: #99a8d6;
+    -fx-font-size: 14px;
 }
 
-.leaderboard-entry.leaderboard-highlight {
-    -fx-text-fill: #ffd700;
+.menu-hero {
+    -fx-background-color: rgba(255, 255, 255, 0.02);
+    -fx-padding: 16;
+    -fx-background-radius: 16;
+    -fx-border-color: rgba(0, 243, 255, 0.15);
+    -fx-border-radius: 16;
+}
+
+.hero-metric-row {
+    -fx-alignment: center-left;
+}
+
+.hero-metric-title {
+    -fx-text-fill: #7b89c8;
+    -fx-font-size: 11px;
+    -fx-letter-spacing: 2px;
+}
+
+.hero-metric-value {
+    -fx-text-fill: #f5faff;
+    -fx-font-size: 20px;
     -fx-font-weight: bold;
-    -fx-effect: dropshadow(gaussian, rgba(255, 215, 0, 0.6), 10, 0.5, 0, 0);
+}
+
+.accent-bar {
+    -fx-background-color: linear-gradient(to right, #ff0055, transparent);
+    -fx-min-height: 2px;
+    -fx-background-radius: 2;
+}
+
+.hero-description {
+    -fx-text-fill: #a5bde8;
+    -fx-font-size: 13px;
+}
+
+.menu-buttons .button {
+    -fx-max-width: Infinity;
+}
+
+.menu-quick-hints {
+    -fx-padding: 12 0 0 0;
+}
+
+.menu-hint {
+    -fx-text-fill: #6b7aa5;
+    -fx-font-size: 12px;
+}
+
+.leaderboard-panel {
+    -fx-background-color: rgba(10, 14, 32, 0.92);
+    background-color: rgba(10, 14, 32, 0.92);
+    -fx-background-radius: 18;
+    -fx-border-radius: 18;
+    border-radius: 18px;
+    -fx-border-color: rgba(0, 243, 255, 0.2);
+    border-color: rgba(0, 243, 255, 0.2);
+    -fx-padding: 48 24 24 24;
+    padding: 48px 24px 24px 24px;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.6), 30, 0.3, 0, 8);
+}
+
+.lb-header {
+    -fx-border-color: transparent transparent rgba(255, 255, 255, 0.08) transparent;
+    border-color: transparent transparent rgba(255, 255, 255, 0.08) transparent;
+    -fx-border-width: 0 0 1 0;
+    border-width: 0 0 1px 0;
+    -fx-padding: 0 0 12 0;
+    padding: 0 0 12px 0;
+}
+
+.lb-title {
+    -fx-text-fill: #00f3ff;
+    -fx-font-size: 18;
+    -fx-font-weight: bold;
+}
+
+.lb-subtitle {
+    -fx-text-fill: #99b8d7;
+    -fx-font-size: 12;
+}
+
+.lb-footer {
+    -fx-text-fill: #6f88b4;
+    -fx-font-size: 11;
+    font-size: 11px;
+    -fx-padding: 12 0 0 0;
+    padding: 12px 0 0 0;
 }
 
 .lb-scroll {
@@ -57,117 +262,146 @@
     -fx-border-color: transparent;
 }
 
-.lb-scroll .viewport {
-    -fx-background-color: transparent;
-}
-
+.lb-scroll .viewport,
 .lb-scroll .content {
     -fx-background-color: transparent;
 }
 
 .lb-sections {
-    -fx-padding: 0 8 8 0;
+    -fx-padding: 6 4 0 0;
+    padding: 6px 4px 0 0;
 }
 
 .leaderboard-section {
-    -fx-background-color: rgba(20, 22, 40, 0.85);
-    -fx-background-radius: 12;
-    -fx-border-radius: 12;
-    -fx-border-color: rgba(255, 255, 255, 0.08);
-    -fx-padding: 12 14 14 14;
-    -fx-spacing: 8;
+    -fx-background-color: rgba(255, 255, 255, 0.02);
+    -fx-background-radius: 14;
+    -fx-border-color: rgba(255, 255, 255, 0.06);
+    -fx-border-radius: 14;
+    -fx-padding: 12;
 }
 
 .leaderboard-section-title {
     -fx-text-fill: #7fe9ff;
     -fx-font-size: 13;
-    -fx-font-weight: bold;
     -fx-letter-spacing: 1;
-    -fx-text-transform: uppercase;
 }
 
-/* === Mode Selection === */
-.mode-select-container {
-    -fx-background-color: rgba(13, 14, 21, 0.95);
-    -fx-padding: 30 40;
-    -fx-background-radius: 18;
-    -fx-border-color: rgba(0, 0, 0, 0.65);
-    -fx-border-radius: 18;
-    -fx-font-family: "Segoe UI", "Arial", sans-serif;
+.lb-list {
+    -fx-spacing: 4;
+}
+
+.leaderboard-placeholder {
+    -fx-text-fill: #93a1c1;
+    -fx-font-size: 12;
+}
+
+.leaderboard-entry {
+    -fx-text-fill: #f5f7ff;
+    -fx-font-family: "Consolas", "JetBrains Mono", monospace;
+    -fx-font-size: 13;
+}
+
+.leaderboard-highlight {
+    -fx-text-fill: #fcee0a;
+    -fx-font-weight: bold;
+}
+
+/* ---------- Mode Select ---------- */
+.mode-select-root {
+    -fx-padding: 32;
 }
 
 .mode-header {
-    -fx-spacing: 4;
-    -fx-padding: 0 0 20 0;
+    -fx-padding: 0 0 12 0;
+}
+
+.mode-kicker {
+    -fx-text-fill: #ff0055;
+    -fx-font-size: 12;
+    font-size: 12px;
+    -fx-letter-spacing: 4;
+    letter-spacing: 4px;
 }
 
 .mode-title {
-    -fx-font-size: 36;
-    -fx-font-weight: 800;
-    -fx-text-fill: #ffffff;
+    -fx-text-fill: #f5faff;
+    -fx-font-size: 26;
+    -fx-font-weight: bold;
 }
 
 .mode-subtitle {
-    -fx-text-fill: #8b9bb4;
-    -fx-font-size: 16;
+    -fx-text-fill: #9cb4d6;
+    -fx-font-size: 13;
+}
+
+.mode-scroll {
+    -fx-background-color: transparent;
+    -fx-border-color: rgba(255, 255, 255, 0.04);
+    -fx-border-radius: 16;
+    -fx-background-radius: 16;
+    -fx-padding: 12;
+}
+
+.mode-scroll .viewport {
+    -fx-background-color: transparent;
 }
 
 .mode-list {
-    -fx-spacing: 16;
+    -fx-padding: 6;
 }
 
 .mode-card {
-    -fx-background-color: rgba(30, 32, 48, 0.95);
-    -fx-padding: 18;
-    -fx-background-radius: 10;
-    -fx-border-radius: 10;
-    -fx-border-color: rgba(42, 46, 64, 0.9);
-    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.45), 20, 0.2, 0, 6);
-    -fx-pref-width: 760;
-    -fx-pref-height: 160;
-    -fx-max-width: Infinity;
-    -fx-spacing: 10;
-    -fx-cursor: hand;
+    -fx-background-color: rgba(255, 255, 255, 0.02);
+    -fx-background-radius: 16;
+    -fx-border-color: rgba(255, 255, 255, 0.07);
+    -fx-border-radius: 16;
+    -fx-padding: 16;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.4), 18, 0.12, 0, 6);
+}
+
+.mode-card:selected,
+.mode-card:focused,
+.mode-card.selected {
+    -fx-border-color: #00f3ff;
+    -fx-effect: dropshadow(gaussian, rgba(0, 243, 255, 0.45), 25, 0.4, 0, 8);
 }
 
 .mode-card-title {
-    -fx-text-fill: #ffffff;
+    -fx-text-fill: #f5faff;
     -fx-font-size: 18;
     -fx-font-weight: bold;
 }
 
 .mode-card-description {
-    -fx-text-fill: #b7c3d8;
+    -fx-text-fill: #9fb4d6;
     -fx-font-size: 13;
-    -fx-wrap-text: true;
 }
 
 .mode-badges {
-    -fx-spacing: 8;
+    -fx-alignment: center-left;
 }
 
 .mode-badge {
-    -fx-background-color: rgba(0, 255, 204, 0.12);
-    -fx-border-color: rgba(0, 255, 204, 0.5);
-    -fx-border-radius: 20;
-    -fx-background-radius: 20;
-    -fx-padding: 4 10;
-    -fx-text-fill: #00ffcc;
-    -fx-font-size: 12;
-}
-
-.mode-card.selected {
-    -fx-border-color: #00ffcc;
-    -fx-effect: dropshadow(gaussian, rgba(0, 255, 204, 0.4), 25, 0.35, 0, 0);
+    -fx-background-color: rgba(0, 243, 255, 0.15);
+    -fx-background-radius: 999;
+    -fx-text-fill: #84f2ff;
+    -fx-font-size: 11;
+    -fx-padding: 2 10;
 }
 
 .mode-detail-card {
-    -fx-background-color: rgba(15, 17, 34, 0.9);
-    -fx-background-radius: 10;
-    -fx-border-radius: 10;
-    -fx-border-color: rgba(0, 0, 0, 0.6);
-    -fx-padding: 20;
-    -fx-spacing: 10;
+    -fx-background-color: rgba(255, 255, 255, 0.03);
+    -fx-background-radius: 18;
+    -fx-border-radius: 18;
+    -fx-border-color: rgba(0, 243, 255, 0.18);
+    -fx-padding: 18;
+    -fx-pref-width: 320;
+}
+
+.mode-detail-kicker {
+    -fx-text-fill: #ff0055;
+    -fx-font-size: 11;
+    -fx-letter-spacing: 3;
 }
 
 .mode-detail-title {
@@ -177,474 +411,389 @@
 }
 
 .mode-detail-text {
-    -fx-text-fill: #cdd5e4;
-    -fx-font-size: 14;
-    -fx-wrap-text: true;
-}
-
-.mode-detail-meta {
-    -fx-text-fill: #8b9bb4;
+    -fx-text-fill: #c2d2f2;
     -fx-font-size: 13;
 }
 
-/* === Gameplay Screen === */
-.gameplay-root {
-    -fx-background-color: linear-gradient(to bottom, #05050a, #0f0f1a);
+.mode-detail-meta {
+    -fx-text-fill: #9adcf3;
+    -fx-font-size: 12;
+}
+
+.mode-footer {
+    -fx-padding: 6 0 0 0;
+}
+
+.mode-footer-subtext {
+    -fx-text-fill: #7a8ab9;
+    -fx-font-size: 11;
+}
+
+/* ---------- Settings Dialog ---------- */
+.settings-dialog-root {
     -fx-padding: 24;
 }
 
-.gameplay-surface {
-    -fx-background-color: rgba(8, 10, 20, 0.9);
-    -fx-background-radius: 18;
-    -fx-border-radius: 18;
-    -fx-border-color: rgba(0, 0, 0, 0.6);
-    -fx-padding: 30;
-    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.6), 30, 0.35, 0, 14);
-}
-
-.board-stage {
-    /* Visual styles removed to eliminate double frame */
-}
-
-.gameBoard {
-    -fx-border-color: rgba(61, 214, 208, 0.35);
-    -fx-border-width: 2;
-    -fx-border-radius: 14;
-    -fx-padding: 4;
-    -fx-background-color: rgba(5, 8, 18, 0.95);
-    -fx-background-radius: 14;
-}
-
-.game-layer {
-    -fx-background-color:
-        linear-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px),
-        linear-gradient(to right, rgba(255, 255, 255, 0.04) 1px, transparent 1px),
-        rgba(4, 8, 18, 0.92);
-    -fx-background-insets: 0, 0, 0;
-    -fx-background-radius: 12, 12, 12;
-    -fx-background-size: 20 20, 20 20, auto;
-    -fx-background-repeat: repeat, repeat, stretch;
-    -fx-border-radius: 12;
-    -fx-border-color: rgba(0, 255, 204, 0.15);
-    -fx-border-width: 1.2;
-    -fx-padding: 4;
-    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.5), 20, 0.3, 0, 6);
-}
-
-/* === Sidebar === */
-.sidebar {
-    -fx-pref-width: 240;
-}
-
-.hud-panel {
-    -fx-background-color: rgba(22, 22, 40, 0.95);
-    -fx-background-radius: 12;
-    -fx-border-radius: 12;
-    -fx-border-color: rgba(255, 255, 255, 0.05);
-    -fx-padding: 16;
-    -fx-spacing: 12;
-}
-
-.hud-panel-row {
-    -fx-spacing: 3;
-}
-
-.hud-label {
-    -fx-text-fill: #94a3b8;
-    -fx-font-size: 11;
-    -fx-font-weight: bold;
-    -fx-letter-spacing: 1;
-}
-
-.hud-value {
-    -fx-text-fill: #e0e6ed;
-    -fx-font-size: 18;
-    -fx-font-family: "Segoe UI Semibold", "Orbitron", sans-serif;
-}
-
-.hud-value-lg {
-    -fx-text-fill: #ffd166;
-    -fx-font-size: 24;
-}
-
-.next-queue-panel {
-    -fx-background-color: rgba(22, 22, 40, 0.95);
-    -fx-background-radius: 12;
-    -fx-border-radius: 12;
-    -fx-border-color: rgba(255, 255, 255, 0.05);
-    -fx-padding: 16;
-    -fx-spacing: 12;
-}
-
-.next-queue-title {
-    -fx-text-fill: #3dd6d0;
-    -fx-font-size: 20;
-    -fx-font-family: "Orbitron", sans-serif;
-}
-
-.next-queue-container {
-    -fx-spacing: 10;
-}
-
-.next-queue-cell {
-    -fx-stroke: rgba(255, 255, 255, 0.12);
-    -fx-stroke-width: 0.5;
-    -fx-arc-width: 8;
-    -fx-arc-height: 8;
-}
-
-.help-icon-button {
-    -fx-background-color: rgba(255, 255, 255, 0.04);
-    -fx-border-color: rgba(255, 255, 255, 0.2);
-    -fx-text-fill: #e0e6ed;
-    -fx-font-size: 16;
-    -fx-pref-width: 48;
-    -fx-pref-height: 48;
-    -fx-background-radius: 24;
-    -fx-border-radius: 24;
-}
-
-.help-icon-button:hover {
-    -fx-background-color: rgba(61, 214, 208, 0.12);
-    -fx-text-fill: #3dd6d0;
-    -fx-border-color: rgba(61, 214, 208, 0.8);
-}
-
-/* === Overlays === */
-.pause-overlay {
-    -fx-background-color: rgba(5, 5, 10, 0.82);
-    -fx-background-radius: 16;
-    -fx-border-radius: 16;
-    -fx-border-color: rgba(61, 214, 208, 0.4);
-    -fx-padding: 28;
-    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.7), 25, 0.2, 0, 6);
-}
-
-.overlay-title {
-    -fx-text-fill: #ffffff;
-    -fx-font-size: 28;
-    -fx-font-family: "Orbitron", sans-serif;
-}
-
-.overlay-title.danger {
-    -fx-text-fill: #ff4f4f;
-}
-
-.pause-overlay .button {
-    -fx-pref-width: 110;
-}
-
-.game-over-panel {
-    -fx-background-color: rgba(20, 20, 36, 0.95);
-    -fx-background-radius: 16;
-    -fx-border-radius: 16;
-    -fx-border-color: rgba(255, 255, 255, 0.08);
-    -fx-padding: 28;
-    -fx-spacing: 16;
-}
-
-.seedLabel {
-    -fx-text-fill: #8b9bb4;
-    -fx-font-size: 14;
-    -fx-font-family: "Consolas", "Segoe UI", monospace;
-}
-
-.game-over-panel .button {
-    -fx-pref-width: 160;
-}
-
-/* === Settings Dialog === */
-.settings-dialog {
-    -fx-background-color: rgb(8, 12, 24);
-    -fx-background-image: null;
-    -fx-border-color: rgba(61, 214, 208, 0.3);
-    -fx-border-width: 1;
-    -fx-background-radius: 8;
-    -fx-border-radius: 8;
-    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.8), 40, 0, 0, 10);
-}
-
 .settings-header {
-    -fx-background-color: rgba(255, 255, 255, 0.03);
-    -fx-padding: 15 20;
-    -fx-border-color: transparent transparent rgba(255, 255, 255, 0.1) transparent;
-    -fx-border-width: 0 0 1 0;
-    -fx-font-size: 18px;
+    -fx-padding: 0 0 12 0;
+}
+
+.settings-header .settings-kicker {
+    -fx-text-fill: #ff0055;
+    -fx-letter-spacing: 4;
+    -fx-font-size: 12;
+}
+
+.settings-title {
+    -fx-text-fill: #f8fbff;
+    -fx-font-size: 22;
     -fx-font-weight: bold;
-    -fx-text-fill: white;
-}
-
-.settings-content {
-    -fx-padding: 20;
-}
-
-.settings-section {
-    -fx-background-color: rgba(255, 255, 255, 0.03);
-    -fx-background-radius: 6;
-    -fx-padding: 12;
-}
-
-.settings-section-title {
-    -fx-text-fill: #3dd6d0;
-    -fx-font-size: 14px;
-    -fx-font-weight: bold;
-    -fx-border-color: transparent transparent #333 transparent;
-    -fx-border-width: 0 0 1 0;
-    -fx-padding: 0 0 8 0;
-    -fx-margin: 0 0 8 0;
-}
-
-.form-label {
-    -fx-text-fill: white;
-    -fx-font-size: 13px;
-}
-
-.keybind-row {
-    -fx-background-color: rgba(255, 255, 255, 0.05);
-    -fx-padding: 5 10;
-    -fx-background-radius: 4;
-    -fx-border-radius: 4;
-    -fx-alignment: center-left;
-}
-
-.key-badge {
-    -fx-background-color: #333;
-    -fx-text-fill: white;
-    -fx-border-color: #555;
-    -fx-border-radius: 4;
-    -fx-background-radius: 4;
-    -fx-padding: 2 8;
-    -fx-font-family: "Monospaced";
-    -fx-font-size: 12px;
-    -fx-alignment: center;
-    -fx-pref-width: 80;
-}
-
-.settings-footer {
-    -fx-padding: 15 20;
-    -fx-border-color: rgba(255, 255, 255, 0.1) transparent transparent transparent;
-    -fx-border-width: 1 0 0 0;
-    -fx-background-color: rgba(255, 255, 255, 0.03);
-    -fx-spacing: 10;
-    -fx-alignment: center-right;
 }
 
 .settings-scroll-pane {
     -fx-background-color: transparent;
-    -fx-background: transparent;
-    -fx-padding: 0;
 }
 
-.settings-scroll-pane>.viewport {
+.settings-scroll-pane .viewport {
     -fx-background-color: transparent;
 }
 
-.settings-dialog .text-field {
-    -fx-background-color: rgba(255, 255, 255, 0.1);
-    -fx-text-fill: white;
-    -fx-prompt-text-fill: #888;
-    -fx-border-color: rgba(255, 255, 255, 0.2);
-    -fx-border-radius: 3;
-    -fx-background-radius: 3;
+.settings-content {
+    -fx-padding: 8 0 16 0;
 }
 
-.settings-dialog .text-field:focused {
-    -fx-border-color: #3dd6d0;
-    -fx-background-color: rgba(255, 255, 255, 0.15);
+.callout-card {
+    -fx-background-color: rgba(0, 243, 255, 0.07);
+    -fx-background-radius: 18;
+    -fx-border-color: rgba(0, 243, 255, 0.25);
+    -fx-border-radius: 18;
+    -fx-padding: 14;
 }
 
-/* === Help Dialog === */
-.help-dialog {
-    -fx-background-color: rgb(8, 12, 24);
-    -fx-background-image: null;
-    -fx-border-color: #00ffcc;
-    -fx-border-radius: 12;
-    -fx-background-radius: 12;
-    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.45), 22, 0.2, 0, 8);
+.settings-section {
+    -fx-background-color: rgba(255, 255, 255, 0.02);
+    -fx-background-radius: 16;
+    -fx-border-color: rgba(255, 255, 255, 0.05);
+    -fx-border-radius: 16;
+    -fx-padding: 14;
 }
 
-.help-title {
-    -fx-text-fill: #ffffff;
-    -fx-font-size: 22;
-    -fx-font-weight: bold;
-    -fx-padding: 12 0 24 0;
+.settings-section-title {
+    -fx-text-fill: #7fe9ff;
+    -fx-font-size: 13;
+    -fx-letter-spacing: 2;
 }
 
-.help-text-area {
-    -fx-control-inner-background: rgba(0, 0, 0, 0.4);
-    -fx-text-fill: #d8e0f0;
-    -fx-highlight-fill: rgba(0, 255, 204, 0.35);
-    -fx-border-color: rgba(255, 255, 255, 0.12);
-    -fx-border-radius: 6;
-    -fx-background-radius: 6;
-    -fx-font-size: 14;
-    -fx-padding: 12;
+.info-text {
+    -fx-text-fill: #d1ecff;
+    -fx-font-size: 12;
 }
 
-/* ================================================
-   Neo-Retro Tech Frame Theme (Based on HTML Design)
-   ================================================ */
-
-/* 
- * Color Palette (from HTML :root variables)
- * --cyan: #00f3ff
- * --magenta: #ff0055  
- * --yellow: #fcee0a
- * --bg-dark: #050508
- * --bg-panel: rgba(20, 20, 35, 0.85)
- */
-
-/* Enhanced Start Menu Container - Tech Frame Style */
-.start-menu-container {
-    -fx-background-color: rgba(20, 20, 35, 0.85);
-    -fx-background-radius: 0;
-    /* Tech frame border with cyan accent */
-    -fx-border-color: rgba(0, 243, 255, 0.3);
-    -fx-border-width: 2;
-    -fx-border-radius: 0;
-    -fx-padding: 40;
-    /* Enhanced shadow for tech frame depth */
-    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.7), 40, 0.4, 0, 10),
-        innershadow(gaussian, rgba(0, 0, 0, 0.6), 30, 0.3, 0, 0);
-}
-
-/* TETRIS FX Logo - Multi-Color Gradient Effect */
-.game-title {
-    /* Taller, bolder font matching HTML design */
-    -fx-font-family: "Impact", "Arial Black", "Segoe UI Black", sans-serif;
-    -fx-font-size: 64;
-    -fx-font-weight: 900;
-    /* Gradient from cyan to magenta for color variation */
-    -fx-text-fill: linear-gradient(to right, #00f3ff 0%, #ffffff 50%, #ff0055 100%);
-    /* Multi-color neon glow (cyan + magenta) */
-    -fx-effect: dropshadow(gaussian, rgba(0, 243, 255, 0.6), 25, 0.4, -3, 0),
-        dropshadow(gaussian, rgba(255, 0, 85, 0.6), 25, 0.4, 3, 0),
-        dropshadow(gaussian, rgba(255, 255, 255, 0.4), 15, 0.3, 0, 0);
-}
-
-/* System Subtitle - Magenta Monospace */
-.menu-tagline {
-    -fx-font-family: "Consolas", "Courier New", "Share Tech Mono", monospace;
-    -fx-text-fill: #ff0055;
-    -fx-font-size: 11;
-    -fx-letter-spacing: 6px;
-    /* Subtle magenta glow */
-    -fx-effect: dropshadow(gaussian, rgba(255, 0, 85, 0.3), 5, 0.3, 0, 0);
-}
-
-/* Menu Layout Alignment */
-.menu-left {
-    -fx-alignment: center-left;
-}
-
-.logo-stack {
-    -fx-min-height: 120;
-    -fx-pref-height: 150;
-    -fx-alignment: center-left;
-    -fx-translate-x: -30;
-}
-
-/* Bottom Hint Text */
-.menu-hint {
-    -fx-text-fill: #5c7a8a;
+.form-label {
+    -fx-text-fill: #c8d6f5;
     -fx-font-size: 13;
 }
 
-/* Enhanced Grid Background for Start Menu Root */
-.start-menu-root {
-    -fx-background-color: #050508,
-        linear-gradient(rgba(0, 243, 255, 0.03) 1px, transparent 1px),
-        linear-gradient(to right, rgba(0, 243, 255, 0.03) 1px, transparent 1px);
-    -fx-background-size: auto, 40px 40px, 40px 40px;
-    -fx-padding: 32;
-    -fx-font-family: "Segoe UI", "Rajdhani", sans-serif;
+.form-pair {
+    -fx-alignment: center-left;
 }
 
-/* Leaderboard Panel - Tech Frame Style */
-.leaderboard-panel {
-    -fx-background-color: rgba(10, 12, 24, 0.95);
-    -fx-background-radius: 0;
-    -fx-border-color: rgba(0, 243, 255, 0.2);
+.settings-section .text-field,
+.settings-section .combo-box,
+.settings-section .slider {
+    -fx-background-color: rgba(255, 255, 255, 0.08);
+    -fx-text-fill: #ffffff;
+    -fx-background-radius: 10;
+    -fx-border-radius: 10;
+    -fx-border-color: rgba(255, 255, 255, 0.15);
     -fx-border-width: 1;
-    -fx-border-radius: 0;
-    -fx-padding: 26;
-    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.7), 35, 0.3, 0, 12);
 }
 
-/* Leaderboard Title - Cyan Accent */
-.lb-title {
-    -fx-text-fill: #00f3ff;
-    -fx-font-size: 16;
+.keybind-row {
+    -fx-alignment: center-left;
+    -fx-spacing: 12;
+}
+
+.key-badge {
+    -fx-background-color: rgba(0, 243, 255, 0.15);
+    -fx-background-radius: 12;
+    -fx-border-radius: 12;
+    -fx-border-color: rgba(0, 243, 255, 0.3);
+    -fx-border-width: 1;
+    -fx-text-fill: #f5ffff;
+    -fx-pref-width: 120;
+    -fx-alignment: center;
+}
+
+.status-label {
+    -fx-text-fill: #7fe9ff;
+    -fx-font-style: italic;
+    -fx-padding: 8 0 0 0;
+}
+
+.settings-footer {
+    -fx-padding: 18 0 0 0;
+}
+
+/* ---------- Help Dialog ---------- */
+.help-dialog-root {
+    -fx-padding: 24;
+}
+
+.help-header {
+    -fx-padding: 0 0 8 0;
+}
+
+.help-title {
+    -fx-text-fill: #f5faff;
+    -fx-font-size: 22;
     -fx-font-weight: bold;
-    -fx-letter-spacing: 1.5;
 }
 
-/* Button Styles - Enhanced Neon with Uniform Sizing */
-.btn-primary {
-    -fx-background-color: transparent;
-    -fx-text-fill: #00f3ff;
-    -fx-border-color: #00f3ff;
-    -fx-border-width: 2;
-    -fx-padding: 12 26;
-    -fx-font-size: 16;
-    -fx-font-weight: bold;
-    -fx-background-radius: 0;
-    -fx-border-radius: 0;
-    -fx-cursor: hand;
-    /* Uniform button size */
-    -fx-min-width: 220px;
-    -fx-pref-width: 220px;
-    /* Cyan neon glow */
-    -fx-effect: dropshadow(three-pass-box, rgba(0, 243, 255, 0.4), 10, 0, 0, 0);
+.help-subtitle {
+    -fx-text-fill: #9ab6da;
+    -fx-font-size: 12;
 }
 
-.btn-primary:hover {
-    -fx-background-color: #00f3ff;
-    -fx-text-fill: #050508;
-    -fx-effect: dropshadow(gaussian, rgba(0, 243, 255, 0.7), 20, 0.5, 0, 0);
+.help-text-area {
+    -fx-control-inner-background: rgba(5, 7, 12, 0.85);
+    -fx-text-fill: #d5e8ff;
+    -fx-highlight-fill: rgba(0, 243, 255, 0.35);
+    -fx-highlight-text-fill: #04101a;
+    -fx-border-color: rgba(0, 243, 255, 0.15);
+    -fx-border-radius: 12;
+    -fx-background-radius: 12;
 }
 
-.btn-secondary {
-    -fx-background-color: transparent;
-    -fx-text-fill: #5c7a8a;
-    -fx-border-color: rgba(255, 255, 255, 0.2);
-    -fx-border-width: 2;
-    -fx-padding: 12 26;
-    -fx-font-size: 16;
-    -fx-background-radius: 0;
-    -fx-border-radius: 0;
-    -fx-cursor: hand;
-    /* Uniform button size */
-    -fx-min-width: 220px;
-    -fx-pref-width: 220px;
+.help-footer {
+    -fx-padding: 12 0 0 0;
 }
 
-.btn-secondary:hover {
-    -fx-background-color: rgba(255, 255, 255, 0.1);
-    -fx-text-fill: #e0faff;
-    -fx-border-color: rgba(255, 255, 255, 0.4);
+/* ---------- Gameplay Scene ---------- */
+.gameplay-root {
+    -fx-padding: 18;
 }
 
-.btn-danger {
+.gameplay-header {
+    -fx-padding: 0 0 18 0;
+}
+
+.gameplay-subtitle {
+    -fx-text-fill: #9ab6da;
+    -fx-font-size: 12;
+}
+
+.help-icon-button {
+    -fx-background-color: rgba(0, 243, 255, 0.15);
+    -fx-text-fill: #f5faff;
+    -fx-border-color: rgba(0, 243, 255, 0.35);
+    -fx-border-radius: 20;
+    -fx-background-radius: 20;
+    -fx-padding: 8 18;
+}
+
+.gameplay-columns {
+    -fx-alignment: top-center;
+}
+
+.board-stack {
+    -fx-padding: 18;
+}
+
+.board-stage {
+    -fx-background-color: rgba(2, 4, 10, 0.9);
+    background-color: rgba(2, 4, 10, 0.9);
+    -fx-border-color: rgba(0, 243, 255, 0.2);
+    border-color: rgba(0, 243, 255, 0.2);
+    -fx-border-width: 1;
+    border-width: 1px;
+    -fx-border-radius: 14;
+    border-radius: 14px;
+    -fx-background-radius: 14;
+}
+
+.gameBoard {
+    -fx-background-color: rgba(4, 6, 12, 0.9);
+    -fx-background-radius: 12;
+}
+
+.game-layer {}
+
+.ghost-cell {
+    -fx-opacity: 0.7;
+    -fx-stroke: rgba(255, 255, 255, 0.45);
+    -fx-stroke-dash-array: 4 3;
+    -fx-arc-width: 8;
+    -fx-arc-height: 8;
+}
+
+.sidebar {
+    -fx-background-color: rgba(3, 5, 10, 0.85);
+    -fx-padding: 18;
+    -fx-background-radius: 24;
+    -fx-border-radius: 24;
+    -fx-border-color: rgba(255, 255, 255, 0.04);
+    -fx-spacing: 18;
+}
+
+.sidebar-legends {
+    -fx-background-color: rgba(255, 255, 255, 0.02);
+    -fx-background-radius: 16;
+    -fx-padding: 12;
+}
+
+.sidebar-title {
+    -fx-text-fill: #f5faff;
+    -fx-font-size: 12;
+    -fx-letter-spacing: 2;
+}
+
+.sidebar-hint {
+    -fx-text-fill: #9cb4d6;
+    -fx-font-size: 12;
+}
+
+/* ---------- HUD Panel ---------- */
+.hud-panel {
+    -fx-background-color: linear-gradient(to bottom, rgba(0, 243, 255, 0.08), rgba(2, 4, 12, 0.8));
+    -fx-background-radius: 20;
+    -fx-border-radius: 20;
+    -fx-border-color: rgba(0, 243, 255, 0.2);
+    -fx-padding: 18;
+    -fx-spacing: 14;
+}
+
+.hud-panel-kicker {
     -fx-text-fill: #ff0055;
-    -fx-border-color: #ff0055;
-    -fx-background-color: transparent;
-    -fx-border-width: 2;
-    -fx-padding: 12 26;
-    -fx-font-size: 16;
-    -fx-font-weight: bold;
-    -fx-background-radius: 0;
-    -fx-border-radius: 0;
-    -fx-cursor: hand;
-    /* Uniform button size */
-    -fx-min-width: 220px;
-    -fx-pref-width: 220px;
-    /* Magenta glow */
-    -fx-effect: dropshadow(three-pass-box, rgba(255, 0, 85, 0.4), 10, 0, 0, 0);
+    -fx-letter-spacing: 4;
+    -fx-font-size: 11;
 }
 
-.btn-danger:hover {
-    -fx-background-color: #ff0055;
-    -fx-text-fill: #050508;
-    -fx-effect: dropshadow(gaussian, rgba(255, 0, 85, 0.7), 20, 0.5, 0, 0);
+.hud-panel-title {
+    -fx-text-fill: #f5faff;
+    -fx-font-size: 20;
+    -fx-font-weight: bold;
+}
+
+.hud-stats {
+    -fx-spacing: 10;
+}
+
+.hud-panel-row {
+    -fx-spacing: 2;
+}
+
+.hud-stat-block {
+    -fx-spacing: 2;
+}
+
+.hud-label {
+    -fx-text-fill: #8aa7dc;
+    -fx-font-size: 11;
+    -fx-letter-spacing: 2;
+}
+
+.hud-value {
+    -fx-text-fill: #ffffff;
+    -fx-font-size: 18;
+    -fx-font-weight: bold;
+}
+
+.hud-value-lg {
+    -fx-font-size: 26;
+}
+
+.hud-mode-status {
+    -fx-background-color: rgba(0, 0, 0, 0.35);
+    -fx-background-radius: 14;
+    -fx-text-fill: #9adcf3;
+    -fx-padding: 8 12;
+    -fx-font-size: 12;
+}
+
+.hud-footer-hint {
+    -fx-text-fill: #6f88b4;
+    -fx-font-size: 11;
+}
+
+/* ---------- Next Queue ---------- */
+.next-queue-panel {
+    -fx-background-color: rgba(3, 5, 12, 0.85);
+    -fx-background-radius: 24;
+    -fx-border-radius: 24;
+    -fx-border-color: rgba(255, 255, 255, 0.04);
+    -fx-padding: 18;
+    -fx-alignment: top-center;
+}
+
+.next-queue-title {
+    -fx-text-fill: #7fe9ff;
+    -fx-font-size: 14;
+    -fx-letter-spacing: 2;
+}
+
+.next-queue-container {
+    -fx-spacing: 12;
+}
+
+.next-queue-cell {
+    -fx-arc-height: 8;
+    -fx-arc-width: 8;
+}
+
+/* ---------- Overlays & Notifications ---------- */
+.pause-overlay {
+    -fx-background-color: rgba(4, 6, 12, 0.88);
+    -fx-padding: 28;
+    -fx-background-radius: 20;
+    -fx-border-radius: 20;
+    -fx-border-color: rgba(0, 243, 255, 0.25);
+}
+
+.overlay-title {
+    -fx-text-fill: #fcee0a;
+    -fx-font-size: 32;
+    -fx-font-weight: bold;
+}
+
+.overlay-subtitle {
+    -fx-text-fill: #9cb4d6;
+    -fx-font-size: 13;
+}
+
+.danger {
+    -fx-text-fill: #ff0055;
+}
+
+.game-over-panel {
+    -fx-background-color: rgba(4, 6, 12, 0.92);
+    -fx-background-radius: 24;
+    -fx-border-radius: 24;
+    -fx-border-color: rgba(255, 0, 85, 0.35);
+    -fx-padding: 28;
+    -fx-spacing: 16;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.65), 30, 0.4, 0, 6);
+}
+
+.game-over-panel .button {
+    -fx-min-width: 180;
+}
+
+.seedLabel {
+    -fx-text-fill: #9adcf3;
+    -fx-font-size: 12;
+}
+
+.notification-panel {
+    -fx-background-color: transparent;
+    -fx-padding: 12;
+}
+
+.bonusStyle {
+    -fx-font-family: "Orbitron", "Segoe UI", sans-serif;
+    font-family: "Orbitron", "Segoe UI", sans-serif;
+    -fx-font-size: 26;
+    font-size: 26px;
+    -fx-text-fill: #fcee0a;
+    -fx-effect: dropshadow(gaussian, rgba(252, 238, 10, 0.6), 15, 0.4, 0, 0);
 }
